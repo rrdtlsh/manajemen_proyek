@@ -18,7 +18,7 @@ $otherLocaleText = $currentLocale === 'id' ? lang('Login.switch_to_english') : l
         <!-- Bagian Kiri - GIF Toko -->
         <div class="left-section">
             <div class="illustration-wrapper">
-                <img src="<?= base_url('images/gif toko.gif') ?>" alt="Toko Illustration" class="bank-image">
+                <img src="<?= base_url('images/bank.jpeg') ?>" alt="Illustration" class="bank-image">
             </div>
         </div>
 
@@ -46,13 +46,13 @@ $otherLocaleText = $currentLocale === 'id' ? lang('Login.switch_to_english') : l
 
                 <form action="<?= base_url('login/auth') ?>" method="post">
                     <div class="form-group">
-                        <label for="username" class="form-label"><?= lang('Login.email') ?></label>
+                        <label for="username" class="form-label">Username</label>
                         <input 
                             type="text" 
                             id="username" 
                             name="username" 
                             class="form-input"
-                            placeholder="<?= lang('Login.email_placeholder') ?>" 
+                            placeholder="Masukkan username" 
                             required>
                     </div>
 
