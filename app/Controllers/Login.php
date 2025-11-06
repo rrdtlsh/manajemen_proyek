@@ -2,59 +2,69 @@
 
 namespace App\Controllers;
 
-class Login extends BaseController
+use App\Controllers\BaseController;
+use App\Models\UserModel; // Pastikan ini adalah nama model Anda
+
+class Login extends BaseController // Sesuaikan nama Class ini
 {
+    protected $userModel;
+
+    public function __construct()
+    {
+        $this->userModel = new UserModel();
+        helper(['session', 'url']); // Load helper session dan url
+    }
+
+    // Fungsi untuk MENAMPILKAN halaman login
     public function index()
     {
-        // Set locale berdasarkan session atau default
-        $session = session();
-        $locale = $session->get('locale') ?: 'id';
-        $this->request->setLocale($locale);
-        
-        // Pass locale ke view untuk menghindari error
-        $data = [
-            'currentLocale' => $locale
-        ];
-        
-        return view('auth/login', $data);
-    }
-
-    public function switchLanguage($lang)
-    {
-        // Validasi bahasa yang diizinkan
-        $allowedLangs = ['id', 'en'];
-        if (!in_array($lang, $allowedLangs)) {
-            $lang = 'id';
+        // Jika user SUDAH login, lempar langsung ke dashboard
+        if (session()->get('isLoggedIn')) {
+            return redirect()->to('/dashboardowner'); // Ganti ini ke rute dashboard Anda
         }
-
-        // Simpan di session
-        $session = session();
-        $session->set('locale', $lang);
         
-        // Redirect kembali ke halaman login
-        return redirect()->to(base_url('login'));
+        // Jika belum, tampilkan view login
+        return view('auth/login'); 
     }
 
+    // Fungsi untuk MEMPROSES upaya login
+    // Ini adalah target dari rute '/login/auth' Anda
     public function auth()
     {
-        // Handle login authentication
+        // 1. Ambil data dari form
         $username = $this->request->getPost('username');
         $password = $this->request->getPost('password');
-        
-        // TODO: Implementasi logika autentikasi di sini
-        // Contoh sederhana (ganti dengan logika autentikasi yang sebenarnya):
-        // - Validasi username dan password
-        // - Cek ke database
-        // - Set session jika berhasil
-        // - Redirect ke dashboard jika berhasil
-        // - Tampilkan error jika gagal
-        
-        // Contoh sederhana role-based redirect (ganti dengan validasi DB sesungguhnya)
-        $session = session();
-        $session->set('username', $username ?: 'Owner');
 
-        // Redirect sementara ke dashboard owner (menyesuaikan permintaan saat ini)
-        $session->set('role', 'owner');
-        return redirect()->to(base_url('dashboardowner'));
+        // 2. Cari user di database
+        $user = $this->userModel->getUserByUsername($username);
+
+        // 3. Pengecekan
+        // Apakah user-nya ada? DAN Apakah passwordnya cocok?
+        if ($user && password_verify($password, $user['password'])) {
+            
+            // 4. JIKA BERHASIL: Buat Sesi
+            session()->set([
+                'id_user'   => $user['id_user'],
+                'username'  => $user['username'],
+                'role'      => $user['role'],
+                'isLoggedIn' => true
+            ]);
+
+            // 5. Arahkan ke dashboard
+            return redirect()->to('/dashboardowner'); // Ganti ini ke rute dashboard Anda
+
+        } else {
+            
+            // 6. JIKA GAGAL:
+            // Kembalikan ke halaman login dengan pesan error
+            return redirect()->back()->with('error', 'Username atau password salah.');
+        }
+    }
+
+    // Fungsi untuk logout
+    public function logout()
+    {
+        session()->destroy();
+        return redirect()->to('/login');
     }
 }

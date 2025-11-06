@@ -13,14 +13,12 @@
 
 <body>
     <div class="login-container">
-        <!-- Bagian Kiri - GIF Toko -->
         <div class="left-section">
             <div class="illustration-wrapper">
                 <img src="<?= base_url('images/bank.png') ?>" alt="Illustration" class="bank-image">
             </div>
         </div>
 
-        <!-- Bagian Kanan - Form Login -->
         <div class="right-section" style="display:flex;align-items:center;justify-content:center;">
             <div class="login-form-wrapper" style="width:100%;max-width:420px;">
                 <div class="logo" style="text-align:center;">
@@ -31,7 +29,7 @@
                 <p class="form-subtitle" style="text-align:center;">Selamat datang kembali! Silakan masukkan detail Anda.</p>
 
                 <div class="employee-notice" style="text-align:center;">
-                    <p class="employee-text">Halaman ini hanya untuk karyawan.</p>
+                    <p class="employee-text">Hanya untuk karyawan.</p>
                     <a href="<?= base_url('/') ?>" class="homepage-link">Klik Disini untuk Kembali ke beranda</a>
                 </div>
 
@@ -71,6 +69,19 @@
             </div>
         </div>
     </div>
-</body>
 
+    <?php if (session()->getFlashdata('error')) : ?>
+        <script>
+            // Menunggu halaman siap
+            window.onload = function() {
+                // 1. Mengosongkan field username dan password
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+
+                // 2. Menampilkan pop-up alert biasa
+                alert("<?= session()->getFlashdata('error') ?>");
+            };
+        </script>
+    <?php endif; ?>
+    </body>
 </html>
