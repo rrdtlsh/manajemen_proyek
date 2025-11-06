@@ -14,10 +14,15 @@ class Home extends BaseController
         // Ambil gambar karpet dan bedcover
         $karpetImages = $this->getProductImages('karpet');
         $bedcoverImages = $this->getProductImages('bedcover');
+        // Ambil gambar sprei dan sejadah (struktur flat tanpa subfolder kategori)
+        $spreiImages = $this->getFlatImages('sprei');
+        $sejadahImages = $this->getFlatImages('sejadah');
 
         $data = [
             'karpet' => $karpetImages,
             'bedcover' => $bedcoverImages,
+            'sprei' => $spreiImages,
+            'sejadah' => $sejadahImages,
             'store_info' => [
                 'name' => 'SADANG THJ',
                 'location' => 'Jl. Contoh No. 123, Kota Anda', // Ganti dengan alamat sebenarnya
@@ -65,6 +70,41 @@ class Home extends BaseController
                         'name' => basename($file)
                     ];
                 }
+            }
+        }
+
+        return $images;
+    }
+
+    // Ambil gambar dari folder datar seperti /public/images/sprei atau /public/images/sejadah
+    private function getFlatImages(string $folder): array
+    {
+        $basePath = FCPATH . 'images' . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR;
+        $images = [];
+
+        if (!is_dir($basePath)) {
+            return $images;
+        }
+
+        $allowedExtensions = ['jpg', 'jpeg', 'JPG', 'JPEG', 'png', 'PNG'];
+        $files = [];
+        foreach ($allowedExtensions as $ext) {
+            $pattern = $basePath . '*.' . $ext;
+            $found = glob($pattern);
+            if ($found) {
+                $files = array_merge($files, $found);
+            }
+        }
+
+        // Ambil sampai 12 gambar pertama
+        $files = array_slice($files, 0, 12);
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                $images[] = [
+                    'category' => ucfirst($folder),
+                    'path' => 'images/' . $folder . '/' . basename($file),
+                    'name' => basename($file),
+                ];
             }
         }
 
