@@ -49,8 +49,12 @@ class Login extends BaseController
         // - Redirect ke dashboard jika berhasil
         // - Tampilkan error jika gagal
         
-        // Untuk sementara, redirect ke homepage sebagai contoh
-        // Setelah implementasi autentikasi, ganti dengan redirect ke dashboard
-        return redirect()->to(base_url('homepage'));
+        // Contoh sederhana role-based redirect (ganti dengan validasi DB sesungguhnya)
+        $session = session();
+        $session->set('username', $username ?: 'Owner');
+
+        // Redirect sementara ke dashboard owner (menyesuaikan permintaan saat ini)
+        $session->set('role', 'owner');
+        return redirect()->to(base_url('dashboardowner'));
     }
 }

@@ -13,3 +13,6 @@ $routes->get('/homepage', 'Home::homepage');
 $routes->get('/login', 'Login::index');
 $routes->post('/login/auth', 'Login::auth');
 $routes->get('/login/switch/(:segment)', 'Login::switchLanguage/$1');
+
+// Dashboard Owner
+$routes->get('/dashboardowner', 'Owner::dashboard');
