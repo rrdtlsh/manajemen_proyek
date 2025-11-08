@@ -1,5 +1,42 @@
 // Carousel dengan tombol panah
 document.addEventListener('DOMContentLoaded', function() {
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const navbarHeight = document.querySelector('.navbar').offsetHeight;
+                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+                // Close navbar dropdown if open on mobile
+                const navbarCollapse = document.querySelector('.navbar-collapse');
+                if (navbarCollapse.classList.contains('show')) {
+                    navbarCollapse.classList.remove('show');
+                }
+            }
+        });
+    });
+
+    // Setup image modal functionality
+    const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+    const modalImage = document.getElementById('modalImage');
+    const modalTitle = document.getElementById('imageModalLabel');
+
+    // Add click event to all product images
+    document.querySelectorAll('.product-image').forEach(img => {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', function(e) {
+            e.preventDefault();
+            modalImage.src = this.src;
+            modalTitle.textContent = this.alt;
+            imageModal.show();
+        });
+    });
+
     const carouselWrappers = document.querySelectorAll('.product-carousel-wrapper');
     
     carouselWrappers.forEach(function(wrapper) {
@@ -10,80 +47,120 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!carousel || !track || !prevBtn || !nextBtn) return;
         
-        const cardWidth = 280; // Sesuai dengan width product-card
+        const cardWidth = 300; // Sesuai dengan width product-card yang baru
         const gap = 20; // Sesuai dengan gap di CSS
         const scrollAmount = cardWidth + gap;
         
-        let currentScroll = 0;
-        let maxScroll = track.scrollWidth - carousel.offsetWidth;
+        let currentIndex = 0;
+        const totalItems = track.children.length;
         
-        // Update button states
-        function updateButtons() {
-            prevBtn.disabled = currentScroll <= 0;
-            nextBtn.disabled = currentScroll >= maxScroll;
+        // Clone items for infinite loop
+        const items = Array.from(track.children);
+        items.forEach(item => {
+            const clone = item.cloneNode(true);
+            // Pastikan event click untuk modal juga ter-copy
+            const img = clone.querySelector('.product-image');
+            if (img) {
+                img.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    modalImage.src = this.src;
+                    modalTitle.textContent = this.alt;
+                    imageModal.show();
+                });
+            }
+            track.appendChild(clone);
+        });
+        
+        function updatePosition(animate = true) {
+            const translateX = -currentIndex * scrollAmount;
+            track.style.transition = animate ? 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
+            track.style.transform = `translateX(${translateX}px)`;
         }
         
-        // Initial button state
-        updateButtons();
+        // Initial position
+        updatePosition(false);
         
         // Next button
         nextBtn.addEventListener('click', function() {
-            if (currentScroll < maxScroll) {
-                currentScroll = Math.min(currentScroll + scrollAmount, maxScroll);
-                track.style.transform = `translateX(-${currentScroll}px)`;
-                updateButtons();
+            currentIndex++;
+            updatePosition(true);
+            
+            // If we've scrolled to the cloned items
+            if (currentIndex >= totalItems) {
+                setTimeout(() => {
+                    currentIndex = 0;
+                    updatePosition(false);
+                }, 300); // Match with transition duration
             }
         });
         
         // Prev button
         prevBtn.addEventListener('click', function() {
-            if (currentScroll > 0) {
-                currentScroll = Math.max(currentScroll - scrollAmount, 0);
-                track.style.transform = `translateX(-${currentScroll}px)`;
-                updateButtons();
+            currentIndex--;
+            
+            if (currentIndex < 0) {
+                currentIndex = totalItems - 1;
+                updatePosition(false);
+                requestAnimationFrame(() => {
+                    currentIndex = totalItems - 1;
+                    updatePosition(true);
+                });
+            } else {
+                updatePosition(true);
             }
-        });
-        
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            const newMaxScroll = track.scrollWidth - carousel.offsetWidth;
-            if (currentScroll > newMaxScroll) {
-                currentScroll = newMaxScroll;
-                track.style.transform = `translateX(-${currentScroll}px)`;
-            }
-            maxScroll = newMaxScroll;
-            updateButtons();
         });
         
         // Touch/swipe support untuk mobile
         let touchStartX = 0;
-        let touchScrollLeft = 0;
+        let touchStartY = 0;
+        let initialIndex = 0;
         let isDragging = false;
         
         carousel.addEventListener('touchstart', function(e) {
             touchStartX = e.touches[0].pageX;
-            touchScrollLeft = currentScroll;
+            touchStartY = e.touches[0].pageY;
+            initialIndex = currentIndex;
             isDragging = true;
+            track.style.transition = 'none';
         });
         
         carousel.addEventListener('touchmove', function(e) {
             if (!isDragging) return;
-            e.preventDefault();
+            
             const x = e.touches[0].pageX;
-            const walk = (touchStartX - x) * 2;
-            const newScroll = Math.max(0, Math.min(maxScroll, touchScrollLeft + walk));
-            currentScroll = newScroll;
-            track.style.transform = `translateX(-${currentScroll}px)`;
-            updateButtons();
+            const y = e.touches[0].pageY;
+            const xDiff = touchStartX - x;
+            const yDiff = touchStartY - y;
+            
+            if (Math.abs(yDiff) > Math.abs(xDiff)) {
+                isDragging = false;
+                return;
+            }
+            
+            e.preventDefault();
+            const walk = xDiff;
+            track.style.transform = `translateX(${-(initialIndex * scrollAmount + walk)}px)`;
         });
         
         carousel.addEventListener('touchend', function() {
+            if (!isDragging) return;
             isDragging = false;
-            // Snap to nearest card
-            const snappedScroll = Math.round(currentScroll / scrollAmount) * scrollAmount;
-            currentScroll = Math.max(0, Math.min(maxScroll, snappedScroll));
-            track.style.transform = `translateX(-${currentScroll}px)`;
-            updateButtons();
+            
+            const moveBy = Math.round((touchStartX - event.changedTouches[0].pageX) / scrollAmount);
+            currentIndex = initialIndex + moveBy;
+            
+            if (currentIndex < 0) {
+                currentIndex = totalItems - 1;
+                updatePosition(false);
+                requestAnimationFrame(() => {
+                    updatePosition(true);
+                });
+            } else if (currentIndex >= totalItems) {
+                currentIndex = 0;
+                updatePosition(true);
+            } else {
+                updatePosition(true);
+            }
         });
     });
 });

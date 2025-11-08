@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homepage - <?= esc($store_info['name']) ?></title>
+    <meta name="description" content="Temukan koleksi karpet, bedcover, sprei, dan sejadah berkualitas tinggi di <?= esc($store_info['name']) ?>">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?= base_url('css/homepage.css') ?>">
     <script src="<?= base_url('js/homepage.js') ?>" defer></script>
@@ -17,20 +20,22 @@
     </div>
     <!-- Header -->
     <header class="header">
-        <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+        <nav class="navbar navbar-expand-lg">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center gap-2" href="#">
-                    <img src="<?= base_url('images/logo-karpet.jpeg') ?>" alt="Logo <?= esc($store_info['name']) ?>" class="logo" style="height:48px; width:auto;">
-                    <span class="store-name mb-0 h4"><?= esc($store_info['name']) ?></span>
+                    <img src="<?= base_url('images/logo-karpet.jpeg') ?>" alt="Logo <?= esc($store_info['name']) ?>" class="logo" style="height:36px; width:auto;">
+                    <span class="store-name mb-0"><?= esc($store_info['name']) ?></span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="mainNav">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="#karpet">Karpet</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#karpet">Karpet</a></li>
                         <li class="nav-item"><a class="nav-link" href="#bedcover">Bedcover</a></li>
-                        <li class="nav-item"><a class="btn btn-outline-success ms-lg-3" href="<?= base_url('login') ?>">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#sprei">Sprei</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#sejadah">Sejadah</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#about">Tentang Kami</a></li>
                     </ul>
                 </div>
             </div>
@@ -106,25 +111,50 @@
             <section class="store-info-section py-4">
                 <div class="store-info-card p-4">
                     <div class="store-info-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
-                        </svg>
+                        <i class="bi bi-shop-window" style="font-size: 2.5rem;"></i>
                     </div>
-                    <h3 class="store-info-title">Kunjungi Toko Kami</h3>
-                    <p class="store-info-location">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
-                        </svg>
-                        <?= esc($store_info['location']) ?>
-                    </p>
-                    <a href="https://wa.me/<?= esc($store_info['whatsapp']) ?>?text=Halo,%20saya%20tertarik%20dengan%20produk%20karpet%20dan%20bedcover%20di%20toko%20Anda" 
-                       target="_blank" 
-                       class="whatsapp-button btn btn-success btn-lg mt-3">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.98 2.898 1.857 1.867 2.892 4.35 2.892 6.99 0 5.45-4.436 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" fill="currentColor"/>
-                        </svg>
-                        Hubungi Kami via WhatsApp
-                    </a>
+                    <h3 class="store-info-title">TOKO H.JALI</h3>
+                    <div class="store-info-details">
+                        <p class="store-info-address mb-2">
+                            <i class="bi bi-geo-alt-fill me-2"></i>
+                            Jl. Brigjen H. Hasan Basri No.12, Sungai Lulut, Kec. Banjarmasin Tim., Kota Banjarmasin, Kalimantan Selatan 70236
+                        </p>
+                        <div class="store-info-badges mb-3">
+                            <span class="store-badge">
+                                <i class="bi bi-star-fill"></i>
+                                4.4 / 5.0
+                            </span>
+                            <span class="store-badge">
+                                <i class="bi bi-clock-fill"></i>
+                                Buka: 08.00 - 17.00
+                            </span>
+                        </div>
+                        <div class="maps-container mb-3">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3983.285692865271!2d114.59190547489083!3d-3.324713197175023!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2de423003e29bd57%3A0x9b4caea68c6a5ad2!2sTOKO%20H.JALI!5e0!3m2!1sen!2sid!4v1699373547788!5m2!1sen!2sid" 
+                                width="100%" 
+                                height="250" 
+                                style="border:0; border-radius: 12px;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                        <div class="store-actions">
+                            <a href="https://wa.me/<?= esc($store_info['whatsapp']) ?>?text=Halo,%20saya%20tertarik%20dengan%20produk%20karpet%20dan%20bedcover%20di%20toko%20Anda" 
+                               target="_blank" 
+                               class="whatsapp-button btn btn-success">
+                                <i class="bi bi-whatsapp me-2"></i>
+                                Hubungi via WhatsApp
+                            </a>
+                            <a href="https://www.google.com/maps?ll=-3.324713,114.59441&z=17&t=m&hl=en&gl=ID&mapclient=embed&cid=11207744710097877714" 
+                               target="_blank" 
+                               class="directions-button btn">
+                                <i class="bi bi-map me-2"></i>
+                                Petunjuk Arah
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -189,6 +219,45 @@
                 </div>
             </section>
             <?php endif; ?>
+
+            <!-- About Us Section -->
+            <section id="about" class="about-section py-5">
+                <div class="about-card">
+                    <h2 class="section-title">Tentang Kami</h2>
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="about-image">
+                                <img src="<?= base_url('images/toko-1.webp') ?>" alt="Toko <?= esc($store_info['name']) ?>" class="img-fluid rounded shadow">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="about-content">
+                                <h3 class="about-subtitle"><?= esc($store_info['name']) ?></h3>
+                                <p class="about-text">
+                                    Selamat datang di <?= esc($store_info['name']) ?>! Kami adalah toko yang berkomitmen untuk menyediakan produk berkualitas tinggi untuk kebutuhan rumah Anda. Dengan pengalaman bertahun-tahun dalam industri ini, kami memahami pentingnya kenyamanan dan estetika dalam setiap produk yang kami tawarkan.
+                                </p>
+                                <p class="about-text">
+                                    Kami menyediakan berbagai pilihan karpet, bedcover, sprei, dan sejadah dengan desain modern dan klasik. Setiap produk dipilih dengan teliti untuk memastikan kualitas terbaik bagi pelanggan kami.
+                                </p>
+                                <div class="about-features">
+                                    <div class="feature-item">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        <span>Produk Berkualitas</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="bi bi-star-fill"></i>
+                                        <span>Pelayanan Terbaik</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="bi bi-truck"></i>
+                                        <span>Pengiriman Cepat</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 
@@ -198,6 +267,21 @@
             <p>&copy; <?= date('Y') ?> <?= esc($store_info['name']) ?>. All rights reserved.</p>
         </div>
     </footer>
+    <!-- Image Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-0">
+                    <img src="" class="img-fluid" id="modalImage" alt="Product Image">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>

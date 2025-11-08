@@ -14,7 +14,6 @@ class Home extends BaseController
         // Ambil gambar karpet dan bedcover
         $karpetImages = $this->getProductImages('karpet');
         $bedcoverImages = $this->getProductImages('bedcover');
-        // Ambil gambar sprei dan sejadah (struktur flat tanpa subfolder kategori)
         $spreiImages = $this->getFlatImages('sprei');
         $sejadahImages = $this->getFlatImages('sejadah');
 
@@ -24,7 +23,7 @@ class Home extends BaseController
             'sprei' => $spreiImages,
             'sejadah' => $sejadahImages,
             'store_info' => [
-                'name' => 'SADANG THJ',
+                'name' => 'Toko Karpet H.Jali',
                 'location' => 'Jl. Contoh No. 123, Kota Anda', // Ganti dengan alamat sebenarnya
                 'whatsapp' => '6281234567890', // Ganti dengan nomor WhatsApp sebenarnya
             ]
