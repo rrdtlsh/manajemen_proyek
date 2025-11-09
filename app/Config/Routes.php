@@ -16,11 +16,10 @@ $routes->get('/homepage', 'Home::homepage');
  * Rute Autentikasi (Publik)
  * --------------------------------------------------------------------
  */
-// Catatan: Pastikan nama Controller Anda adalah 'Login' (bukan 'LoginController')
 $routes->get('/login', 'Login::index');
-$routes->post('/login/auth', 'Login::auth'); // Ini rute 'authenticate' Anda, sudah OK
-$routes->get('/login/switch/(:segment)', 'Login::switchLanguage/$1');
-$routes->get('/logout', 'Login::logout'); // <-- INI RUTE PENTING YANG HARUS DITAMBAH
+$routes->post('/login/auth', 'Login::auth');
+$routes->get('/login/switch/(:segment)', 'Login::switchLanguage/$1'); // Dari file Anda
+$routes->get('/logout', 'Login::logout');
 
 
 /*
@@ -28,19 +27,32 @@ $routes->get('/logout', 'Login::logout'); // <-- INI RUTE PENTING YANG HARUS DIT
  * Rute Internal yang Dilindungi (Wajib Login)
  * --------------------------------------------------------------------
  */
-// Semua rute di dalam grup ini akan dijaga oleh filter 'auth'
-// (Pastikan 'auth' sudah didaftarkan di app/Config/Filters.php)
+$routes->group('/', ['filter' => 'auth'], static function ($routes) {
 
-$routes->group('', ['filter' => 'auth'], function($routes) {
+    // --- RUTE OWNER (PEMILIK) ---
+    // ===================================
+    $routes->get('owner', 'Owner::index'); // Dashboard Analitik Owner
+    
+    // Rute Owner untuk Laporan & Manajemen
+    // (Anda bisa tambahkan method baru di Owner.php untuk ini)
+    $routes->get('owner/laporan_penjualan', 'Owner::laporan_penjualan');
+    $routes->get('owner/laporan_keuangan', 'Owner::laporan_keuangan');
+    $routes->get('owner/manajemen_produk', 'Owner::manajemen_produk');
 
-    // Dashboard Owner
-    // Catatan: Pastikan nama Controller Anda adalah 'Owner'
-    $routes->get('/dashboardowner', 'Owner::dashboard');
 
-    // Nanti, semua rute lain yang perlu login harus ditaruh DI DALAM SINI:
-    // Contoh:
-    // $routes->get('/penjualan', 'Penjualan::index');
-    // $routes->get('/produk', 'Produk::index');
-    // $routes->get('/keuangan', 'Keuangan::index');
-
+    // --- RUTE KARYAWAN (STAF) ---
+    $routes->get('karyawan', 'Karyawan::index'); // Halaman default Karyawan
+    $routes->get('karyawan/dashboard', 'Karyawan::dashboard'); 
+    $routes->get('karyawan/inventaris', 'Karyawan::inventaris'); 
+    $routes->get('karyawan/keuangan', 'Karyawan::keuangan'); 
+    
+    // === TAMBAHKAN BARIS INI ===
+    $routes->get('karyawan/penjualan', 'Karyawan::penjualan');
+    // ============================
+    
+    // Fitur Input Transaksi (POS) Karyawan
+    $routes->get('karyawan/input_penjualan', 'Karyawan::input_penjualan');
+    $routes->post('karyawan/store_penjualan', 'Karyawan::store_penjualan');
+    
+   
 });

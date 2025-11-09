@@ -2,69 +2,79 @@
 
 namespace App\Controllers;
 
+// WAJIB: Pastikan Anda 'use' Model dan BaseController
+use App\Models\UserModel;
 use App\Controllers\BaseController;
-use App\Models\UserModel; // Pastikan ini adalah nama model Anda
 
-class Login extends BaseController // Sesuaikan nama Class ini
+class Login extends BaseController
 {
-    protected $userModel;
-
-    public function __construct()
-    {
-        $this->userModel = new UserModel();
-        helper(['session', 'url']); // Load helper session dan url
-    }
-
-    // Fungsi untuk MENAMPILKAN halaman login
+    /**
+     * Method ini untuk MENAMPILKAN halaman login
+     * (Dipanggil saat Anda membuka http://localhost:8080/login)
+     */
     public function index()
     {
-        // Jika user SUDAH login, lempar langsung ke dashboard
-        if (session()->get('isLoggedIn')) {
-            return redirect()->to('/dashboardowner'); // Ganti ini ke rute dashboard Anda
-        }
-        
-        // Jika belum, tampilkan view login
-        return view('auth/login'); 
+        $data = [
+            'title' => 'Login'
+        ];
+
+        // Memuat file: app/Views/auth/login.php
+        return view('auth/login', $data);
     }
 
-    // Fungsi untuk MEMPROSES upaya login
-    // Ini adalah target dari rute '/login/auth' Anda
+    /**
+     * Method ini untuk MEMPROSES data login
+     * (Dipanggil oleh form action=".../login/auth")
+     */
     public function auth()
     {
-        // 1. Ambil data dari form
+        $session = session();
+        $model = new \App\Models\UserModel();
+        
         $username = $this->request->getPost('username');
         $password = $this->request->getPost('password');
 
-        // 2. Cari user di database
-        $user = $this->userModel->getUserByUsername($username);
+        $user = $model->where('username', $username)->first();
 
-        // 3. Pengecekan
-        // Apakah user-nya ada? DAN Apakah passwordnya cocok?
-        if ($user && password_verify($password, $user['password'])) {
+        if ($user) {
             
-            // 4. JIKA BERHASIL: Buat Sesi
-            session()->set([
-                'id_user'   => $user['id_user'],
-                'username'  => $user['username'],
-                'role'      => $user['role'],
-                'isLoggedIn' => true
-            ]);
+            if (password_verify($password, $user['password'])) {
 
-            // 5. Arahkan ke dashboard
-            return redirect()->to('/dashboardowner'); // Ganti ini ke rute dashboard Anda
+                // HAPUS 'dd($user['role']);' DARI SINI JIKA TADI ANDA MENAMBAHKANNYA
 
+                // 3. Buat Session
+                $ses_data = [
+                    'user_id'    => $user['id_user'],
+                    'username'   => $user['username'],
+                    'role'       => $user['role'], // Ini akan berisi "Pemilik"
+                    'isLoggedIn' => TRUE
+                ];
+                $session->set($ses_data);
+
+                // 4. Arahkan (Redirect) berdasarkan role
+                // === INI PERBAIKANNYA ===
+                if ($user['role'] == 'Pemilik') { 
+                    return redirect()->to('/owner'); // Ke dashboard Owner
+                } else {
+                    return redirect()->to('/karyawan'); // Ke dashboard Karyawan
+                }
+
+            } else {
+                $session->setFlashdata('error', 'Password yang Anda masukkan salah.');
+                return redirect()->to('/login');
+            }
         } else {
-            
-            // 6. JIKA GAGAL:
-            // Kembalikan ke halaman login dengan pesan error
-            return redirect()->back()->with('error', 'Username atau password salah.');
+            $session->setFlashdata('error', 'Username tidak ditemukan.');
+            return redirect()->to('/login');
         }
     }
-
-    // Fungsi untuk logout
+    /**
+     * Method untuk Logout
+     */
     public function logout()
     {
-        session()->destroy();
+        $session = session();
+        $session->destroy();
         return redirect()->to('/login');
     }
 }

@@ -24,6 +24,9 @@ class Filters extends BaseFilters
      * [filter_name => classname]
      * or [filter_name => [classname1, classname2, ...]]
      */
+
+
+    
     public array $aliases = [
         'csrf'          => CSRF::class,
         'toolbar'       => DebugToolbar::class,
@@ -104,5 +107,17 @@ class Filters extends BaseFilters
      *
      * @var array<string, array<string, list<string>>>
      */
-    public array $filters = [];
+
+    public array $filters = [
+    'auth' => [
+        'before' => [
+            'owner/*',       // Semua di bawah 'owner'
+            'karyawan/*',  // Semua di bawah 'karyawan'
+            'manajemen/*',
+            'penjualan/*'
+            ]
+        ]
+    ];
+
+    
 }

@@ -1,125 +1,135 @@
-<!DOCTYPE html>
-<html lang="id">
+<?= $this->extend('layout/template'); ?>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Owner - SADANG THJ</title>
-    <link rel="stylesheet" href="<?= base_url('css/dashboardowner.css') ?>">
-</head>
+<?= $this->section('head'); ?>
+    <link href="<?= base_url('css/dashboardowner.css') ?>" rel="stylesheet">
+<?= $this->endSection(); ?>
 
-<body>
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <img src="<?= base_url('images/logo-karpet.jpeg') ?>" alt="Logo" class="sidebar-logo">
-            <span class="brand">SADANG</span>
-        </div>
-        <nav class="menu">
-            <a class="menu-item active" href="#">Dashboard</a>
-            <a class="menu-item" href="#">Penjualan</a>
-            <a class="menu-item" href="#">Produk</a>
-            <a class="menu-item" href="#">Keuangan</a>
-        </nav>
+<?= $this->section('content'); ?>
 
-    </aside>
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Dashboard Analitik Owner</h1>
+    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+        <i class="fas fa-download fa-sm text-white-50"></i> Generate Laporan
+    </a>
+</div>
 
-    <main class="main">
-        <header class="topbar">
-            <div class="topbar-left">
-                <button id="burger" class="btn-icon" aria-label="Toggle sidebar" aria-controls="sidebar" aria-expanded="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 389.24" width="20" height="20" fill="currentColor">
-                        <path fill-rule="nonzero" d="M0 0h275.1v50.04H0V0zm361.79 115.14 54.44 54.44H0v50.04h416.2l-54.41 54.41 35.39 35.39L512 194.6v-.03l-35.39-35.36-79.43-79.46-35.39 35.39zM0 339.2h275.1v50.04H0V339.2z" />
-                    </svg>
-                </button>
-                <h1 class="page-title">Home Page</h1>
-            </div>
-            <div class="user-actions">
-                <div class="user-chip">
-                    <img class="avatar" src="https://ui-avatars.com/api/?background=2d8659&color=fff&name=Owner" alt="Owner">
-                    <span class="username">Owner</span>
-                </div>
-                <a href="<?= base_url('logout') ?>" class="btn btn-danger">Log out</a>
-            </div>
-        </header>
+<div class="row">
 
-        <section class="grid grid-cards">
-            <div class="card stat stat-blue">
-                <div class="stat-value">2</div>
-                <div class="stat-label">Order (Bayar)</div>
-            </div>
-            <div class="card stat stat-red">
-                <div class="stat-value">1</div>
-                <div class="stat-label">Order (Belum Bayar)</div>
-            </div>
-            <div class="card stat stat-orange">
-                <div class="stat-value">0</div>
-                <div class="stat-label">Barang Stok Kosong</div>
-            </div>
-            <div class="card stat stat-green">
-                <div class="stat-value">50</div>
-                <div class="stat-label">Barang in Stok</div>
-            </div>
-        </section>
-
-        <section class="grid grid-2">
-            <div class="card">
-                <div class="card-header">Grafik Perbandingan Order</div>
-                <div class="chart-placeholder" aria-label="chart">Chart area</div>
-            </div>
-            <div class="card">
-                <div class="card-header">Grafik Perbandingan Barang</div>
-                <div class="chart-placeholder" aria-label="chart">Chart area</div>
-            </div>
-        </section>
-
-        <section class="grid grid-cards">
-            <div class="card kpi">
-                <div class="kpi-value">200</div>
-                <div class="kpi-label">Jumlah Barang</div>
-            </div>
-            <div class="card kpi">
-                <div class="kpi-value">451</div>
-                <div class="kpi-label">Total Penjualan</div>
-            </div>
-            <div class="card kpi">
-                <div class="kpi-value">597</div>
-                <div class="kpi-label">Total Transaksi</div>
-            </div>
-            <div class="card kpi">
-                <div class="kpi-value">415.13K</div>
-                <div class="kpi-label">Pendapatan</div>
-            </div>
-        </section>
-
-        <section class="grid grid-1">
-            <div class="card">
-                <div class="card-header with-controls">
-                    <span>Laporan Penjualan dan Transaksi per Quartal</span>
-                    <div class="controls">
-                        <button class="btn btn-light">1 Jan - 31 Mar 2024</button>
-                        <button class="btn btn-light">Lihat</button>
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Pendapatan (Bulan Ini)</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            Rp <?= number_format($totalPendapatan, 0, ',', '.'); ?>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
                     </div>
                 </div>
-                <div class="chart-placeholder large">Area chart</div>
             </div>
-        </section>
+        </div>
+    </div>
 
-        <section class="grid grid-2">
-            <div class="card">
-                <div class="card-header">Pendapatan per Produk</div>
-                <div class="chart-placeholder">Bar chart</div>
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Transaksi (Hari Ini)</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <?= $totalTransaksi; ?> Transaksi
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-cash-register fa-2x text-gray-300"></i>
+                    </div>
+                </div>
             </div>
-            <div class="card">
-                <div class="card-header">Jumlah Berdasarkan Metode Pembayaran</div>
-                <div class="chart-placeholder">Donut chart</div>
-            </div>
-        </section>
+        </div>
+    </div>
 
-        <footer class="footer">
-            <p>&copy; <?= date('Y') ?> SADANG THJ. All rights reserved.</p>
-        </footer>
-    </main>
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Produk Stok Menipis (&lt; 10)</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <?= $stokMenipis; ?> Produk
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Grafik Pendapatan (7 Hari Terakhir)</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="grafikPenjualanArea"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Produk Terlaris (Bulan Ini)</h6>
+            </div>
+            <div class="card-body">
+                <?php if (empty($produkTerlaris)) : ?>
+                    <p class="text-center text-muted">Belum ada data penjualan.</p>
+                <?php else : ?>
+                    <?php foreach ($produkTerlaris as $produk) : ?>
+                        <h4 class="small font-weight-bold">
+                            <?= $produk['nama_produk']; ?>
+                            <span class="float-right"><?= $produk['total_terjual']; ?> Pcs</span>
+                        </h4>
+                        <div class="progress mb-4">
+                            <?php
+                            // Hitung persentase (asumsi 100% adalah produk teratas)
+                            $persentase = ($produk['total_terjual'] / $produkTerlaris[0]['total_terjual']) * 100;
+                            ?>
+                            <div class="progress-bar bg-info" role="progressbar" style="width: <?= $persentase; ?>%" 
+                                 aria-valuenow="<?= $persentase; ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?= $this->endSection(); ?>
+
+
+<?= $this->section('script'); ?>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Siapkan data dari PHP untuk digunakan oleh file dashboardowner.js
+        var dataGrafikPenjualan = {
+            labels: <?= json_encode($grafikLabels); ?>,
+            values: <?= json_encode($grafikValues); ?>
+        };
+    </script>
+
     <script src="<?= base_url('js/dashboardowner.js') ?>"></script>
-</body>
-
-</html>
+<?= $this->endSection(); ?>
