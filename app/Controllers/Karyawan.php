@@ -117,6 +117,10 @@ class Karyawan extends BaseController
      * [BARU] Menyimpan transaksi baru ke database
      * Ini akan diakses melalui rute /karyawan/store_penjualan
      */
+/**
+     * [BARU] Menyimpan transaksi baru ke database
+     * Ini akan diakses melalui rute /karyawan/store_penjualan
+     */
     public function store_penjualan()
     {
         $db = \Config\Database::connect();
@@ -129,15 +133,16 @@ class Karyawan extends BaseController
             $produkModel = new ProdukModel();
 
             // 2. Ambil data dari FORM POST
-            $cartItems = $this->request->getPost('cart_items'); 
+            $cartItems  = $this->request->getPost('cart_items'); 
             $totalHarga = $this->request->getPost('total_belanja');
-            $jumlahDP = $this->request->getPost('jumlah_dp');
-            
+            $jumlahDP   = $this->request->getPost('jumlah_dp');
+            $statusBayar = $this->request->getPost('status_bayar'); // Ambil status bayar
+
             // 3. Simpan data ke tabel 'penjualan'
             $dataPenjualan = [
                 'tanggal'           => Time::now()->toDateString(),
                 'total'             => $totalHarga,
-                'status_bayar'      => $this->request->getPost('status_bayar'),
+                'status_pembayaran' => $statusBayar, // SUDAH DIPERBAIKI (dari 'status_bayar')
                 'metode_pembayaran' => $this->request->getPost('metode_pembayaran'),
                 'jumlah_dp'         => empty($jumlahDP) ? 0 : $jumlahDP,
                 'id_user'           => session()->get('user_id') 
@@ -151,31 +156,52 @@ class Karyawan extends BaseController
             $dataDetailBatch = [];
 
             foreach ($items as $item) {
+                // Konversi data dari JS agar aman
+                $qty = (int)($item['qty'] ?? 0);
+                $subtotal = (float)($item['subtotal'] ?? 0);
+
+                // HITUNG HARGA SATUAN DARI SUBTOTAL DAN QTY
+                $harga_satuan = 0;
+                if ($qty > 0) {
+                    $harga_satuan = $subtotal / $qty;
+                }
+
+                // Masukkan data yang SESUAI DENGAN DATABASE
                 $dataDetailBatch[] = [
                     'id_penjualan' => $idPenjualanBaru,
                     'id_produk'    => $item['id'],
-                    'jumlah'       => $item['qty'],
-                    'subtotal'     => $item['subtotal']
+                    'qty'          => $qty,           // Nama kolom database
+                    'harga_satuan' => $harga_satuan   // Nama kolom database
                 ];
 
                 // 5. Kurangi Stok Produk
                 $produkModel->where('id_produk', $item['id'])
-                            ->set('stok', 'stok - ' . (int)$item['qty'], false) 
+                            ->set('stok', 'stok - ' . $qty, false) 
                             ->update();
             }
 
             // 6. Simpan ke tabel 'detail_penjualan'
             if (!empty($dataDetailBatch)) {
-                $detailModel->insertBatch($dataDetailBatch);
+                $detailModel->insertBatch($dataDetailBatch); // Ini akan berhasil jika Model sudah benar
             }
 
             $db->transComplete(); // Selesaikan Transaction
 
-            // Berhasil
-            return redirect()->to('/karyawan/input_penjualan')->with('success', 'Transaksi berhasil disimpan!');
+            // ==========================================================
+            // === LOGIKA REDIRECT YANG ANDA MINTA ===
+            // ==========================================================
+            if ($statusBayar === 'Lunas') {
+                // Jika LUNAS, lempar ke dashboard
+                return redirect()->to('/karyawan/dashboard')->with('success', 'Transaksi Lunas berhasil disimpan!');
+            } else {
+                // Jika DP atau Utang, kembali ke halaman input (untuk transaksi baru)
+                return redirect()->to('/karyawan/input_penjualan')->with('success', 'Transaksi (Belum Lunas) berhasil disimpan!');
+            }
 
         } catch (\Exception $e) {
             $db->transRollback(); // Batalkan semua jika ada error
+            // Tampilkan error yang lebih spesifik
+            log_message('error', 'Error di store_penjualan: ' . $e->getMessage() . ' - File: ' . $e->getFile() . ' - Line: ' . $e->getLine());
             return redirect()->to('/karyawan/input_penjualan')->with('error', 'Error: ' . $e->getMessage());
         }
     }
