@@ -1,0 +1,136 @@
+<?= $this->extend('layout/template'); ?>
+
+<?= $this->section('head'); ?>
+<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<style>
+    .badge-warning {
+        background-color: #f6c23e;
+        color: #fff;
+    }
+
+    .badge-success {
+        background-color: #1cc88a;
+        color: #fff;
+    }
+
+    .badge-danger {
+        background-color: #e74a3b;
+        color: #fff;
+    }
+</style>
+<?= $this->endSection(); ?>
+
+<?= $this->section('content'); ?>
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">
+        <i class="fas fa-history mr-2" style="color: #2d8659;"></i>
+        <?= $title; ?>
+    </h1>
+</div>
+
+<?php if (session()->getFlashdata('success')) : ?>
+    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-left: 4px solid #2d8659;">
+        <i class="fas fa-check-circle mr-2" style="color: #2d8659;"></i>
+        <?= session()->getFlashdata('success'); ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+<?php endif; ?>
+<?php if (session()->getFlashdata('error')) : ?>
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+        <i class="fas fa-exclamation-circle mr-2"></i>
+        <?= session()->getFlashdata('error'); ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+<?php endif; ?>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3" style="background-color: #2d8659; color: white;">
+        <h6 class="m-0 font-weight-bold text-white">Data Seluruh Transaksi</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTableRiwayat" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID Transaksi</th>
+                        <th>Tanggal</th>
+                        <th>Kasir</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Metode Bayar</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($penjualan as $trx) : ?>
+                        <tr>
+                            <td>#<?= $trx['id_penjualan']; ?></td>
+
+                            <td>
+                                <?php if ($trx['tanggal']) : ?>
+                                    <?= \CodeIgniter\I18n\Time::parse($trx['tanggal'])->toLocalizedString('dd MMMM yyyy'); ?>
+                                <?php else : ?>
+                                    <span class="text-muted">N/A</span>
+                                <?php endif; ?>
+                            </td>
+
+                            <td><?= $trx['username'] ?? 'N/A'; ?></td>
+                            <td>Rp <?= number_format($trx['total'], 0, ',', '.'); ?></td>
+                            <td>
+                                <?php
+                                if ($trx['status_pembayaran'] == 'Lunas'):
+                                    echo '<span class="badge badge-success">Lunas</span>';
+                                elseif ($trx['status_pembayaran'] == 'Belum Lunas'):
+                                    echo '<span class="badge badge-warning">Belum Lunas</span>';
+                                else:
+                                    // Fallback jika ada status lain
+                                    echo '<span class="badge badge-danger">' . $trx['status_pembayaran'] . '</span>';
+                                endif;
+                                ?>
+                            </td>
+                            <td><?= $trx['metode_pembayaran']; ?></td>
+                            <td>
+                                <a href="#" class="btn btn-info btn-sm btn-icon-split">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-eye"></i>
+                                    </span>
+                                    <span class="text">Detail</span>
+                                </a>
+
+                                <?php if ($trx['status_pembayaran'] == 'Belum Lunas') : ?>
+                                    <a href="<?= base_url('karyawan/edit_penjualan/' . $trx['id_penjualan']); ?>" class="btn btn-primary btn-sm btn-icon-split">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-edit"></i>
+                                        </span>
+                                        <span class="text">Edit</span>
+                                    </a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<?= $this->endSection(); ?>
+
+<?= $this->section('script'); ?>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#dataTableRiwayat').DataTable({
+            "order": [
+                [0, "desc"]
+            ] // Urutkan berdasarkan ID Transaksi terbaru
+        });
+    });
+</script>
+<?= $this->endSection(); ?>
