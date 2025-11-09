@@ -1,7 +1,7 @@
 <?= $this->extend('layout/template'); ?>
 
 <?= $this->section('head'); ?>
-    <link href="<?= base_url('css/dashboardowner.css') ?>" rel="stylesheet">
+<link href="<?= base_url('css/dashboardowner.css') ?>" rel="stylesheet">
 <?= $this->endSection(); ?>
 
 <?= $this->section('content'); ?>
@@ -107,8 +107,8 @@
                             // Hitung persentase (asumsi 100% adalah produk teratas)
                             $persentase = ($produk['total_terjual'] / $produkTerlaris[0]['total_terjual']) * 100;
                             ?>
-                            <div class="progress-bar bg-info" role="progressbar" style="width: <?= $persentase; ?>%" 
-                                 aria-valuenow="<?= $persentase; ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-info" role="progressbar" style="width: <?= $persentase; ?>%"
+                                aria-valuenow="<?= $persentase; ?>" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -121,15 +121,15 @@
 
 
 <?= $this->section('script'); ?>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script>
-        // Siapkan data dari PHP untuk digunakan oleh file dashboardowner.js
-        var dataGrafikPenjualan = {
-            labels: <?= json_encode($grafikLabels); ?>,
-            values: <?= json_encode($grafikValues); ?>
-        };
-    </script>
+<script>
+    // Siapkan data dari PHP untuk digunakan oleh file dashboardowner.js
+    var dataGrafikPenjualan = {
+        labels: <?= json_encode($grafikLabels); ?>,
+        values: <?= json_encode($grafikValues); ?>
+    };
+</script>
 
-    <script src="<?= base_url('js/dashboardowner.js') ?>"></script>
+<script src="<?= base_url('js/dashboardowner.js') ?>"></script>
 <?= $this->endSection(); ?>

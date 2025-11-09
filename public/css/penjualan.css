@@ -1,0 +1,473 @@
+/* Tema Dark Green untuk Penjualan */
+
+:root {
+    --dark-green: #2d8659;
+    --dark-green-hover: #256048;
+    --light-green: #e8fff3;
+    --light-blue: #4a90e2;
+    --light-blue-hover: #357abd;
+    --white: #ffffff;
+    --gray-light: #f8f9fc;
+    --gray-border: #e3e6f0;
+    --text-dark: #374151;
+    --text-gray: #6b7280;
+}
+
+/* Sidebar Dark Green - Full Green dengan Font Poppins */
+ul.sidebar.penjualan-sidebar {
+    background: var(--dark-green) !important;
+    background-image: linear-gradient(180deg, var(--dark-green) 10%, #1e5d3f 100%) !important;
+    border-right: none;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif !important;
+}
+
+ul.sidebar.penjualan-sidebar .sidebar-brand {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: var(--white);
+    padding: 1rem;
+    margin-bottom: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+ul.sidebar.penjualan-sidebar .sidebar-brand:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+ul.sidebar.penjualan-sidebar .sidebar-brand-text {
+    color: var(--white) !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+}
+
+ul.sidebar.penjualan-sidebar .sidebar-brand-icon {
+    color: var(--white) !important;
+    font-size: 1.5rem;
+}
+
+ul.sidebar.penjualan-sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    padding: 0.875rem 1rem;
+    border-radius: 8px;
+    margin: 0.25rem 0.5rem;
+    transition: all 0.2s ease;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem;
+}
+
+ul.sidebar.penjualan-sidebar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: var(--white) !important;
+    transform: translateX(5px);
+}
+
+ul.sidebar.penjualan-sidebar .nav-link.active {
+    background: rgba(255, 255, 255, 0.25) !important;
+    color: var(--white) !important;
+    font-weight: 700 !important;
+    border-left: 4px solid var(--white);
+    padding-left: calc(1rem - 4px);
+}
+
+ul.sidebar.penjualan-sidebar .nav-link i {
+    color: rgba(255, 255, 255, 0.9) !important;
+    margin-right: 0.75rem;
+    width: 1.2rem;
+    font-size: 1rem;
+}
+
+ul.sidebar.penjualan-sidebar .nav-link.active i,
+ul.sidebar.penjualan-sidebar .nav-link:hover i {
+    color: var(--white) !important;
+}
+
+ul.sidebar.penjualan-sidebar .sidebar-heading {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.75rem;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    margin-top: 1rem;
+    letter-spacing: 1px;
+}
+
+ul.sidebar.penjualan-sidebar .sidebar-divider {
+    border-color: rgba(255, 255, 255, 0.15);
+    margin: 0.5rem 0;
+}
+
+ul.sidebar.penjualan-sidebar #sidebarToggle {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+ul.sidebar.penjualan-sidebar #sidebarToggle:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Topbar Dark Green */
+.topbar.penjualan-topbar {
+    background: var(--dark-green) !important;
+    border-bottom: none;
+    padding: 0.75rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.topbar.penjualan-topbar .navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-direction: row;
+}
+
+.topbar.penjualan-topbar .nav-item {
+    display: flex;
+    align-items: center;
+}
+
+.topbar.penjualan-topbar .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    color: var(--white);
+    margin-right: 1rem;
+}
+
+.topbar.penjualan-topbar .user-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.topbar.penjualan-topbar .user-role {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.topbar.penjualan-topbar .btn-logout {
+    background: #ef4444;
+    color: var(--white) !important;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.topbar.penjualan-topbar .btn-logout:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    color: var(--white) !important;
+    text-decoration: none;
+}
+
+.topbar.penjualan-topbar .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 1.25rem;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+/* Card Styling */
+.card.penjualan-card {
+    border: 1px solid var(--gray-border);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    background: var(--white);
+    transition: box-shadow 0.3s ease;
+}
+
+.card.penjualan-card:hover {
+    box-shadow: 0 4px 12px rgba(45, 134, 89, 0.1);
+}
+
+.card-header.penjualan-card-header {
+    background: var(--white);
+    border-bottom: 2px solid var(--gray-border);
+    padding: 1rem 1.5rem;
+    border-radius: 12px 12px 0 0;
+}
+
+/* Button Styling */
+.btn-primary.penjualan-btn {
+    background: var(--light-blue);
+    border: none;
+    color: var(--white);
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-primary.penjualan-btn:hover {
+    background: var(--light-blue-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+}
+
+.btn-success.penjualan-btn {
+    background: var(--dark-green);
+    border: none;
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-success.penjualan-btn:hover {
+    background: var(--dark-green-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(45, 134, 89, 0.3);
+}
+
+.btn-danger.penjualan-btn {
+    background: #ef4444;
+    border: none;
+    color: var(--white);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-danger.penjualan-btn:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+/* Product Item */
+.produk-item.penjualan-item {
+    border: 2px solid var(--gray-border);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: var(--white);
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.produk-item.penjualan-item:hover {
+    border-color: var(--dark-green);
+    box-shadow: 0 6px 16px rgba(45, 134, 89, 0.2);
+    transform: translateY(-4px);
+}
+
+.produk-item.penjualan-item:active {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(45, 134, 89, 0.15);
+}
+
+/* Cart Item */
+.cart-item-card.penjualan-cart {
+    background: var(--gray-light);
+    border: 2px solid var(--gray-border);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.cart-item-card.penjualan-cart:hover {
+    border-color: var(--dark-green);
+    background: #f0f4f8;
+    box-shadow: 0 2px 8px rgba(45, 134, 89, 0.1);
+}
+
+/* Total Belanja Card */
+.total-belanja-card.penjualan-total {
+    background: linear-gradient(135deg, var(--dark-green) 0%, #1e5d3f 100%);
+    color: var(--white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(45, 134, 89, 0.3);
+}
+
+/* Form Control - dihapus karena sudah di body.penjualan-body */
+
+/* Alert - styling dasar, override di body.penjualan-body */
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+    border-radius: 8px;
+    border-left: 4px solid #dc3545;
+}
+
+.alert.penjualan-alert {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Section Icon */
+.section-icon.penjualan-icon {
+    color: var(--dark-green) !important;
+}
+
+/* Page Title */
+.penjualan-page-title {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.penjualan-page-title i {
+    color: var(--dark-green) !important;
+}
+
+/* Text Primary Override untuk Penjualan - dihapus karena sudah di body.penjualan-body */
+
+/* Card Header Text */
+.card-header.penjualan-card-header h6 {
+    color: var(--dark-green) !important;
+}
+
+.card-header.penjualan-card-header .text-primary {
+    color: var(--dark-green) !important;
+}
+
+/* Label Styling */
+label.font-weight-bold {
+    color: var(--text-dark);
+}
+
+/* Select Option Styling - sudah dipindah ke body.penjualan-body */
+
+/* Background Body untuk Penjualan */
+body.penjualan-body {
+    background-color: #f3f4f6;
+}
+
+body.penjualan-body #content-wrapper {
+    background-color: #f3f4f6;
+}
+
+/* Footer */
+body.penjualan-body .sticky-footer {
+    background: var(--white) !important;
+    border-top: 1px solid var(--gray-border);
+}
+
+/* Content Area - hanya untuk penjualan */
+body.penjualan-body .container-fluid {
+    background-color: #f3f4f6;
+    padding: 1.5rem;
+}
+
+/* Override untuk semua elemen dalam body penjualan */
+body.penjualan-body .text-primary {
+    color: var(--dark-green) !important;
+}
+
+/* Override Bootstrap Primary untuk Penjualan */
+body.penjualan-body .btn-primary:not(.penjualan-btn) {
+    background-color: var(--dark-green);
+    border-color: var(--dark-green);
+}
+
+body.penjualan-body .btn-primary:not(.penjualan-btn):hover {
+    background-color: var(--dark-green-hover);
+    border-color: var(--dark-green-hover);
+}
+
+/* Override alert untuk penjualan */
+body.penjualan-body .alert-success {
+    background-color: #d4edda;
+    border-color: var(--dark-green);
+    color: #155724;
+    border-left: 4px solid var(--dark-green);
+}
+
+body.penjualan-body .alert-success .fa-check-circle {
+    color: var(--dark-green) !important;
+}
+
+/* Form control focus untuk penjualan */
+body.penjualan-body .form-control:focus {
+    border-color: var(--dark-green);
+    box-shadow: 0 0 0 0.2rem rgba(45, 134, 89, 0.25);
+}
+
+body.penjualan-body select.form-control:focus {
+    border-color: var(--dark-green);
+    box-shadow: 0 0 0 0.2rem rgba(45, 134, 89, 0.25);
+}
+
+/* Scrollbar */
+body.penjualan-body ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+body.penjualan-body ::-webkit-scrollbar-track {
+    background: var(--gray-light);
+    border-radius: 10px;
+}
+
+body.penjualan-body ::-webkit-scrollbar-thumb {
+    background: var(--text-gray);
+    border-radius: 10px;
+}
+
+body.penjualan-body ::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-green);
+}
+
+/* Badge dan Stok Styling */
+body.penjualan-body .badge {
+    background-color: var(--dark-green);
+    color: var(--white);
+}
+
+body.penjualan-body .text-success {
+    color: var(--dark-green) !important;
+}
+
+/* HR Styling */
+body.penjualan-body hr {
+    border-color: var(--gray-border);
+    opacity: 0.5;
+}
+
+/* Shadow untuk card dalam body penjualan */
+body.penjualan-body .shadow {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+
+body.penjualan-body .shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(45, 134, 89, 0.075) !important;
+}
+
+/* Link styling */
+body.penjualan-body a:not(.btn):not(.nav-link) {
+    color: var(--dark-green);
+    transition: color 0.2s ease;
+}
+
+body.penjualan-body a:not(.btn):not(.nav-link):hover {
+    color: var(--dark-green-hover);
+    text-decoration: none;
+}
+
