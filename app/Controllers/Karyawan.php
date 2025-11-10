@@ -189,10 +189,10 @@ class Karyawan extends BaseController
 
         $data = [
             'title' => 'Riwayat Transaksi Penjualan',
-            // [PERUBAHAN] Join ke tabel 'pelanggan' bukan 'user'
+            // [PERBAIKAN] Join ke tabel 'pelanggan' untuk ambil nama
             'penjualan' => $penjualanModel
                 ->select('penjualan.*, pelanggan.nama_pelanggan')
-                ->join('pelanggan', 'pelanggan.id_pelanggan = penjualan.id_pelanggan', 'left') // Ganti ke 'pelanggan'
+                ->join('pelanggan', 'pelanggan.id_pelanggan = penjualan.id_pelanggan', 'left') // 'left' join agar data lama (null) tetap tampil
                 ->orderBy('penjualan.tanggal', 'DESC')
                 ->orderBy('penjualan.id_penjualan', 'DESC')
                 ->findAll()
@@ -335,7 +335,6 @@ class Karyawan extends BaseController
             $db->transComplete();
 
             if ($statusBayarEnum === 'Lunas') {
-                // DIUBAH: Arahkan kembali ke input_penjualan, bukan dashboard
                 return redirect()->to('/karyawan/input_penjualan')->with('success', 'Transaksi Lunas berhasil disimpan!');
             } else {
                 return redirect()->to('/karyawan/input_penjualan')->with('success', 'Transaksi (Belum Lunas) berhasil disimpan!');
@@ -356,46 +355,61 @@ class Karyawan extends BaseController
         $penjualanModel = new PenjualanModel();
         $detailModel = new DetailPenjualanModel();
         $produkModel = new ProdukModel();
+        $pelangganModel = new PelangganModel(); // Pastikan 'use App\Models\PelangganModel;' ada di atas
 
+        // 1. Ambil data penjualan utama
         $penjualan = $penjualanModel->find($id_penjualan);
 
         if (!$penjualan) {
             return redirect()->to('karyawan/riwayat_penjualan')->with('error', 'Transaksi tidak ditemukan.');
         }
-
+        // Hanya yang belum lunas boleh diedit
         if ($penjualan['status_pembayaran'] == 'Lunas') {
             return redirect()->to('karyawan/riwayat_penjualan')->with('error', 'Transaksi yang sudah lunas tidak dapat diedit.');
         }
 
+        // 2. Ambil semua produk untuk panel kiri
         $produk = $produkModel->findAll();
 
+        // 3. Ambil detail keranjang yang ada
         $detail_penjualan = $detailModel
             ->select('detail_penjualan.id_produk, detail_penjualan.qty, produk.nama_produk, produk.harga, produk.stok')
             ->join('produk', 'produk.id_produk = detail_penjualan.id_produk')
             ->where('detail_penjualan.id_penjualan', $id_penjualan)
             ->findAll();
 
+        // 4. Format keranjang untuk JS
         $cart_items_json = [];
         foreach ($detail_penjualan as $item) {
             $cart_items_json[] = [
                 'id'    => $item['id_produk'],
                 'nama'  => $item['nama_produk'],
                 'harga' => (float) $item['harga'],
-                'stok'  => (int) $item['stok'],
+                'stok'  => (int) $item['stok'], // Ini adalah stok produk SAAT INI
                 'qty'   => (int) $item['qty'],
             ];
+        }
+
+        // 5. [PENTING] Ambil data pelanggan yang dipilih
+        $pelanggan_terpilih = null;
+        if ($penjualan['id_pelanggan']) {
+            $pelanggan_terpilih = $pelangganModel->find($penjualan['id_pelanggan']);
         }
 
         $data = [
             'title'                 => 'Edit Transaksi Penjualan',
             'produk'                => $produk,
-            'penjualan'             => $penjualan,
-            'detail_penjualan_json' => json_encode($cart_items_json),
+            'penjualan'             => $penjualan, // Kirim semua data penjualan (tanggal, dp, dll)
+            'detail_penjualan_json' => json_encode($cart_items_json), // Kirim keranjang
+            'pelanggan_terpilih'    => $pelanggan_terpilih, // Kirim data pelanggan
         ];
 
         return view('penjualan/edit_transaksi', $data);
     }
 
+    /**
+     * [DIUBAH] Memproses update data transaksi penjualan.
+     */
     public function update_penjualan($id_penjualan)
     {
         $db = \Config\Database::connect();
@@ -404,29 +418,50 @@ class Karyawan extends BaseController
         $produkModel = new ProdukModel();
         $keuanganModel = new KeuanganModel();
 
+        // 1. Validasi
         $penjualan = $penjualanModel->find($id_penjualan);
-        if (!$penjualan || $penjualan['status_pembayaran'] == 'Lunas') {
+        if (!$penjualan) {
             return redirect()->to('karyawan/riwayat_penjualan')->with('error', 'Transaksi ini tidak dapat diperbarui.');
         }
 
+        // 2. Ambil data dari form
         $cart_items_json = $this->request->getPost('cart_items');
         $cart_items = json_decode($cart_items_json, true);
         $total_belanja = $this->request->getPost('total_belanja');
-        $status_bayar_form = $this->request->getPost('status_bayar'); // ('lunas' / 'belum_lunas')
         $jumlah_dp_form = $this->request->getPost('jumlah_dp') ?? 0;
         $metode_bayar_form = $this->request->getPost('metode_pembayaran');
+        $tanggal_form = $this->request->getPost('tanggal');
+        $id_pelanggan_form = $this->request->getPost('id_pelanggan');
 
-        $statusBayarEnum = ($status_bayar_form == 'lunas') ? 'Lunas' : 'Belum Lunas';
+        // 3. [LOGIKA OTOMATIS] Tentukan status bayar di backend
+        $statusBayarEnum = 'Belum Lunas';
+        $jumlah_dibayar_sekarang = floatval($jumlah_dp_form);
+
+        if ($jumlah_dibayar_sekarang >= floatval($total_belanja) && floatval($total_belanja) > 0) {
+            $statusBayarEnum = 'Lunas';
+            $jumlah_dibayar_sekarang = floatval($total_belanja); // Jika Lunas, yg dibayar adalah total
+        }
+
+        // 4. Validasi Ulang
+        if ($statusBayarEnum == 'Belum Lunas' && (empty($jumlah_dp_form) || $jumlah_dp_form <= 0)) {
+            return redirect()->back()->withInput()->with('error', 'Jumlah DP wajib diisi jika status Belum Lunas.');
+        }
+        if (empty($cart_items) || $cart_items == '[]') {
+            return redirect()->back()->withInput()->with('error', 'Keranjang tidak boleh kosong.');
+        }
 
         $db->transStart();
 
+        // 5. Kembalikan Stok Lama
         $old_details = $detailModel->where('id_penjualan', $id_penjualan)->findAll();
         foreach ($old_details as $item) {
-            $produkModel->update($item['id_produk'], ['stok' => $item['qty']], true);
+            $produkModel->update($item['id_produk'], ['stok' => $item['qty']], true); // increment
         }
 
+        // 6. Hapus detail penjualan lama
         $detailModel->where('id_penjualan', $id_penjualan)->delete();
 
+        // 7. Simpan detail penjualan (keranjang) baru dan kurangi stok baru
         $dataDetailBatch = [];
         foreach ($cart_items as $item) {
             $qty = (int)($item['qty'] ?? 0);
@@ -439,21 +474,24 @@ class Karyawan extends BaseController
                 'qty'          => $qty,
                 'harga_satuan' => $harga_satuan,
             ];
-
-            $produkModel->update($item['id'], ['stok' => $qty], true);
+            // Kurangi stok produk (stok baru)
+            $produkModel->update($item['id'], ['stok' => $qty], true); // decrement
         }
         if (!empty($dataDetailBatch)) {
             $detailModel->insertBatch($dataDetailBatch);
         }
 
+        // 8. Update data penjualan utama
         $penjualanModel->update($id_penjualan, [
+            'tanggal'           => $tanggal_form,
+            'id_pelanggan'      => $id_pelanggan_form,
             'total'             => $total_belanja,
-            'status_pembayaran' => $statusBayarEnum,
+            'status_pembayaran' => $statusBayarEnum, // Status Otomatis
             'metode_pembayaran' => $metode_bayar_form,
             'jumlah_dp'         => ($statusBayarEnum == 'Lunas') ? 0 : $jumlah_dp_form,
         ]);
 
-        $jumlah_dibayar_sekarang = ($statusBayarEnum == 'Lunas') ? $total_belanja : $jumlah_dp_form;
+        // 9. Update data Keuangan
         $keuanganRecord = $keuanganModel->where('keterangan', 'Penjualan #' . $id_penjualan)->first();
 
         if ($keuanganRecord) {
@@ -463,12 +501,12 @@ class Karyawan extends BaseController
             ]);
         } elseif ($jumlah_dibayar_sekarang > 0) {
             $keuanganModel->insert([
-                'tanggal'     => Time::now()->toDateString(),
+                'tanggal'     => $tanggal_form,
                 'keterangan'  => 'Penjualan #' . $id_penjualan,
                 'pemasukan'   => $jumlah_dibayar_sekarang,
                 'pengeluaran' => 0,
                 'tipe'        => ($statusBayarEnum == 'Lunas') ? 'Pemasukan' : 'DP',
-                'id_user'     => session()->get('user_id') // [BUG FIX] Tambahkan id_user
+                'id_user'     => session()->get('user_id')
             ]);
         }
 
@@ -478,7 +516,7 @@ class Karyawan extends BaseController
             return redirect()->back()->withInput()->with('error', 'Gagal memperbarui transaksi.');
         }
 
-        return redirect()->to('karyawan/riwayat_penjualan')->with('success', 'Transaksi berhasil diperbarui.');
+        return redirect()->to('karyawan/riwayat_penjualan')->with('success', 'Transaksi #' . $id_penjualan . ' berhasil diperbarui.');
     }
 
 

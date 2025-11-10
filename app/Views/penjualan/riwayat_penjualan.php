@@ -63,7 +63,6 @@
                     <?php foreach ($penjualan as $trx) : ?>
                         <tr>
                             <td>#<?= $trx['id_penjualan']; ?></td>
-
                             <td>
                                 <?php if ($trx['tanggal']) : ?>
                                     <?= \CodeIgniter\I18n\Time::parse($trx['tanggal'])->toLocalizedString('dd MMMM yyyy'); ?>
@@ -121,13 +120,10 @@
         $('#dataTableRiwayat').DataTable({
             "order": [
                 [0, "desc"]
-            ] // Urutkan berdasarkan ID Transaksi terbaru
+            ]
         });
     });
 
-    /**
-     * [BARU] Fungsi konfirmasi hapus dengan SweetAlert
-     */
     function confirmDelete(idPenjualan) {
         Swal.fire({
             title: 'Anda Yakin?',
@@ -140,7 +136,6 @@
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Arahkan ke URL delete
                 window.location.href = `<?= base_url('karyawan/delete_penjualan/'); ?>${idPenjualan}`;
             }
         });
