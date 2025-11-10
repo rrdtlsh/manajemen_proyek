@@ -203,49 +203,50 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTableLaporan" width="100%" cellspacing="0">
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Keterangan</th>
-                        <th>Tipe</th>
-                        <th>Pemasukan (Debit)</th>
-                        <th>Pengeluaran (Kredit)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($laporan)): ?>
-                        <tr>
-                            <td colspan="5" class="text-center">Tidak ada data untuk periode ini.</td>
-                        </tr>
+<table class="table table-bordered" id="dataTableLaporan" width="100%" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Tanggal</th>
+            <th>Keterangan</th>
+            <th>Tipe</th>
+            <th>Pemasukan (Debit)</th>
+            <th>Pengeluaran (Kredit)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (empty($laporan)): ?>
+            <tr>
+                <td colspan="5" class="text-center">Tidak ada data untuk periode ini.</td>
+            </tr>
+        <?php endif; ?>
+
+        <?php foreach ($laporan as $item) : ?>
+            <tr>
+                <td>
+                    <?php if ($item['tanggal']) : ?>
+                        <?= \CodeIgniter\I18n\Time::parse($item['tanggal'])->toLocalizedString('dd MMMM yyyy'); ?>
+                    <?php else : ?>
+                        <span class="text-muted">N/A</span>
                     <?php endif; ?>
-                    <?php foreach ($laporan as $item) : ?>
-                        <tr>
-                            <td>
-                                <?php if ($item['tanggal']) : ?>
-                                    <?= \CodeIgniter\I18n\Time::parse($item['tanggal'])->toLocalizedString('dd MMMM yyyy'); ?>
-                                <?php else : ?>
-                                    <span class="text-muted">N/A</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><?= $item['keterangan']; ?></td>
-                            <td>
-                                <?php if ($item['tipe'] == 'Pemasukan' || $item['tipe'] == 'DP'): ?>
-                                    <span class="badge badge-success"><?= $item['tipe']; ?></span>
-                                <?php else: ?>
-                                    <span class="badge badge-danger"><?= $item['tipe']; ?></span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="text-success">
-                                <?= ($item['pemasukan'] > 0) ? 'Rp ' . number_format($item['pemasukan'], 0, ',', '.') : '-'; ?>
-                            </td>
-                            <td class="text-danger">
-                                <?= ($item['pengeluaran'] > 0) ? 'Rp ' . number_format($item['pengeluaran'], 0, ',', '.') : '-'; ?>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                </td>
+                <td><?= $item['keterangan']; ?></td>
+                <td>
+                    <?php if ($item['tipe'] == 'Pemasukan' || $item['tipe'] == 'DP'): ?>
+                        <span class="badge badge-success"><?= $item['tipe']; ?></span>
+                    <?php else: ?>
+                        <span class="badge badge-danger"><?= $item['tipe']; ?></span>
+                    <?php endif; ?>
+                </td>
+                <td class="text-success">
+                    <?= ($item['pemasukan'] > 0) ? 'Rp ' . number_format($item['pemasukan'], 0, ',', '.') : '-'; ?>
+                </td>
+                <td class="text-danger">
+                    <?= ($item['pengeluaran'] > 0) ? 'Rp ' . number_format($item['pengeluaran'], 0, ',', '.') : '-'; ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
         </div>
     </div>
 </div>
