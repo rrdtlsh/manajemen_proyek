@@ -34,9 +34,14 @@ class CreatePenjualanTable extends Migration
                 'type' => 'INT',
                 'null' => true,
             ],
+            'id_pelanggan' => [
+            'type' => 'INT',
+            'null' => true,
+            ],
         ]);
         $this->forge->addKey('id_penjualan', true);
         $this->forge->addForeignKey('id_user', 'user', 'id_user', 'CASCADE', 'NO ACTION');
+        $this->forge->addForeignKey('id_pelanggan', 'pelanggan', 'id_pelanggan', 'CASCADE', 'SET NULL');
         $this->forge->createTable('penjualan');
     }
 
