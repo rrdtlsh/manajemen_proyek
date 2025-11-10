@@ -3,54 +3,59 @@
 namespace App\Filters;
 
 use CodeIgniter\Filters\FilterInterface;
-use CodeIgniter\HTTP\RequestInterface;  // <-- WAJIB: Memperbaiki error 'Undefined type'
-use CodeIgniter\HTTP\ResponseInterface; // <-- WAJIB: Dibutuhkan oleh Interface
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
 
 class AuthFilter implements FilterInterface
 {
-    /**
-     * @param RequestInterface $request
-     * @param array|null       $arguments
-     *
-     * @return RequestInterface|ResponseInterface|string|void
-     */
     public function before(RequestInterface $request, $arguments = null)
     {
-        $session = session();
-
-        // 1. Cek jika sudah login
-        if (!$session->get('isLoggedIn')) {
+        // 1. Cek apakah pengguna sudah login
+        if (!session()->get('isLoggedIn')) {
+            // Jika belum, lempar ke halaman login
             return redirect()->to('/login');
         }
 
-        // 2. Cek Role (PENTING!)
-        $role = $session->get('role');
-        $uri = service('uri'); // service('uri') tidak butuh $request
+        // 2. Ambil role dari session (yang sudah di-set saat login)
+        $userRole = session()->get('role');
 
-        // Jika BUKAN Pemilik mencoba akses halaman owner
-        if ($role != 'Pemilik' && $uri->getSegment(1) == 'owner') {
-            // Paksa redirect ke halaman karyawan
-            return redirect()->to('/karyawan'); 
-        }
+        // 3. Cek jika rute ini butuh role khusus (ada $arguments)
+        if (!empty($arguments)) {
+            $isAllowed = false;
+            foreach ($arguments as $allowedRole) {
+                // Cek role (case-insensitive, misal 'Keuangan' sama dengan 'keuangan')
+                if (strcasecmp($userRole, $allowedRole) == 0) {
+                    $isAllowed = true;
+                    break;
+                }
+            }
 
-        // Jika BUKAN Pemilik mencoba akses halaman manajemen
-        if ($role != 'Pemilik' && $uri->getSegment(1) == 'manajemen') {
-            return redirect()->to('/karyawan'); 
+            // 4. Jika role pengguna tidak ada di daftar $arguments
+            if (!$isAllowed) {
+                // Tentukan dashboard default untuk role ini
+                $role = strtolower($userRole);
+                $redirectURL = '/'; // Halaman default
+
+                if ($role == 'owner' || $role == 'pemilik') {
+                    $redirectURL = '/owner';
+                } elseif ($role == 'penjualan') {
+                    $redirectURL = '/karyawan/dashboard';
+                } elseif ($role == 'keuangan') {
+                    // [PENTING] Arahkan ke rute laporan yang benar
+                    $redirectURL = '/karyawan/keuangan/laporan';
+                } elseif ($role == 'inventaris') {
+                    $redirectURL = '/karyawan/inventaris';
+                }
+
+                // Kembalikan pengguna ke dashboard mereka dengan pesan error
+                return redirect()->to(base_url($redirectURL))->with('error', 'Anda tidak memiliki akses ke halaman tersebut.');
+            }
         }
-        
-        // Jika $role adalah 'owner', dia akan lolos semua 'if' di atas 
-        // dan diizinkan mengakses halaman.
+        // Jika lolos semua cek, lanjutkan ke controller
     }
 
-    /**
-     * @param RequestInterface  $request
-     * @param ResponseInterface $response
-     * @param array|null        $arguments
-     *
-     * @return void
-     */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        // Tidak perlu melakukan apa-apa
+        // Tidak perlu melakukan apa-apa setelah request
     }
 }

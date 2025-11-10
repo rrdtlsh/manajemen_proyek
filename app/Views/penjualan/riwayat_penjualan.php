@@ -30,23 +30,16 @@
 </div>
 
 <?php if (session()->getFlashdata('success')) : ?>
-    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-left: 4px solid #2d8659;">
-        <i class="fas fa-check-circle mr-2" style="color: #2d8659;"></i>
+    <div class="alert alert-success d-none" role="alert">
         <?= session()->getFlashdata('success'); ?>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
     </div>
 <?php endif; ?>
 <?php if (session()->getFlashdata('error')) : ?>
-    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-        <i class="fas fa-exclamation-circle mr-2"></i>
+    <div class="alert alert-danger d-none" role="alert">
         <?= session()->getFlashdata('error'); ?>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
     </div>
 <?php endif; ?>
+
 
 <div class="card shadow mb-4">
     <div class="card-header py-3" style="background-color: #2d8659; color: white;">
@@ -59,7 +52,7 @@
                     <tr>
                         <th>ID Transaksi</th>
                         <th>Tanggal</th>
-                        <th>Kasir</th>
+                        <th>Nama Pembeli</th>
                         <th>Total</th>
                         <th>Status</th>
                         <th>Metode Bayar</th>
@@ -79,7 +72,8 @@
                                 <?php endif; ?>
                             </td>
 
-                            <td><?= $trx['username'] ?? 'N/A'; ?></td>
+                            <td><?= $trx['nama_pelanggan'] ?? 'N/A'; ?></td>
+
                             <td>Rp <?= number_format($trx['total'], 0, ',', '.'); ?></td>
                             <td>
                                 <?php
@@ -88,28 +82,26 @@
                                 elseif ($trx['status_pembayaran'] == 'Belum Lunas'):
                                     echo '<span class="badge badge-warning">Belum Lunas</span>';
                                 else:
-                                    // Fallback jika ada status lain
                                     echo '<span class="badge badge-danger">' . $trx['status_pembayaran'] . '</span>';
                                 endif;
                                 ?>
                             </td>
                             <td><?= $trx['metode_pembayaran']; ?></td>
                             <td>
-                                <a href="#" class="btn btn-info btn-sm btn-icon-split">
-                                    <span class="icon text-white-50">
-                                        <i class="fas fa-eye"></i>
-                                    </span>
-                                    <span class="text">Detail</span>
+                                <a href="#" class="btn btn-info btn-sm">
+                                    <i class="fas fa-eye"></i>
                                 </a>
 
                                 <?php if ($trx['status_pembayaran'] == 'Belum Lunas') : ?>
-                                    <a href="<?= base_url('karyawan/edit_penjualan/' . $trx['id_penjualan']); ?>" class="btn btn-primary btn-sm btn-icon-split">
-                                        <span class="icon text-white-50">
-                                            <i class="fas fa-edit"></i>
-                                        </span>
-                                        <span class="text">Edit</span>
+                                    <a href="<?= base_url('karyawan/edit_penjualan/' . $trx['id_penjualan']); ?>" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit"></i>
                                     </a>
                                 <?php endif; ?>
+
+                                <button type="button" class="btn btn-danger btn-sm"
+                                    onclick="confirmDelete('<?= $trx['id_penjualan']; ?>')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -132,5 +124,26 @@
             ] // Urutkan berdasarkan ID Transaksi terbaru
         });
     });
+
+    /**
+     * [BARU] Fungsi konfirmasi hapus dengan SweetAlert
+     */
+    function confirmDelete(idPenjualan) {
+        Swal.fire({
+            title: 'Anda Yakin?',
+            text: "Transaksi #" + idPenjualan + " akan dihapus permanen. Stok barang akan dikembalikan.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Arahkan ke URL delete
+                window.location.href = `<?= base_url('karyawan/delete_penjualan/'); ?>${idPenjualan}`;
+            }
+        });
+    }
 </script>
 <?= $this->endSection(); ?>

@@ -6,35 +6,27 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-// Homepage untuk pelanggan/public (Tidak perlu login)
+// Homepage
 $routes->get('/', 'Home::homepage');
 $routes->get('/homepage', 'Home::homepage');
 
 
 /*
- * --------------------------------------------------------------------
- * Rute Autentikasi (Publik)
- * --------------------------------------------------------------------
+ * Rute Autentikasi
  */
 $routes->get('/login', 'Login::index');
 $routes->post('/login/auth', 'Login::auth');
-$routes->get('/login/switch/(:segment)', 'Login::switchLanguage/$1'); // Dari file Anda
+$routes->get('/login/switch/(:segment)', 'Login::switchLanguage/$1');
 $routes->get('/logout', 'Login::logout');
 
 
 /*
- * --------------------------------------------------------------------
- * Rute Internal yang Dilindungi (Wajib Login)
- * --------------------------------------------------------------------
+ * Rute Internal yang Dilindungi
  */
 $routes->group('/', ['filter' => 'auth'], static function ($routes) {
 
     // --- RUTE OWNER (PEMILIK) ---
-    // ===================================
-    $routes->get('owner', 'Owner::index'); // Dashboard Analitik Owner
-
-    // Rute Owner untuk Laporan & Manajemen
-    // (Anda bisa tambahkan method baru di Owner.php untuk ini)
+    $routes->get('owner', 'Owner::index');
     $routes->get('owner/laporan_penjualan', 'Owner::laporan_penjualan');
     $routes->get('owner/laporan_keuangan', 'Owner::laporan_keuangan');
     $routes->get('owner/manajemen_produk', 'Owner::manajemen_produk');
@@ -42,40 +34,38 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
 
     // --- RUTE KARYAWAN (STAF) ---
     $routes->group('karyawan', static function ($routes) {
-        $routes->get('/', 'Karyawan::index'); // Halaman default Karyawan
+        $routes->get('/', 'Karyawan::index');
         $routes->get('dashboard', 'Karyawan::dashboard');
-        $routes->get('inventaris', 'Karyawan::inventaris');
-        $routes->get('keuangan', 'Karyawan::keuangan');
 
-        // Rute untuk Penjualan
-        $routes->get('penjualan', 'Karyawan::penjualan'); // Ini akan me-redirect ke riwayat
-
-        // Halaman Input Transaksi (POS)
+        // --- Rute Penjualan ---
+        $routes->get('penjualan', 'Karyawan::penjualan');
         $routes->get('input_penjualan', 'Karyawan::input_penjualan');
         $routes->post('store_penjualan', 'Karyawan::store_penjualan');
-
-        // == RUTE BARU UNTUK RIWAYAT ==
         $routes->get('riwayat_penjualan', 'Karyawan::riwayat_penjualan');
-
-        // == RUTE EDIT & UPDATE (SUDAH DIPINDAHKAN KE DALAM GRUP 'karyawan') ==
         $routes->get('edit_penjualan/(:num)', 'Karyawan::edit_penjualan/$1');
         $routes->post('update_penjualan/(:num)', 'Karyawan::update_penjualan/$1');
 
-        $routes->group('karyawan', ['filter' => 'auth'], function ($routes) {
-    // ... (rute Anda yang sudah ada seperti 'dashboard', 'input_penjualan', dll) ...
+        // [BARU] Rute AJAX untuk Pelanggan & Produk Search
+        $routes->get('search_pelanggan', 'Karyawan::searchPelanggan');
+        $routes->get('search_produk', 'Karyawan::searchProduk');
+        $routes->post('add_pelanggan', 'Karyawan::addPelanggan');
 
-     // Halaman Input Transaksi (POS)
+        // --- Rute Inventaris ---
+        $routes->get('inventaris', 'Karyawan::inventaris');
         $routes->get('input_inventaris', 'Karyawan::input_inventaris');
+        $routes->get('inventaris/tambah', 'Karyawan::tambah_produk');
+        $routes->post('inventaris/store', 'Karyawan::store_produk');
+        $routes->get('inventaris/edit/(:num)', 'Karyawan::edit_produk/$1');
+        $routes->post('inventaris/update/(:num)', 'Karyawan::update_produk/$1');
+        $routes->get('inventaris/delete/(:num)', 'Karyawan::delete_produk/$1');
 
-    // RUTE LAMA ANDA UNTUK INVENTARIS (HANYA DAFTAR)
-    $routes->get('inventaris', 'Karyawan::inventaris'); 
-    
-    // RUTE-RUTE BARU UNTUK MANAJEMEN INVENTARIS (CRUD)
-    $routes->get('inventaris/tambah', 'Karyawan::tambah_produk'); // Menampilkan form tambah
-    $routes->post('inventaris/store', 'Karyawan::store_produk');  // Menyimpan data baru
-    $routes->get('inventaris/edit/(:num)', 'Karyawan::edit_produk/$1'); // Menampilkan form edit
-    $routes->post('inventaris/update/(:num)', 'Karyawan::update_produk/$1'); // Menyimpan data update
-    $routes->get('inventaris/delete/(:num)', 'Karyawan::delete_produk/$1'); // Menghapus data
-});
+        // --- Rute Keuangan ---
+        $routes->get('keuangan/pemasukan', 'Karyawan::keuanganPemasukan');
+        $routes->get('keuangan/pengeluaran', 'Karyawan::keuanganPengeluaran');
+        $routes->get('keuangan/laporan', 'Karyawan::laporanKeuangan');
+        $routes->get('input_keuangan', 'Karyawan::input_keuangan');
+        $routes->post('store_keuangan', 'Karyawan::store_keuangan');
+
+        $routes->get('delete_penjualan/(:num)', 'Karyawan::delete_penjualan/$1');
     });
 });

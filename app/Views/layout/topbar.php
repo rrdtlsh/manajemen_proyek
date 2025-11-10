@@ -4,7 +4,10 @@ $role = $session->get('role');
 $username = $session->get('username') ?? 'Pengguna';
 ?>
 
-<?php if ($role == 'Penjualan' || $role == 'penjualan') : ?>
+<?php if (
+    $role == 'Penjualan' || $role == 'penjualan' ||
+    $role == 'Keuangan' || $role == 'keuangan'
+) : ?>
     <nav class="navbar navbar-expand navbar-light topbar penjualan-topbar mb-4 static-top shadow">
         <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3 text-white">
             <i class="fa fa-bars"></i>
@@ -19,7 +22,7 @@ $username = $session->get('username') ?? 'Pengguna';
                     <p class="user-name mb-0"><?= $username; ?></p>
                     <p class="user-role mb-0"><?= $role; ?></p>
                 </div>
-                <a href="<?= base_url('logout'); ?>" class="btn-logout">
+                <a href="#" class="btn-logout" data-toggle="modal" data-target="#logoutModal">
                     <i class="fas fa-sign-out-alt"></i>
                     Log Out
                 </a>
@@ -38,7 +41,7 @@ $username = $session->get('username') ?? 'Pengguna';
             <li class="nav-item dropdown no-arrow">
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                        <?= session()->get('username') ?? 'Pengguna'; ?>
+                        <?= $username; ?>
                     </span>
                     <img class="img-profile rounded-circle" src="https://via.placeholder.com/60">
                 </a>
@@ -48,7 +51,7 @@ $username = $session->get('username') ?? 'Pengguna';
                         Profil
                     </a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="<?= base_url('logout'); ?>">
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                         <i class="fas fa-arrow-left fa-sm fa-fw mr-2 text-gray-400"></i> Logout
                     </a>
                 </div>

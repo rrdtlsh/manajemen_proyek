@@ -26,60 +26,50 @@ class Login extends BaseController
      * Method ini untuk MEMPROSES data login
      * (Dipanggil oleh form action=".../login/auth")
      */
-/**
-     * Method ini untuk MEMPROSES data login
-     * (Dipanggil oleh form action=".../login/auth")
-     */
     public function auth()
     {
         $session = session();
         $model = new \App\Models\UserModel();
-        
+
         $username = $this->request->getPost('username');
         $password = $this->request->getPost('password');
 
         $user = $model->where('username', $username)->first();
 
         if ($user) {
-            
+
             if (password_verify($password, $user['password'])) {
 
                 // 3. Buat Session
                 $ses_data = [
                     'user_id'    => $user['id_user'],
                     'username'   => $user['username'],
-                    'role'       => $user['role'], 
+                    'role'       => $user['role'],
                     'isLoggedIn' => TRUE
                 ];
                 $session->set($ses_data);
 
-                // 4. Arahkan (Redirect) 
-                
-                // Cek KHUSUS untuk username 'inventaris' DULU
-                if ($user['username'] == 'inventaris') {
-                    return redirect()->to('/karyawan/inventaris');
-                }
-                
-                // ==========================================================
-                // ▼▼▼ TAMBAHKAN BLOK INI ▼▼▼
-                // ==========================================================
-                // Cek KHUSUS untuk username 'keuangan'
-                if ($user['username'] == 'keuangan') {
-                    // Arahkan ke rute keuangan
-                    return redirect()->to('/karyawan/keuangan'); 
-                }
-                // ==========================================================
-                // ▲▲▲ BATAS TAMBAHAN ▲▲▲
-                // ==========================================================
+                // 4. Arahkan (Redirect) BERDASARKAN ROLE
 
-                // Jika bukan 'inventaris' ATAU 'keuangan', baru cek role
-                if ($user['role'] == 'Pemilik') { 
+                // [PERBAIKAN LOGIKA]
+                // Kita gunakan $user['role'] (dari database) untuk menentukan tujuan
+                $role = strtolower($user['role']); // Ubah jadi huruf kecil untuk pencocokan
+
+                if ($role == 'owner' || $role == 'pemilik') {
                     return redirect()->to('/owner'); // Ke dashboard Owner
-                } else {
-                    // Semua karyawan lain (penjualan, dll)
-                    return redirect()->to('/karyawan'); // Ke dashboard Karyawan default
-                }
 
+                } elseif ($role == 'keuangan') {
+                    // [PERBAIKAN UTAMA] Arahkan ke rute laporan keuangan baru
+                    return redirect()->to('/karyawan/keuangan/laporan');
+                } elseif ($role == 'inventaris') {
+                    return redirect()->to('/karyawan/inventaris');
+                } elseif ($role == 'penjualan') {
+                    return redirect()->to('/karyawan/dashboard'); // Ke dashboard Karyawan Penjualan
+
+                } else {
+                    // Fallback jika rolenya 'staff' atau lainnya
+                    return redirect()->to('/karyawan/dashboard');
+                }
             } else {
                 $session->setFlashdata('error', 'Password yang Anda masukkan salah.');
                 return redirect()->to('/login');
@@ -89,6 +79,7 @@ class Login extends BaseController
             return redirect()->to('/login');
         }
     }
+
     /**
      * Method untuk Logout
      */
