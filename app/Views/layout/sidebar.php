@@ -7,6 +7,7 @@ $currentPath = uri_string();
 
 <?php if (
     $role == 'Penjualan' || $role == 'penjualan' ||
+    $role == 'inventaris' || $role == 'Inventaris'  || // <-- Ini sudah benar
     $role == 'Keuangan' || $role == 'keuangan'
 ) : ?>
     <ul class="navbar-nav sidebar penjualan-sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -65,6 +66,26 @@ $currentPath = uri_string();
                     <span>Laporan Keuangan</span>
                 </a>
             </li>
+            
+        <?php elseif ($role == 'inventaris' || $role == 'Inventaris') : ?>
+            <div class="sidebar-heading">
+                Operasional Toko
+            </div>
+            
+            <li class="nav-item <?= (strpos($currentPath, 'karyawan/inventaris') !== false && strpos($currentPath, 'restok') === false) ? 'active' : ''; ?>">
+                <a class="nav-link" href="<?= base_url('karyawan/inventaris'); ?>">
+                    <i class="fas fa-fw fa-box-open"></i>
+                    <span>Inventaris Stok</span>
+                </a>
+            </li>
+
+            <li class="nav-item <?= (strpos($currentPath, 'inventaris/restok') !== false) ? 'active' : ''; ?>">
+                <a class="nav-link" href="<?= base_url('karyawan/inventaris/restok'); ?>">
+                    <i class="fas fa-fw fa-dolly"></i>
+                    <span>Restok Supplier</span>
+                </a>
+            </li>
+
         <?php endif; ?>
 
         <hr class="sidebar-divider d-none d-md-block">
@@ -93,11 +114,6 @@ $currentPath = uri_string();
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard Owner</span>
                 </a>
-            <?php elseif ($role == 'inventaris') : ?>
-                <a class="nav-link" href="<?= base_url('karyawan/inventaris'); ?>">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard Inventaris</span>
-                </a>
             <?php else : // Fallback untuk role 'staff' atau 'karyawan' umum 
             ?>
                 <a class="nav-link" href="<?= base_url('karyawan/dashboard'); ?>">
@@ -108,7 +124,6 @@ $currentPath = uri_string();
         </li>
 
         <hr class="sidebar-divider">
-
 
         <?php if ($role == 'owner') : ?>
             <div class="sidebar-heading">
@@ -134,18 +149,6 @@ $currentPath = uri_string();
             </li>
         <?php endif; ?>
 
-        <?php if ($role == 'inventaris') : ?>
-            <div class="sidebar-heading">
-                Operasional Toko
-            </div>
-            <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('karyawan/inventaris'); ?>">
-                    <i class="fas fa-fw fa-box-open"></i>
-                    <span>Inventaris Stok</span>
-                </a>
-            </li>
-        <?php endif; ?>
-
         <?php if ($role == 'staff' || $role == 'karyawan') : ?>
             <li class="nav-item">
                 <a class="nav-link" href="<?= base_url('karyawan/inventaris'); ?>">
@@ -154,7 +157,6 @@ $currentPath = uri_string();
                 </a>
             </li>
         <?php endif; ?>
-
 
         <hr class="sidebar-divider d-none d-md-block">
 

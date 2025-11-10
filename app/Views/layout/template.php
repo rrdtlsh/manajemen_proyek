@@ -23,6 +23,7 @@
     $role = session()->get('role');
     if (
         $role == 'Penjualan' || $role == 'penjualan' ||
+        $role == 'inventaris' || $role == 'Inventaris'  ||
         $role == 'Keuangan' || $role == 'keuangan'
     ) : ?>
         <link href="<?= base_url('css/penjualan.css') ?>" rel="stylesheet">
@@ -35,6 +36,7 @@
 
 <body id="page-top" <?php if (
                         $role == 'Penjualan' || $role == 'penjualan' ||
+                        $role == 'inventaris' || $role == 'Inventaris'  ||
                         $role == 'Keuangan' || $role == 'keuangan'
                     ) : ?>class="penjualan-body" <?php endif; ?>>
 

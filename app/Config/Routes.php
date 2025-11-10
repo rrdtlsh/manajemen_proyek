@@ -52,6 +52,7 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
 
         // --- Rute Inventaris ---
         $routes->get('inventaris', 'Karyawan::inventaris');
+        $routes->get('inventaris/restok', 'Karyawan::restok_supplier');
         $routes->get('input_inventaris', 'Karyawan::input_inventaris');
         $routes->get('inventaris/tambah', 'Karyawan::tambah_produk');
         $routes->post('inventaris/store', 'Karyawan::store_produk');

@@ -771,4 +771,17 @@ class Karyawan extends BaseController
             return redirect()->to('karyawan/riwayat_penjualan')->with('error', 'Terjadi kesalahan server saat menghapus transaksi.');
         }
     }
+
+    public function restok_supplier()
+    {
+        $data = [
+            'title' => 'Restok Barang Supplier'
+            // Kirim data lain yang diperlukan untuk view di sini
+        ];
+
+        // Memanggil file view yang tadi kita buat
+        return view('inventaris/restok_supplier', $data);
+    }
 }
+
+

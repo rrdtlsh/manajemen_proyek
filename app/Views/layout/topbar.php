@@ -6,6 +6,7 @@ $username = $session->get('username') ?? 'Pengguna';
 
 <?php if (
     $role == 'Penjualan' || $role == 'penjualan' ||
+    $role == 'inventaris' || $role == 'Inventaris'  ||
     $role == 'Keuangan' || $role == 'keuangan'
 ) : ?>
     <nav class="navbar navbar-expand navbar-light topbar penjualan-topbar mb-4 static-top shadow">
