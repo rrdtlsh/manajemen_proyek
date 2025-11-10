@@ -70,7 +70,6 @@ public function inventaris()
             'produk' => $produkModel->findAll() // Anda mungkin masih perlu ini
         ];
         
-        // INI BAGIAN YANG DIUBAH
         return view('inventaris/input_inventaris', $data); 
     }
 
@@ -86,11 +85,11 @@ public function inventaris()
     /**
      * (Method ini dari file Manajemen.php lama Anda)
      */
-    public function keuangan()
-    {
-        // ...
-        return view('dashboard_staff/dashboard_keuangan');
-    }
+public function keuangan()
+{
+    // ...
+    return view('keuangan/input_keuangan');
+}
 
     // ==========================================================
     // === METHOD UNTUK RIWAYAT PENJUALAN ===

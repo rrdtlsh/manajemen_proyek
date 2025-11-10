@@ -55,23 +55,29 @@ class Login extends BaseController
 
                 // 4. Arahkan (Redirect) 
                 
-                // ==========================================================
-                // ▼▼▼ TAMBAHKAN KODE INI ▼▼▼
-                // ==========================================================
                 // Cek KHUSUS untuk username 'inventaris' DULU
                 if ($user['username'] == 'inventaris') {
                     return redirect()->to('/karyawan/inventaris');
+                }
+                
+                // ==========================================================
+                // ▼▼▼ TAMBAHKAN BLOK INI ▼▼▼
+                // ==========================================================
+                // Cek KHUSUS untuk username 'keuangan'
+                if ($user['username'] == 'keuangan') {
+                    // Arahkan ke rute keuangan
+                    return redirect()->to('/karyawan/keuangan'); 
                 }
                 // ==========================================================
                 // ▲▲▲ BATAS TAMBAHAN ▲▲▲
                 // ==========================================================
 
-                // Jika bukan 'inventaris', baru cek role seperti biasa
+                // Jika bukan 'inventaris' ATAU 'keuangan', baru cek role
                 if ($user['role'] == 'Pemilik') { 
                     return redirect()->to('/owner'); // Ke dashboard Owner
                 } else {
-                    // Semua karyawan lain (penjualan, keuangan, dll)
-                    return redirect()->to('/karyawan'); // Ke dashboard Karyawan
+                    // Semua karyawan lain (penjualan, dll)
+                    return redirect()->to('/karyawan'); // Ke dashboard Karyawan default
                 }
 
             } else {
