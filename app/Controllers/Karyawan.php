@@ -59,15 +59,19 @@ class Karyawan extends BaseController
     /**
      * (Method ini dari file Manajemen.php lama Anda)
      */
-    public function inventaris()
+public function inventaris()
     {
-        // Pastikan 'use App\Models\ProdukModel;' ada di atas
-        $produkModel = new ProdukModel();
+        // Anda mungkin tidak perlu $produkModel->findAll() 
+        // jika ini adalah halaman INPUT
+        $produkModel = new ProdukModel(); 
+        
         $data = [
-            'title'  => 'Dashboard Inventaris',
-            'produk' => $produkModel->findAll()
+            'title'  => 'Input Inventaris', // Ganti judulnya
+            'produk' => $produkModel->findAll() // Anda mungkin masih perlu ini
         ];
-        return view('dashboard_staff/dashboard_inventaris', $data);
+        
+        // INI BAGIAN YANG DIUBAH
+        return view('inventaris/input_inventaris', $data); 
     }
 
     /**
@@ -372,5 +376,105 @@ class Karyawan extends BaseController
         }
 
         return redirect()->to('karyawan/riwayat_penjualan')->with('success', 'Transaksi berhasil diperbarui.');
+    }
+
+    /**
+     * (Fungsi Anda yang sudah ada - untuk menampilkan daftar)
+     */
+
+    public function tambah_produk()
+    {
+        $data = [
+            'title' => 'Tambah Produk Baru'
+        ];
+        return view('inventaris/v_tambah_produk', $data);
+    }
+
+    /**
+     * [BARU] Menyimpan data produk baru ke database
+     */
+    public function store_produk()
+    {
+        $produkModel = new ProdukModel();
+
+        // Ambil data dari form
+        $data = [
+            'nama_produk' => $this->request->getPost('nama_produk'),
+            'harga'       => $this->request->getPost('harga'),
+            'stok'        => $this->request->getPost('stok'),
+            // Tambahkan field lain jika ada (misal: 'kategori', 'deskripsi')
+        ];
+
+        // Validasi sederhana (Anda bisa tambahkan aturan validasi di sini)
+        if (empty($data['nama_produk']) || empty($data['harga']) || !isset($data['stok'])) {
+            return redirect()->back()->withInput()->with('error', 'Semua field wajib diisi.');
+        }
+
+        // Simpan ke database
+        $produkModel->insert($data);
+
+        return redirect()->to('/karyawan/inventaris')->with('success', 'Produk berhasil ditambahkan.');
+    }
+
+    /**
+     * [BARU] Menampilkan halaman form untuk mengedit produk
+     */
+    public function edit_produk($id_produk)
+    {
+        $produkModel = new ProdukModel();
+        $produk = $produkModel->find($id_produk);
+
+        if (!$produk) {
+            return redirect()->to('/karyawan/inventaris')->with('error', 'Produk tidak ditemukan.');
+        }
+
+        $data = [
+            'title'  => 'Edit Produk',
+            'produk' => $produk
+        ];
+
+        return view('inventaris/v_edit_produk', $data);
+    }
+
+    /**
+     * [BARU] Memperbarui data produk di database
+     */
+    public function update_produk($id_produk)
+    {
+        $produkModel = new ProdukModel();
+
+        // Ambil data dari form
+        $data = [
+            'nama_produk' => $this->request->getPost('nama_produk'),
+            'harga'       => $this->request->getPost('harga'),
+            'stok'        => $this->request->getPost('stok')
+        ];
+        
+        // Validasi
+        if (empty($data['nama_produk']) || empty($data['harga']) || !isset($data['stok'])) {
+            return redirect()->back()->withInput()->with('error', 'Semua field wajib diisi.');
+        }
+
+        // Update data
+        $produkModel->update($id_produk, $data);
+
+        return redirect()->to('/karyawan/inventaris')->with('success', 'Produk berhasil diperbarui.');
+    }
+
+    /**
+     * [BARU] Menghapus produk dari database
+     */
+    public function delete_produk($id_produk)
+    {
+        $produkModel = new ProdukModel();
+        
+        // Cek apakah produk ada
+        $produk = $produkModel->find($id_produk);
+        if ($produk) {
+            $produkModel->delete($id_produk);
+            return redirect()->to('/karyawan/inventaris')->with('success', 'Produk berhasil dihapus.');
+        } else {
+            return redirect()->to('/karyawan/inventaris')->with('error', 'Produk gagal dihapus atau tidak ditemukan.');
+        }
     }
 }

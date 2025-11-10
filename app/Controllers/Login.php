@@ -26,6 +26,10 @@ class Login extends BaseController
      * Method ini untuk MEMPROSES data login
      * (Dipanggil oleh form action=".../login/auth")
      */
+/**
+     * Method ini untuk MEMPROSES data login
+     * (Dipanggil oleh form action=".../login/auth")
+     */
     public function auth()
     {
         $session = session();
@@ -40,22 +44,33 @@ class Login extends BaseController
             
             if (password_verify($password, $user['password'])) {
 
-                // HAPUS 'dd($user['role']);' DARI SINI JIKA TADI ANDA MENAMBAHKANNYA
-
                 // 3. Buat Session
                 $ses_data = [
                     'user_id'    => $user['id_user'],
                     'username'   => $user['username'],
-                    'role'       => $user['role'], // Ini akan berisi "Pemilik"
+                    'role'       => $user['role'], 
                     'isLoggedIn' => TRUE
                 ];
                 $session->set($ses_data);
 
-                // 4. Arahkan (Redirect) berdasarkan role
-                // === INI PERBAIKANNYA ===
+                // 4. Arahkan (Redirect) 
+                
+                // ==========================================================
+                // ▼▼▼ TAMBAHKAN KODE INI ▼▼▼
+                // ==========================================================
+                // Cek KHUSUS untuk username 'inventaris' DULU
+                if ($user['username'] == 'inventaris') {
+                    return redirect()->to('/karyawan/inventaris');
+                }
+                // ==========================================================
+                // ▲▲▲ BATAS TAMBAHAN ▲▲▲
+                // ==========================================================
+
+                // Jika bukan 'inventaris', baru cek role seperti biasa
                 if ($user['role'] == 'Pemilik') { 
                     return redirect()->to('/owner'); // Ke dashboard Owner
                 } else {
+                    // Semua karyawan lain (penjualan, keuangan, dll)
                     return redirect()->to('/karyawan'); // Ke dashboard Karyawan
                 }
 

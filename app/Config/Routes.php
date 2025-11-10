@@ -60,5 +60,22 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
         // == RUTE EDIT & UPDATE (SUDAH DIPINDAHKAN KE DALAM GRUP 'karyawan') ==
         $routes->get('edit_penjualan/(:num)', 'Karyawan::edit_penjualan/$1');
         $routes->post('update_penjualan/(:num)', 'Karyawan::update_penjualan/$1');
+
+        $routes->group('karyawan', ['filter' => 'auth'], function ($routes) {
+    // ... (rute Anda yang sudah ada seperti 'dashboard', 'input_penjualan', dll) ...
+
+     // Halaman Input Transaksi (POS)
+        $routes->get('input_inventaris', 'Karyawan::input_inventaris');
+
+    // RUTE LAMA ANDA UNTUK INVENTARIS (HANYA DAFTAR)
+    $routes->get('inventaris', 'Karyawan::inventaris'); 
+    
+    // RUTE-RUTE BARU UNTUK MANAJEMEN INVENTARIS (CRUD)
+    $routes->get('inventaris/tambah', 'Karyawan::tambah_produk'); // Menampilkan form tambah
+    $routes->post('inventaris/store', 'Karyawan::store_produk');  // Menyimpan data baru
+    $routes->get('inventaris/edit/(:num)', 'Karyawan::edit_produk/$1'); // Menampilkan form edit
+    $routes->post('inventaris/update/(:num)', 'Karyawan::update_produk/$1'); // Menyimpan data update
+    $routes->get('inventaris/delete/(:num)', 'Karyawan::delete_produk/$1'); // Menghapus data
+});
     });
 });
