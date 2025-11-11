@@ -12,7 +12,7 @@
         <i class="fas fa-cubes mr-2" style="color: #2d8659;"></i>
         <?= $title; ?>
     </h1>
-    <a href="<?= base_url('karyawan/inventaris/tambah'); ?>" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
+    <a href="<?= base_url('inventaris/tambah_produk'); ?>" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
         <i class="fas fa-plus fa-sm text-white-50"></i> Tambah Produk Baru
     </a>
 </div>
@@ -59,12 +59,12 @@
                             <td>Rp <?= number_format($p['harga'], 0, ',', '.'); ?></td>
                             <td><?= $p['stok']; ?></td>
                             <td>
-                                <a href="<?= base_url('karyawan/inventaris/edit/' . $p['id_produk']); ?>" class="btn btn-primary btn-aksi">
+                                <a href="<?= base_url('inventaris/edit_produk/' . $p['id_produk']); ?>" class="btn btn-primary btn-aksi">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
                                 
                                 <button type="button" class="btn btn-danger btn-aksi" 
-                                    onclick="confirmDelete(<?= $p['id_produk']; ?>, '<?= base_url('karyawan/inventaris/delete/' . $p['id_produk']); ?>')">
+                                    onclick="confirmDelete(<?= $p['id_produk']; ?>, '<?= base_url('inventaris/delete_produk/' . $p['id_produk']); ?>')">
                                     <i class="fas fa-trash"></i> Hapus
                                 </button>
                             </td>

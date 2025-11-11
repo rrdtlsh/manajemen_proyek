@@ -60,9 +60,9 @@ class Login extends BaseController
 
                 } elseif ($role == 'keuangan') {
                     // [PERBAIKAN UTAMA] Arahkan ke rute laporan keuangan baru
-                    return redirect()->to('/karyawan/keuangan/laporan');
+                    return redirect()->to('/keuangan/laporanKeuangan');
                 } elseif ($role == 'inventaris') {
-                    return redirect()->to('/karyawan/inventaris');
+                    return redirect()->to('/inventaris');
                 } elseif ($role == 'penjualan') {
                     return redirect()->to('/karyawan/dashboard'); // Ke dashboard Karyawan Penjualan
 
