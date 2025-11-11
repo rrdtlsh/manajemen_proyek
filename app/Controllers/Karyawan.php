@@ -24,14 +24,37 @@ class Karyawan extends BaseController
         ];
 
         if ($role === 'penjualan') {
+            // -- MULAI PERUBAHAN --
+            // 1. Panggil Model
+            $penjualanModel = new \App\Models\PenjualanModel();
+
+            // 2. Ambil data dashboard dari fungsi yang tadi kita buat
+            $salesData = $penjualanModel->getDashboardData();
+
+            // 3. Gabungkan data (username + data sales)
+            $data = array_merge($data, $salesData);
+            // -- SELESAI PERUBAHAN --
+
             $data['title'] = 'Dashboard Penjualan';
             return view('dashboard_staff/dashboard_penjualan', $data);
         } elseif ($role === 'keuangan') {
             return redirect()->to('karyawan/keuangan/laporan');
         } elseif ($role === 'inventaris') {
             $data['title'] = 'Dashboard Inventaris';
+            // Nanti Anda bisa membuat fungsi getDashboardData() untuk inventaris
             return view('dashboard_staff/dashboard_inventaris', $data);
         } else {
+            // -- MULAI PERUBAHAN (UNTUK ROLE LAIN) --
+            // 1. Panggil Model
+            $penjualanModel = new \App\Models\PenjualanModel();
+
+            // 2. Ambil data dashboard
+            $salesData = $penjualanModel->getDashboardData();
+
+            // 3. Gabungkan data
+            $data = array_merge($data, $salesData);
+            // -- SELESAI PERUBAHAN --
+
             $data['title'] = 'Dashboard';
             return view('dashboard_staff/dashboard_penjualan', $data);
         }
@@ -427,7 +450,7 @@ class Karyawan extends BaseController
         // 2. Ambil data dari form
         $cart_items_json = $this->request->getPost('cart_items');
         $cart_items = json_decode($cart_items_json, true);
-        $total_belanja = $this->request->getPost('total_belanja');
+        $total_belanja = $this->request->getPost('total');
         $jumlah_dp_form = $this->request->getPost('jumlah_dp') ?? 0;
         $metode_bayar_form = $this->request->getPost('metode_pembayaran');
         $tanggal_form = $this->request->getPost('tanggal');
@@ -455,7 +478,7 @@ class Karyawan extends BaseController
         // 5. Kembalikan Stok Lama
         $old_details = $detailModel->where('id_penjualan', $id_penjualan)->findAll();
         foreach ($old_details as $item) {
-            $produkModel->update($item['id_produk'], ['stok' => $item['qty']], true); // increment
+            $produkModel->tambahStok($item['id_produk'], $item['qty']);
         }
 
         // 6. Hapus detail penjualan lama
@@ -475,7 +498,7 @@ class Karyawan extends BaseController
                 'harga_satuan' => $harga_satuan,
             ];
             // Kurangi stok produk (stok baru)
-            $produkModel->update($item['id'], ['stok' => $qty], true); // decrement
+            $produkModel->kurangiStok($item['id'], $qty);
         }
         if (!empty($dataDetailBatch)) {
             $detailModel->insertBatch($dataDetailBatch);
@@ -517,6 +540,30 @@ class Karyawan extends BaseController
         }
 
         return redirect()->to('karyawan/riwayat_penjualan')->with('success', 'Transaksi #' . $id_penjualan . ' berhasil diperbarui.');
+    }
+
+
+    public function detail_penjualan($id_penjualan)
+    {
+        // Instansiasi Model (mengikuti pola Anda dari fungsi update)
+        $penjualanModel = new \App\Models\PenjualanModel();
+        $detailModel = new \App\Models\DetailPenjualanModel();
+        $data['title'] = 'Detail Transaksi';
+
+        // 1. Ambil data utama penjualan (Pakai fungsi yg sudah ada)
+        // Fungsi ini sudah ada di PenjualanModel Anda dan sudah JOIN dgn pelanggan/user
+        $data['penjualan'] = $penjualanModel->getPenjualanById($id_penjualan);
+
+        // 2. Ambil data item/barang (Pakai fungsi baru dari Langkah 1)
+        $data['detail_items'] = $detailModel->getDetailItems($id_penjualan);
+
+        // 3. Cek jika data ada
+        if (empty($data['penjualan'])) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Data penjualan tidak ditemukan: ' . $id_penjualan);
+        }
+
+        // 4. Tampilkan View baru
+        return view('penjualan/detail_penjualan', $data);
     }
 
 
@@ -783,5 +830,3 @@ class Karyawan extends BaseController
         return view('inventaris/restok_supplier', $data);
     }
 }
-
-

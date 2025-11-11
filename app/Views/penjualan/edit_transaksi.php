@@ -216,7 +216,7 @@
                                 <option value="lunas">Lunas</option>
                                 <option value="belum_lunas">Belum Lunas (DP)</option>
                             </select>
-                            <input type="hidden" id="status_bayar_hidden" name="status_bayar" value="<?= ($penjualan['status_pembayaran'] == 'Lunas') ? 'lunas' : 'belum_lunas'; ?>">
+                            <input type="hidden" id="status_bayar_hidden" name="status_pembayaran" value="<?= ($penjualan['status_pembayaran'] == 'Lunas') ? 'lunas' : 'belum_lunas'; ?>">
                         </div>
                         <div class="form-group col-md-6">
                             <label for="metode_pembayaran" class="font-weight-bold text-gray-700">Metode Pembayaran*</label>
@@ -231,7 +231,7 @@
                         <input type="number" class="form-control" id="jumlah_dp" name="jumlah_dp" placeholder="Masukkan jumlah bayar" value="<?= $penjualan['jumlah_dp']; ?>" required>
                     </div>
 
-                    <input type="hidden" name="total_belanja" id="total_belanja_hidden">
+                    <input type="hidden" name="total" id="total_belanja_hidden">
                     <input type="hidden" name="cart_items" id="cart_items_hidden">
 
                     <div class="row mt-4">

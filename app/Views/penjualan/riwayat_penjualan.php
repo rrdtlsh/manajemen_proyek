@@ -87,7 +87,7 @@
                             </td>
                             <td><?= $trx['metode_pembayaran']; ?></td>
                             <td>
-                                <a href="#" class="btn btn-info btn-sm">
+                                <a href="<?= base_url('karyawan/detail_penjualan/' . $trx['id_penjualan']); ?>" class="btn btn-info btn-sm">
                                     <i class="fas fa-eye"></i>
                                 </a>
 

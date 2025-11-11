@@ -68,5 +68,6 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
         $routes->post('store_keuangan', 'Karyawan::store_keuangan');
 
         $routes->get('delete_penjualan/(:num)', 'Karyawan::delete_penjualan/$1');
+        $routes->get('detail_penjualan/(:num)', 'Karyawan::detail_penjualan/$1');
     });
 });
