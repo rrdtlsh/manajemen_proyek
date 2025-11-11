@@ -1,0 +1,14 @@
+.badge-warning {
+    background-color: #f6c23e;
+    color: #fff;
+}
+
+.badge-success {
+    background-color: #1cc88a;
+    color: #fff;
+}
+
+.badge-danger {
+    background-color: #e74a3b;
+    color: #fff;
+}

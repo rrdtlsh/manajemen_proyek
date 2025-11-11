@@ -19,16 +19,16 @@
             </div>
         </div>
 
-        <div class="right-section" style="display:flex;align-items:center;justify-content:center;">
-            <div class="login-form-wrapper" style="width:100%;max-width:420px;">
-                <div class="logo" style="text-align:center;">
-                    <img src="<?= base_url('images/logo-karpet.jpeg') ?>" alt="Logo SADANG THJ" style="display:block;margin:0 auto;max-width:160px;height:auto;">
+        <div class="right-section">
+            <div class="login-form-wrapper">
+                <div class="logo">
+                    <img src="<?= base_url('images/logo-karpet.jpeg') ?>" alt="Logo SADANG THJ">
                 </div>
 
-                <h1 class="form-title" style="text-align:center;">SADANG THJ Dashboard</h1>
-                <p class="form-subtitle" style="text-align:center;">Selamat datang kembali! Silakan masukkan detail Anda.</p>
+                <h1 class="form-title">SADANG THJ Dashboard</h1>
+                <p class="form-subtitle">Selamat datang kembali! Silakan masukkan detail Anda.</p>
 
-                <div class="employee-notice" style="text-align:center;">
+                <div class="employee-notice">
                     <p class="employee-text">Hanya untuk karyawan.</p>
                     <a href="<?= base_url('/') ?>" class="homepage-link">Klik Disini untuk Kembali ke beranda</a>
                 </div>

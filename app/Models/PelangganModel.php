@@ -12,7 +12,7 @@ class PelangganModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['nama_pelanggan', 'no_hp', 'alamat'];
+    protected $allowedFields    = ['nama_pelanggan', 'no_hp', 'alamat', 'created_at', 'updated_at'];
 
     // Dates
     protected $useTimestamps = true;

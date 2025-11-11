@@ -2,22 +2,7 @@
 
 <?= $this->section('head'); ?>
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
-<style>
-    .badge-warning {
-        background-color: #f6c23e;
-        color: #fff;
-    }
-
-    .badge-success {
-        background-color: #1cc88a;
-        color: #fff;
-    }
-
-    .badge-danger {
-        background-color: #e74a3b;
-        color: #fff;
-    }
-</style>
+<link href="<?= base_url('css/riwayat_penjualan.css') ?>" rel="stylesheet">
 <?= $this->endSection(); ?>
 
 <?= $this->section('content'); ?>
@@ -98,7 +83,7 @@
                                 <?php endif; ?>
 
                                 <button type="button" class="btn btn-danger btn-sm"
-                                    onclick="confirmDelete('<?= $trx['id_penjualan']; ?>')">
+                                    onclick="confirmDelete('<?= $trx['id_penjualan']; ?>', '<?= base_url('karyawan/delete_penjualan/' . $trx['id_penjualan']); ?>')">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
@@ -115,30 +100,5 @@
 <?= $this->section('script'); ?>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $('#dataTableRiwayat').DataTable({
-            "order": [
-                [0, "desc"]
-            ]
-        });
-    });
-
-    function confirmDelete(idPenjualan) {
-        Swal.fire({
-            title: 'Anda Yakin?',
-            text: "Transaksi #" + idPenjualan + " akan dihapus permanen. Stok barang akan dikembalikan.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = `<?= base_url('karyawan/delete_penjualan/'); ?>${idPenjualan}`;
-            }
-        });
-    }
-</script>
+<script src="<?= base_url('js/riwayat_penjualan.js') ?>"></script>
 <?= $this->endSection(); ?>

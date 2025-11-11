@@ -65,12 +65,15 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
+    text-align: center;
 }
 
 .logo img {
     max-width: 200px;
     height: auto;
     object-fit: contain;
+    display: block;
+    margin: 0 auto;
 }
 
 .language-switcher {
@@ -108,12 +111,14 @@ body {
     font-weight: 700;
     color: #2d8659;
     margin-bottom: 8px;
+    text-align: center;
 }
 
 .form-subtitle {
     font-size: 16px;
     color: #9ca3af;
     margin-bottom: 16px;
+    text-align: center;
 }
 
 .employee-notice {

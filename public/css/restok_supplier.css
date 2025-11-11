@@ -1,0 +1,29 @@
+.supplier-card {
+    border-left: 4px solid #2d8659;
+    transition: all 0.3s ease;
+}
+.supplier-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+.supplier-card .card-body {
+    padding: 1.5rem;
+}
+.supplier-card .btn {
+    background-color: #2d8659;
+    border-color: #2d8659;
+    color: white;
+}
+.supplier-card .btn:hover {
+    background-color: #256d47;
+    border-color: #256d47;
+}
+
+/* Menyesuaikan Tombol Aksi */
+.btn-aksi {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+.page-title-icon {
+    color: #2d8659;
+}

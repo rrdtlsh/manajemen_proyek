@@ -14,13 +14,13 @@ class AddDashboardFields extends Migration
                 'type'       => 'ENUM',
                 'constraint' => ['lunas', 'belum_lunas'],
                 'default'    => 'belum_lunas',
-                'after'      => 'total', // Ditempatkan setelah total_harga
+                'after'      => 'total', 
             ],
             'metode_pembayaran' => [
                 'type'       => 'ENUM',
                 'constraint' => ['cash', 'transfer'],
                 'default'    => 'cash',
-                'after'      => 'status_bayar', // Ditempatkan setelah status_bayar
+                'after'      => 'status_bayar',
             ],
         ];
         $this->forge->addColumn('penjualan', $fieldsPenjualan);

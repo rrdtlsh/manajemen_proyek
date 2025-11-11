@@ -22,7 +22,7 @@
         <?= $title; ?>
     </h1>
     <a href="<?= base_url('karyawan/input_keuangan'); ?>" class="btn btn-primary btn-sm shadow-sm">
-        <i class="fas fa-plus fa-sm text-white-50"></i> Tambah Pengeluaran
+        <i class="fas fa-plus fa-sm text-white-50 mr-1"></i> Input Pengeluaran Manual
     </a>
 </div>
 
@@ -71,13 +71,5 @@
 <?= $this->section('script'); ?>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $('#dataTable').DataTable({
-            "order": [
-                [0, "desc"]
-            ]
-        });
-    });
-</script>
+<script src="<?= base_url('js/pengeluaran.js') ?>"></script>
 <?= $this->endSection(); ?>

@@ -2,16 +2,7 @@
 
 <?= $this->section('head') ?>
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
-<style>
-    /* Menyesuaikan Tombol Aksi */
-    .btn-aksi {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-    }
-    .page-title-icon {
-        color: #2d8659;
-    }
-</style>
+<link href="<?= base_url('css/restok_supplier.css') ?>" rel="stylesheet">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
@@ -162,27 +153,5 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 
-<script>
-    $(document).ready(function() {
-        $('#dataTableRestok').DataTable({
-            "order": [
-                [0, "desc"] // Urutkan berdasarkan ID terbaru
-            ]
-        });
-
-        // (Opsional) Logika front-end untuk hitung total di modal
-        const inputHarga = document.getElementById('restok_harga');
-        const inputJumlah = document.getElementById('restok_jumlah');
-        const inputTotal = document.getElementById('restok_total');
-
-        function hitungTotal() {
-            const harga = parseFloat(inputHarga.value) || 0;
-            const jumlah = parseInt(inputJumlah.value) || 0;
-            inputTotal.value = harga * jumlah;
-        }
-
-        inputHarga.addEventListener('input', hitungTotal);
-        inputJumlah.addEventListener('input', hitungTotal);
-    });
-</script>
+<script src="<?= base_url('js/restok_supplier.js') ?>"></script>
 <?= $this->endSection() ?>

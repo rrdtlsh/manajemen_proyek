@@ -1,0 +1,60 @@
+.card-summary {
+    border-left-width: 4px;
+}
+
+.card-success {
+    border-left-color: #1cc88a;
+}
+
+.card-danger {
+    border-left-color: #e74a3b;
+}
+
+.card-info {
+    border-left-color: #36b9cc;
+}
+
+.card-primary {
+    border-left-color: #4e73df;
+}
+
+.card-warning {
+    border-left-color: #f6c23e;
+}
+
+.card-summary .icon-circle {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-success-light {
+    background-color: rgba(28, 200, 138, 0.1);
+}
+
+.bg-danger-light {
+    background-color: rgba(231, 74, 59, 0.1);
+}
+
+.bg-info-light {
+    background-color: rgba(54, 185, 204, 0.1);
+}
+
+.bg-primary-light {
+    background-color: rgba(78, 115, 223, 0.1);
+}
+
+.bg-warning-light {
+    background-color: rgba(246, 194, 62, 0.1);
+}
+
+.text-success-light {
+    color: #1cc88a;
+}
+
+.text-danger-light {
+    color: #e74a3b;
+}
