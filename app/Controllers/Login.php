@@ -10,21 +10,17 @@ class Login extends BaseController
 {
     /**
      * Method ini untuk MENAMPILKAN halaman login
-     * (Dipanggil saat Anda membuka http://localhost:8080/login)
      */
     public function index()
     {
         $data = [
             'title' => 'Login'
         ];
-
-        // Memuat file: app/Views/auth/login.php
         return view('auth/login', $data);
     }
 
     /**
      * Method ini untuk MEMPROSES data login
-     * (Dipanggil oleh form action=".../login/auth")
      */
     public function auth()
     {
@@ -50,24 +46,22 @@ class Login extends BaseController
                 $session->set($ses_data);
 
                 // 4. Arahkan (Redirect) BERDASARKAN ROLE
-
-                // [PERBAIKAN LOGIKA]
-                // Kita gunakan $user['role'] (dari database) untuk menentukan tujuan
-                $role = strtolower($user['role']); // Ubah jadi huruf kecil untuk pencocokan
+                $role = strtolower($user['role']);
 
                 if ($role == 'owner' || $role == 'pemilik') {
                     return redirect()->to('/owner'); // Ke dashboard Owner
 
                 } elseif ($role == 'keuangan') {
-                    // [PERBAIKAN UTAMA] Arahkan ke rute laporan keuangan baru
-                    return redirect()->to('/keuangan/laporanKeuangan');
+                    // [PERBAIKAN] Arahkan ke rute karyawan/keuangan/laporan
+                    return redirect()->to('karyawan/keuangan/laporan');
                 } elseif ($role == 'inventaris') {
-                    return redirect()->to('/inventaris');
+                    // [PERBAIKAN] Arahkan ke rute karyawan/inventaris
+                    return redirect()->to('karyawan/inventaris');
                 } elseif ($role == 'penjualan') {
-                    return redirect()->to('/karyawan/dashboard'); // Ke dashboard Karyawan Penjualan
-
+                    // Ini sudah benar, mengarah ke redirector Karyawan
+                    return redirect()->to('/karyawan/dashboard');
                 } else {
-                    // Fallback jika rolenya 'staff' atau lainnya
+                    // Fallback
                     return redirect()->to('/karyawan/dashboard');
                 }
             } else {

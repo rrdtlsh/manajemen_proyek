@@ -448,10 +448,29 @@ class PenjualanController extends BaseController
 
     public function addPelanggan()
     {
+        // [PERBAIKAN] Aturan validasi diperketat
         $rules = [
-            'nama_pelanggan' => 'required|min_length[3]',
-            'no_hp'          => 'required|min_length[10]|max_length[15]',
-            'alamat'         => 'permit_empty|min_length[5]',
+            'nama_pelanggan' => [
+                'label' => 'Nama Pelanggan',
+                'rules' => 'required|min_length[3]|alpha_space', // Hanya huruf dan spasi
+                'errors' => [
+                    'alpha_space' => 'Nama pelanggan hanya boleh berisi huruf dan spasi.'
+                ]
+            ],
+            'no_hp'          => [
+                'label' => 'No. HP',
+                'rules' => 'required|min_length[10]|max_length[15]|numeric', // Hanya angka
+                'errors' => [
+                    'numeric' => 'Nomor HP hanya boleh berisi angka.'
+                ]
+            ],
+            'alamat'         => [
+                'label' => 'Alamat',
+                'rules' => 'required|min_length[5]', // Dibuat wajib diisi
+                'errors' => [
+                    'required' => 'Alamat wajib diisi.'
+                ]
+            ],
         ];
 
         if (!$this->validate($rules)) {

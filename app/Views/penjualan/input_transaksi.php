@@ -66,11 +66,11 @@
             </div>
             <div class="card-body">
                 <form action="<?= base_url('karyawan/store_penjualan'); ?>" method="POST" id="form-transaksi"
-                data-url-search-pelanggan="<?= base_url('karyawan/search_pelanggan'); ?>"
-                data-url-search-produk="<?= base_url('karyawan/search_produk'); ?>"
-                data-url-add-pelanggan="<?= base_url('karyawan/add_pelanggan'); ?>">    
-                
-                <?= csrf_field(); ?>
+                    data-url-search-pelanggan="<?= base_url('karyawan/search_pelanggan'); ?>"
+                    data-url-search-produk="<?= base_url('karyawan/search_produk'); ?>"
+                    data-url-add-pelanggan="<?= base_url('karyawan/add_pelanggan'); ?>">
+
+                    <?= csrf_field(); ?>
 
 
                     <div class="form-group">
@@ -172,11 +172,13 @@
                     <div id="modal-errors" class="alert alert-danger" style="display: none;"></div>
                     <div class="form-group">
                         <label for="nama_pelanggan">Nama Pelanggan*</label>
-                        <input type="text" class="form-control" id="nama_pelanggan" name="nama_pelanggan" required>
+                        <input type="text" class="form-control" id="nama_pelanggan" name="nama_pelanggan" required
+                            oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '');">
                     </div>
                     <div class="form-group">
                         <label for="no_hp">No. HP*</label>
-                        <input type="text" class="form-control" id="no_hp" name="no_hp" required>
+                        <input type="text" class="form-control" id="no_hp" name="no_hp" required maxlength="15"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                     </div>
                     <div class="form-group">
                         <label for="alamat">Alamat</label>

@@ -78,7 +78,7 @@
                         <th>Pelanggan</th>
                         <th>Total</th>
                         <th>Status</th>
-                        <th>Waktu</th>
+                        <th>Tanggal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,7 +100,7 @@
                                     echo '<span class="' . $status_class . '">' . $trx['status_pembayaran'] . '</span>';
                                     ?>
                                 </td>
-                                <td class="text-muted"><small><?= date('H:i', strtotime($trx['tanggal'])); ?> WIB</small></td>
+                                <td class="text-muted"><small><?= date('d M Y', strtotime($trx['tanggal'])); ?></small></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
