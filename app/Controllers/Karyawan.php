@@ -3,51 +3,41 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
-// Hanya panggil model yang diperlukan untuk dashboard
-use App\Models\PenjualanModel;
+// Hapus semua 'use' Model, karena file ini tidak membutuhkannya lagi
+// Cukup BaseController saja
 
 class Karyawan extends BaseController
 {
-    public function index()
-    {
-        // Arahkan ke dashboard sebagai halaman utama
-        return redirect()->to('/karyawan/dashboard');
-    }
-
+    /**
+     * Fungsi ini HANYA bertugas mengarahkan (me-redirect)
+     * user ke dashboard sesuai role mereka.
+     */
     public function dashboard()
     {
         $role = session()->get('role');
-        $username = session()->get('username');
-
-        $data = [
-            'username' => $username
-        ];
 
         if ($role === 'penjualan') {
-            $penjualanModel = new \App\Models\PenjualanModel();
-            $salesData = $penjualanModel->getDashboardData();
-            $data = array_merge($data, $salesData);
-            $data['title'] = 'Dashboard Penjualan';
-            return view('dashboard_staff/dashboard_penjualan', $data);
-
+            // [PERBAIKAN] Arahkan ke dashboard penjualan yang baru
+            // Rute ini ada di Routes.php Anda di grup 'penjualan'
+            return redirect()->to('penjualan/dashboard');
         } elseif ($role === 'keuangan') {
-            // [PERUBAHAN] Arahkan ke controller Keuangan yang baru
-            return redirect()->to('keuangan/laporanKeuangan');
-
+            // [PERBAIKAN] Tambahkan awalan 'karyawan/' agar cocok dengan Routes.php
+            return redirect()->to('karyawan/keuangan/laporan');
         } elseif ($role === 'inventaris') {
-            $data['title'] = 'Dashboard Inventaris';
-            // Nanti Anda bisa membuat fungsi getDashboardData() untuk inventaris
-            return view('dashboard_staff/dashboard_inventaris', $data);
-
+            // [PERBAIKAN] Arahkan ke rute 'karyawan/inventaris' (sesuai Routes.php)
+            // Rute ini akan memanggil InventarisController::index
+            return redirect()->to('karyawan/inventaris');
         } else {
-            // Role lain (misal: admin) bisa lihat dashboard penjualan
-            $penjualanModel = new \App\Models\PenjualanModel();
-            $salesData = $penjualanModel->getDashboardData();
-            $data = array_merge($data, $salesData);
-            $data['title'] = 'Dashboard';
-            return view('dashboard_staff/dashboard_penjualan', $data);
+            // Default fallback jika role tidak dikenal
+            return redirect()->to('penjualan/dashboard');
         }
     }
 
-    // === SEMUA FUNGSI LAIN (penjualan, keuangan, inventaris) SUDAH DIHAPUS ===
+    /**
+     * Index default untuk karyawan, arahkan ke dashboard.
+     */
+    public function index()
+    {
+        return redirect()->to('/karyawan/dashboard');
+    }
 }

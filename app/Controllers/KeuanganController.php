@@ -3,48 +3,34 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
-// [PERBAIKAN PENTING] Tambahkan SEMUA model yang kita butuhkan
 use App\Models\KeuanganModel;
 use App\Models\PenjualanModel;
-use CodeIgniter\I18n\Time; // Pastikan ini juga ada
+use CodeIgniter\I18n\Time;
 
-class Keuangan extends BaseController
+class KeuanganController extends BaseController
 {
-    /**
-     * Halaman index akan diarahkan ke laporan utama
-     */
     public function index()
     {
-        return redirect()->to('keuangan/laporanKeuangan');
+        // [PERBAIKAN] Arahkan ke rute 'karyawan/'
+        return redirect()->to('karyawan/keuangan/laporan');
     }
 
-    /**
-     * [PERBAIKAN] Kode sudah diisi
-     * Menampilkan halaman Laporan Pemasukan
-     */
-    public function keuanganPemasukan()
+    public function pemasukan()
     {
         $keuanganModel = new KeuanganModel();
-
         $data = [
             'title' => 'Laporan Pemasukan',
             'laporan' => $keuanganModel
-                ->whereIn('tipe', ['Pemasukan', 'DP']) // Hanya ambil Pemasukan dan DP
+                ->whereIn('tipe', ['Pemasukan', 'DP'])
                 ->orderBy('tanggal', 'DESC')
                 ->findAll()
         ];
-
-        return view('keuangan/pemasukan', $data); // Pastikan view 'keuangan/pemasukan.php' ada
+        return view('keuangan/pemasukan', $data);
     }
 
-    /**
-     * [PERBAIKAN] Kode sudah diisi
-     * Menampilkan halaman Laporan Pengeluaran
-     */
-    public function keuanganPengeluaran()
+    public function pengeluaran()
     {
         $keuanganModel = new KeuanganModel();
-
         $data = [
             'title' => 'Laporan Pengeluaran',
             'laporan' => $keuanganModel
@@ -52,14 +38,9 @@ class Keuangan extends BaseController
                 ->orderBy('tanggal', 'DESC')
                 ->findAll()
         ];
-
-        return view('keuangan/pengeluaran', $data); // Pastikan view 'keuangan/pengeluaran.php' ada
+        return view('keuangan/pengeluaran', $data);
     }
 
-    /**
-     * [PERBAIKAN] Kode sudah diisi
-     * Menampilkan halaman Laporan Keuangan utama
-     */
     public function laporanKeuangan()
     {
         $keuanganModel = new KeuanganModel();
@@ -87,7 +68,6 @@ class Keuangan extends BaseController
         }
 
         $keuanganBuilder = $keuanganModel->where('tanggal >=', $startDate)->where('tanggal <=', $endDate);
-
         $laporan = (clone $keuanganBuilder)->orderBy('tanggal', 'ASC')->findAll();
 
         $totalPemasukan = (clone $keuanganBuilder)->whereIn('tipe', ['Pemasukan', 'DP'])->selectSum('pemasukan')->first()['pemasukan'] ?? 0;
@@ -103,40 +83,31 @@ class Keuangan extends BaseController
         $avgTransaksi = ($totalTransaksi > 0) ? $totalNilaiTransaksi / $totalTransaksi : 0;
 
         $data = [
-            'title'              => 'Laporan Keuangan',
-            'laporan'            => $laporan,
-            'total_pemasukan'    => $totalPemasukan,
-            'total_pengeluaran'  => $totalPengeluaran,
-            'laba_rugi'          => $labaRugi,
-            'total_transaksi'    => $totalTransaksi,
-            'avg_transaksi'      => $avgTransaksi,
-            'selectedYear'       => $year,
-            'selectedQuarter'    => $quarter,
+            'title'               => 'Laporan Keuangan',
+            'laporan'             => $laporan,
+            'total_pemasukan'     => $totalPemasukan,
+            'total_pengeluaran'   => $totalPengeluaran,
+            'laba_rugi'           => $labaRugi,
+            'total_transaksi'     => $totalTransaksi,
+            'avg_transaksi'       => $avgTransaksi,
+            'selectedYear'        => $year,
+            'selectedQuarter'     => $quarter,
         ];
 
-        return view('keuangan/laporan', $data); // Pastikan view 'keuangan/laporan.php' ada
+        return view('keuangan/laporan', $data);
     }
 
-    /**
-     * [PERBAIKAN] Kode sudah diisi
-     * Menampilkan form input keuangan manual
-     */
     public function input_keuangan()
     {
         $data = [
             'title' => 'Input Manual Keuangan'
         ];
-        return view('keuangan/input_keuangan', $data); // Pastikan view 'keuangan/input_keuangan.php' ada
+        return view('keuangan/input_keuangan', $data);
     }
 
-    /**
-     * [PERBAIKAN] Kode sudah diisi
-     * Menyimpan data keuangan manual
-     */
     public function store_keuangan()
     {
         $keuanganModel = new KeuanganModel();
-
         $tipe = $this->request->getPost('tipe');
         $jumlah = $this->request->getPost('jumlah');
 
@@ -155,7 +126,11 @@ class Keuangan extends BaseController
 
         $keuanganModel->insert($data);
 
-        // [PERBAIKAN] Redirect ke rute keuangan yang baru
-        return redirect()->to('keuangan/pengeluaran')->with('success', 'Data pengeluaran manual berhasil ditambahkan.');
+        // [PERBAIKAN] Redirect ke rute 'karyawan/'
+        if ($tipe == 'Pemasukan') {
+            return redirect()->to('karyawan/keuangan/pemasukan')->with('success', 'Data pemasukan manual berhasil ditambahkan.');
+        } else {
+            return redirect()->to('karyawan/keuangan/pengeluaran')->with('success', 'Data pengeluaran manual berhasil ditambahkan.');
+        }
     }
 }
