@@ -9,6 +9,8 @@ class ProdukModel extends Model
     protected $table            = 'produk';
     protected $primaryKey       = 'id_produk';
     protected $useAutoIncrement = true;
+    protected $useTimestamps = false;
+
 
     // Diambil dari file Anda sebelumnya
     protected $allowedFields = [

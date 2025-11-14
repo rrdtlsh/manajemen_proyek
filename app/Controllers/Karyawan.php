@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 // Hapus semua 'use' Model, karena file ini tidak membutuhkannya lagi
-// Cukup BaseController saja
 
 class Karyawan extends BaseController
 {
@@ -14,18 +13,15 @@ class Karyawan extends BaseController
      */
     public function dashboard()
     {
-        $role = session()->get('role');
+        // [PERBAIKAN] Ambil role dan langsung ubah ke huruf kecil
+        $role = strtolower(session()->get('role') ?? '');
 
         if ($role === 'penjualan') {
-            // [PERBAIKAN] Arahkan ke dashboard penjualan yang baru
-            // Rute ini ada di Routes.php Anda di grup 'penjualan'
             return redirect()->to('penjualan/dashboard');
         } elseif ($role === 'keuangan') {
-            // [PERBAIKAN] Tambahkan awalan 'karyawan/' agar cocok dengan Routes.php
             return redirect()->to('karyawan/keuangan/laporan');
         } elseif ($role === 'inventaris') {
-            // [PERBAIKAN] Arahkan ke rute 'karyawan/inventaris' (sesuai Routes.php)
-            // Rute ini akan memanggil InventarisController::index
+            // Rute 'inventaris/dashboard' sudah ada di Routes.php
             return redirect()->to('inventaris/dashboard');
         } else {
             // Default fallback jika role tidak dikenal

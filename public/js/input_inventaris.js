@@ -3,10 +3,10 @@
 $(document).ready(function () {
     // Inisialisasi DataTable
     $('#dataTableInventaris').DataTable({
-        "order": [[0, "asc"]],
-        "paging": true,
-        "ordering": false,
+        "order": [],        // Tidak auto-sort No
+        "autoWidth": false,
         "columnDefs": [
+            { "orderable": false, "targets": [1, 6] },
             { "width": "1%", "targets": 0 },  // No
             { "width": "15%", "targets": 1 }, // Gambar
             { "width": "20%", "targets": 2 }, // Kode Produk

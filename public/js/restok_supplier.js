@@ -17,7 +17,6 @@ $(document).ready(function () {
     const $inputTotal = $('#restok_total');
     const $inputSupplier = $('#restok_pt_supplier');
     const $inputNamaBarang = $('#restok_nama_barang');
-    const $inputStatus = $('#restok_status');
     const $hiddenId = $('#restok_id_hidden');
 
     // Hitung total (harga * qty)
@@ -41,7 +40,6 @@ $(document).ready(function () {
         const supplier = $(this).data('supplier') ?? '';
         const barang = $(this).data('barang') ?? '';
         const qty = $(this).data('qty') ?? '';
-        const status = $(this).data('status') ?? 'Menunggu';
         const harga_satuan = $(this).data('harga_satuan') ?? '';
         const total_harga = $(this).data('total_harga') ?? '';
 
@@ -52,7 +50,6 @@ $(document).ready(function () {
         $inputJumlah.val(qty);
         $inputHarga.val(harga_satuan);
         $inputTotal.val(total_harga);
-        $inputStatus.val(status);
 
         // Pastikan option supplier terpilih (nilai option adalah nama_supplier)
         if ($inputSupplier.find('option[value="' + supplier + '"]').length) {
@@ -82,7 +79,6 @@ $(document).ready(function () {
         $inputJumlah.val('');
         $inputHarga.val('');
         $inputTotal.val('');
-        $inputStatus.val('Menunggu');
         $modal.find('#modalInputRestokLabel').text('Input Barang Supplier');
     });
 

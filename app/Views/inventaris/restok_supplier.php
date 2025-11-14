@@ -71,16 +71,22 @@
                                     </a>
 
                                     <!-- EDIT -->
-                                    <button class="btn btn-warning btn-sm btn-edit"
-                                        data-id="<?= $item['id_restok']; ?>"
-                                        data-supplier="<?= esc($item['nama_supplier']); ?>"
-                                        data-barang="<?= esc($item['nama_barang']); ?>"
-                                        data-qty="<?= $item['qty']; ?>"
-                                        data-status="<?= $item['status']; ?>"
-                                        data-harga_satuan="<?= $item['harga_satuan']; ?>"
-                                        data-total_harga="<?= $item['total_harga']; ?>">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </button>
+                                    <?php if ($item['status'] !== 'Disetujui'): ?>
+                                        <button class="btn btn-warning btn-sm btn-edit"
+                                            data-id="<?= $item['id_restok']; ?>"
+                                            data-supplier="<?= esc($item['nama_supplier']); ?>"
+                                            data-barang="<?= esc($item['nama_barang']); ?>"
+                                            data-qty="<?= $item['qty']; ?>"
+                                            data-status="<?= $item['status']; ?>"
+                                            data-harga_satuan="<?= $item['harga_satuan']; ?>"
+                                            data-total_harga="<?= $item['total_harga']; ?>">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="btn btn-secondary btn-sm" disabled>
+                                            <i class="fas fa-lock"></i> Edit
+                                        </button>
+                                    <?php endif; ?>
 
                                     <!-- HAPUS -->
                                     <button class="btn btn-danger btn-sm"
@@ -158,14 +164,7 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="form-group mt-3">
-                        <label for="restok_status">Status</label>
-                        <select id="restok_status" name="status" class="form-control" required>
-                            <option value="Menunggu">Menunggu</option>
-                            <option value="Disetujui">Disetujui</option>
-                        </select>
-                    </div>
+                    <input type="hidden" id="restok_status" name="status" value="Menunggu">
 
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>

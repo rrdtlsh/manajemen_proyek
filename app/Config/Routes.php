@@ -89,6 +89,11 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
         $routes->get('keuangan/laporan', 'KeuanganController::laporanKeuangan');
         $routes->get('input_keuangan', 'KeuanganController::input_keuangan');
         $routes->post('store_keuangan', 'KeuanganController::store_keuangan');
+
+        // --- Rute Owner untuk Approval Restok ---
+        $routes->get('owner/restok', 'OwnerRestokController::index');
+        $routes->get('owner/restok/approve/(:num)', 'OwnerRestokController::approve/$1');
+        $routes->get('owner/restok/reject/(:num)', 'OwnerRestokController::reject/$1');
     });
 
     // --- RUTE BARU UNTUK DASHBOARD ---

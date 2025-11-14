@@ -6,28 +6,60 @@ use CodeIgniter\Model;
 
 class RestokModel extends Model
 {
-    // [PENTING] Sesuaikan 'restok' dengan nama tabel Anda di database
-    protected $table            = 'restok'; 
-    
-    // [PENTING] Sesuaikan 'id_restok' dengan nama Primary Key Anda
-    protected $primaryKey       = 'id_restok'; 
+    protected $table            = 'restok';
+    protected $primaryKey       = 'id_restok';
 
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
     protected $protectFields    = true;
 
-    // [PENTING] Kolom-kolom ini adalah yang diizinkan untuk diisi
-    // Kolom ini diambil dari fungsi store_restok di controller Anda
     protected $allowedFields    = [
         'nama_supplier',
         'nama_barang',
-        'status',
         'qty',
         'harga_satuan',
-        'total_harga'
+        'total_harga',
+
+        // status inventaris → owner
+        'status',          // Menunggu / Disetujui / Ditolak
+        'status_owner',    // Menunggu / Disetujui / Ditolak
+        'id_owner',
+        'tanggal_approve',
+
+        // timestamps
+        'created_at',
+        'updated_at'
     ];
 
-    // Jika Anda menggunakan Timestamps (created_at, updated_at)
-    // protected $useTimestamps = true; 
+    protected $useTimestamps = true;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+
+    // ====================================================
+    //                   CUSTOM QUERY
+    // ====================================================
+
+    // Request menunggu persetujuan owner
+    public function getPendingForOwner()
+    {
+        return $this->where('status_owner', 'Menunggu')
+            ->orderBy('id_restok', 'DESC')
+            ->findAll();
+    }
+
+    // Request yang sudah disetujui owner
+    public function getApproved()
+    {
+        return $this->where('status_owner', 'Disetujui')
+            ->orderBy('id_restok', 'DESC')
+            ->findAll();
+    }
+
+    // Request yang ditolak owner
+    public function getRejected()
+    {
+        return $this->where('status_owner', 'Ditolak')
+            ->orderBy('id_restok', 'DESC')
+            ->findAll();
+    }
 }

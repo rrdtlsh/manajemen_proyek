@@ -11,12 +11,53 @@ class InventarisController extends BaseController
 {
     public function dashboard()
     {
-        $data = [
-            'username' => session()->get('username'),
-            'title'    => 'Dashboard Inventaris'
+        $produkModel   = new \App\Models\ProdukModel();
+        $restokModel   = new \App\Models\RestokModel();
+        $supplierModel = new \App\Models\SupplierModel();
+
+        // Ringkasan
+        $jumlah_produk     = $produkModel->countAll();
+        $total_stok        = $produkModel->selectSum('stok')->first()['stok'] ?? 0;
+        $restok_menunggu   = $restokModel->where('status', 'Menunggu')->countAllResults();
+        $restok_disetujui  = $restokModel->where('status', 'Disetujui')->countAllResults();
+
+        // Stok 7 Hari Terakhir (buat grafik line)
+        $stokPerHari = [
+            'labels' => [],
+            'values' => []
         ];
+
+        $stok_total = $produkModel->selectSum('stok')->first()['stok'] ?? 0;
+
+        // Untuk 7 hari, tampilkan nilai sama (stok total)
+        for ($i = 6; $i >= 0; $i--) {
+            $tanggal = date('Y-m-d', strtotime("-$i days"));
+
+            $stokPerHari['labels'][] = date('d M', strtotime($tanggal));
+            $stokPerHari['values'][] = (int)$stok_total;
+        }
+
+        // Data terbaru untuk tabel
+        $latest_produk = $produkModel->orderBy('id_produk', 'DESC')->limit(5)->find();
+        $latest_restok = $restokModel->orderBy('id_restok', 'DESC')->limit(5)->find();
+        $latest_supplier = $supplierModel->orderBy('id_supplier', 'DESC')->limit(5)->find();
+
+        $data = [
+            'title'            => 'Dashboard Inventaris',
+            'jumlah_produk'    => $jumlah_produk,
+            'total_stok'       => $total_stok,
+            'restok_menunggu'  => $restok_menunggu,
+            'restok_disetujui' => $restok_disetujui,
+            'stok_labels'      => json_encode($stokPerHari['labels']),
+            'stok_values'      => json_encode($stokPerHari['values']),
+            'latest_produk'    => $latest_produk,
+            'latest_restok'    => $latest_restok,
+            'latest_supplier'  => $latest_supplier
+        ];
+
         return view('dashboard_staff/dashboard_inventaris', $data);
     }
+
 
     /**
      * Menampilkan halaman utama inventaris (daftar produk)
@@ -202,7 +243,7 @@ class InventarisController extends BaseController
 
         $data = [
             'title'       => 'Restok Barang Supplier',
-            'data_restok' => $restokModel->orderBy('id_restok', 'DESC')->findAll(),
+            'data_restok' => $restokModel->orderBy('id_restok', 'ASC')->findAll(),
             'suppliers'   => $supplierModel->orderBy('nama_supplier', 'ASC')->findAll() // 🔹 tambahan penting
         ];
 
@@ -216,23 +257,31 @@ class InventarisController extends BaseController
     public function store_restok()
     {
         $restokModel = new RestokModel();
+
         $data = [
             'nama_supplier' => $this->request->getPost('nama_supplier'),
             'nama_barang'   => $this->request->getPost('nama_barang'),
-            'status'        => $this->request->getPost('status'),
             'qty'           => $this->request->getPost('qty'),
             'harga_satuan'  => $this->request->getPost('harga_satuan'),
             'total_harga'   => $this->request->getPost('total_harga'),
+
+            // status inventaris ke owner
+            'status'        => 'Menunggu',
+            'status_owner'  => 'Menunggu',
         ];
+
         $id_restok = $this->request->getPost('id_restok');
 
         if (empty($id_restok)) {
+            // INSERT baru
             $restokModel->insert($data);
-            $message = 'Data restok baru berhasil ditambahkan.';
+            $message = 'Permintaan restok berhasil dibuat (Menunggu persetujuan owner).';
         } else {
+            // UPDATE (staf hanya boleh edit data restok, tidak bisa edit approval owner)
             $restokModel->update($id_restok, $data);
-            $message = 'Data restok berhasil diperbarui.';
+            $message = 'Data restok berhasil diperbarui (status approval tidak berubah).';
         }
+
         return redirect()->to('/karyawan/inventaris/restok')->with('success', $message);
     }
 
@@ -247,7 +296,6 @@ class InventarisController extends BaseController
             return redirect()->to('/karyawan/inventaris/restok')->with('error', 'Data restok tidak ditemukan.');
         }
 
-        // Ambil data supplier berdasarkan nama supplier
         $supplier = $supplierModel->where('nama_supplier', $restok['nama_supplier'])->first();
 
         $data = [
