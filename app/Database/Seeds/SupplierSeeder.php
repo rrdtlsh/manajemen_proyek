@@ -12,17 +12,17 @@ class SupplierSeeder extends Seeder
             [
                 'nama_supplier' => 'PT. Jaya Abadi',
                 'alamat'        => 'Jl. Veteran No. 12, Banjarmasin',
-                'kontak'        => '081234567890'
+                'no_telp'       => '081234567890' // [PERBAIKAN] dari 'kontak'
             ],
             [
                 'nama_supplier' => 'CV. Berkah Mandiri',
                 'alamat'        => 'Jl. A. Yani Km. 5, Banjarmasin',
-                'kontak'        => '081198765432'
+                'no_telp'       => '081198765432' // [PERBAIKAN] dari 'kontak'
             ],
             [
                 'nama_supplier' => 'UD. Sinar Terang',
                 'alamat'        => 'Jl. Belitung Darat No. 45',
-                'kontak'        => '085211223344'
+                'no_telp'       => '085211223344' // [PERBAIKAN] dari 'kontak'
             ],
         ];
 

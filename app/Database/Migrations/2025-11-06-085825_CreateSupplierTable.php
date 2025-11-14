@@ -11,6 +11,8 @@ class CreateSupplierTable extends Migration
         $this->forge->addField([
             'id_supplier' => [
                 'type'           => 'INT',
+                'constraint'     => 11,
+                'unsigned'       => true, // <-- INI PERBAIKANNYA
                 'auto_increment' => true,
             ],
             'nama_supplier' => [
@@ -22,9 +24,9 @@ class CreateSupplierTable extends Migration
                 'type' => 'TEXT',
                 'null' => true,
             ],
-            'kontak' => [
+            'no_telp' => [
                 'type'       => 'VARCHAR',
-                'constraint' => '50',
+                'constraint' => '20',
                 'null'       => true,
             ],
         ]);

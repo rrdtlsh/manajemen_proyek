@@ -11,6 +11,8 @@ class CreateUserTable extends Migration
         $this->forge->addField([
             'id_user' => [
                 'type'           => 'INT',
+                'constraint'     => 11,
+                'unsigned'       => true, // <-- TAMBAHKAN INI
                 'auto_increment' => true,
             ],
             'username' => [

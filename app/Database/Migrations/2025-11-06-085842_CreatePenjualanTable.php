@@ -11,39 +11,28 @@ class CreatePenjualanTable extends Migration
         $this->forge->addField([
             'id_penjualan' => [
                 'type'           => 'INT',
+                'constraint'     => 11,
+                'unsigned'       => true, // <-- PERBAIKAN
                 'auto_increment' => true,
             ],
-            'tanggal' => [
-                'type' => 'DATE',
-                'null' => false,
-            ],
-            'total' => [
-                'type' => 'DOUBLE',
-                'null' => false,
-            ],
-            'status_pembayaran' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '20',
+            'tanggal' => ['type' => 'DATE', 'null' => false],
+            'total' => ['type' => 'DOUBLE', 'null' => false],
+            'status_pembayaran' => ['type' => 'VARCHAR', 'constraint' => '20', 'null' => true],
+            'jumlah_dp' => ['type' => 'DOUBLE', 'null' => true],
+            'id_user' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true, // <-- PERBAIKAN
                 'null'       => true,
             ],
-            'jumlah_dp' => [
-                'type' => 'DOUBLE',
-                'null' => true,
-            ],
-            'id_user' => [
-                'type' => 'INT',
-                'null' => true,
-            ],
-            // Kolom id_pelanggan DIHAPUS dari sini
         ]);
         $this->forge->addKey('id_penjualan', true);
-        $this->forge->addForeignKey('id_user', 'user', 'id_user', 'CASCADE', 'NO ACTION');
-        // Foreign key id_pelanggan DIHAPUS dari sini
+        $this->forge->addForeignKey('id_user', 'user', 'id_user', 'SET NULL', 'CASCADE', 'penjualan_id_user_foreign');
         $this->forge->createTable('penjualan');
     }
-
     public function down()
     {
+        $this->forge->dropForeignKey('penjualan', 'penjualan_id_user_foreign');
         $this->forge->dropTable('penjualan');
     }
 }

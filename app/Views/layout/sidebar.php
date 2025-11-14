@@ -89,6 +89,12 @@ if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuan
                     <span>Restok Supplier</span>
                 </a>
             </li>
+            <li class="nav-item <?= (strpos($currentPath, 'karyawan/inventaris/supplier') !== false) ? 'active' : ''; ?>">
+                <a class="nav-link" href="<?= base_url('karyawan/inventaris/supplier'); ?>">
+                    <i class="fas fa-fw fa-truck"></i>
+                    <span>Data Supplier</span>
+                </a>
+            </li>
         <?php endif; ?>
 
         <hr class="sidebar-divider d-none d-md-block">

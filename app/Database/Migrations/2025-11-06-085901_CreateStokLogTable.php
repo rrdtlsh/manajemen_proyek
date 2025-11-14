@@ -11,6 +11,8 @@ class CreateStokLogTable extends Migration
         $this->forge->addField([
             'id_log' => [
                 'type'           => 'INT',
+                'constraint'     => 11,
+                'unsigned'       => true, // <-- PERBAIKAN
                 'auto_increment' => true,
             ],
             'tanggal' => [
@@ -31,27 +33,37 @@ class CreateStokLogTable extends Migration
                 'null' => true,
             ],
             'id_produk' => [
-                'type' => 'INT',
-                'null' => true,
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true, // <-- PERBAIKAN
+                'null'       => true,
             ],
             'id_penjualan' => [
-                'type' => 'INT',
-                'null' => true,
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true, // <-- PERBAIKAN
+                'null'       => true,
             ],
             'id_pemasokan' => [
-                'type' => 'INT',
-                'null' => true,
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true, // <-- PERBAIKAN
+                'null'       => true,
             ],
         ]);
         $this->forge->addKey('id_log', true);
-        $this->forge->addForeignKey('id_produk', 'produk', 'id_produk', 'CASCADE', 'NO ACTION');
-        $this->forge->addForeignKey('id_penjualan', 'penjualan', 'id_penjualan', 'CASCADE', 'NO ACTION');
-        $this->forge->addForeignKey('id_pemasokan', 'pemasokan', 'id_pemasokan', 'CASCADE', 'NO ACTION');
+        // Memberi nama spesifik pada constraint
+        $this->forge->addForeignKey('id_produk', 'produk', 'id_produk', 'SET NULL', 'CASCADE', 'stok_log_id_produk_foreign');
+        $this->forge->addForeignKey('id_penjualan', 'penjualan', 'id_penjualan', 'SET NULL', 'CASCADE', 'stok_log_id_penjualan_foreign');
+        $this->forge->addForeignKey('id_pemasokan', 'pemasokan', 'id_pemasokan', 'SET NULL', 'CASCADE', 'stok_log_id_pemasokan_foreign');
         $this->forge->createTable('stok_log');
     }
 
     public function down()
     {
+        $this->forge->dropForeignKey('stok_log', 'stok_log_id_produk_foreign');
+        $this->forge->dropForeignKey('stok_log', 'stok_log_id_penjualan_foreign');
+        $this->forge->dropForeignKey('stok_log', 'stok_log_id_pemasokan_foreign');
         $this->forge->dropTable('stok_log');
     }
 }

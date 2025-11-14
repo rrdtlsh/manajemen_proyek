@@ -26,7 +26,7 @@ class Karyawan extends BaseController
         } elseif ($role === 'inventaris') {
             // [PERBAIKAN] Arahkan ke rute 'karyawan/inventaris' (sesuai Routes.php)
             // Rute ini akan memanggil InventarisController::index
-            return redirect()->to('karyawan/inventaris');
+            return redirect()->to('inventaris/dashboard');
         } else {
             // Default fallback jika role tidak dikenal
             return redirect()->to('penjualan/dashboard');

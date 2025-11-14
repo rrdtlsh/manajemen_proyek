@@ -59,15 +59,28 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
 
 
         // --- Rute Inventaris ---
-        // [PERBAIKAN] Mengarah ke InventarisController
         $routes->get('inventaris', 'InventarisController::index');
         $routes->get('inventaris/restok', 'InventarisController::restok_supplier');
-        $routes->get('input_inventaris', 'InventarisController::index'); // Alias ke index
-        $routes->get('inventaris/tambah', 'InventarisController::tambah_produk');
+        $routes->get('inventaris/detail/(:num)', 'InventarisController::detail_produk/$1'); // ✅ BARU
+
+        // Rute CRUD Produk (Modal)
         $routes->post('inventaris/store', 'InventarisController::store_produk');
-        $routes->get('inventaris/edit/(:num)', 'InventarisController::edit_produk/$1');
+        $routes->post('inventaris/store_produk', 'InventarisController::store_produk');
         $routes->post('inventaris/update/(:num)', 'InventarisController::update_produk/$1');
         $routes->get('inventaris/delete/(:num)', 'InventarisController::delete_produk/$1');
+
+        // Rute CRUD Restok (Modal)
+        $routes->post('inventaris/store_restok', 'InventarisController::store_restok');
+        $routes->get('inventaris/delete_restok/(:num)', 'InventarisController::delete_restok/$1');
+        $routes->get('inventaris/detail_restok/(:num)', 'InventarisController::detail_restok/$1');
+
+        // --- Rute Supplier ---
+        $routes->get('inventaris/supplier', 'InventarisController::supplier');
+        $routes->post('inventaris/store_supplier', 'InventarisController::store_supplier');
+        $routes->post('inventaris/update_supplier/(:num)', 'InventarisController::update_supplier/$1');
+        // Detail & Delete Supplier
+        $routes->get('inventaris/detail_supplier/(:num)', 'InventarisController::detail_supplier/$1');
+        $routes->get('inventaris/delete_supplier/(:num)', 'InventarisController::delete_supplier/$1');
 
         // --- Rute Keuangan ---
         // [PERBAIKAN] Mengarah ke KeuanganController

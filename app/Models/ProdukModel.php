@@ -11,7 +11,16 @@ class ProdukModel extends Model
     protected $useAutoIncrement = true;
 
     // Diambil dari file Anda sebelumnya
-    protected $allowedFields    = ['nama_produk', 'kategori', 'stok', 'harga', 'gambar', 'deskripsi'];
+    protected $allowedFields = [
+        'kode_produk',
+        'nama_produk',
+        'id_kategori',
+        'id_supplier',
+        'harga',
+        'stok',
+        'tanggal_masuk',
+        'gambar_produk'
+    ];
 
     /**
      * Mengurangi stok produk.

@@ -471,3 +471,12 @@ body.penjualan-body a:not(.btn):not(.nav-link):hover {
     text-decoration: none;
 }
 
+.btn-aksi-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.btn-aksi-group .btn {
+    font-size: .8rem;
+}

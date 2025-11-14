@@ -4,7 +4,8 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\ProdukModel;
-use App\Models\RestokModel; // Pastikan Anda memiliki Model ini
+use App\Models\RestokModel;
+use App\Models\SupplierModel;
 
 class InventarisController extends BaseController
 {
@@ -12,115 +13,138 @@ class InventarisController extends BaseController
     {
         $data = [
             'username' => session()->get('username'),
-            'title' => 'Dashboard Inventaris'
+            'title'    => 'Dashboard Inventaris'
         ];
         return view('dashboard_staff/dashboard_inventaris', $data);
     }
 
+    /**
+     * Menampilkan halaman utama inventaris (daftar produk)
+     */
     public function index()
     {
-        $produkModel = new ProdukModel();
+        $produkModel   = new ProdukModel();
+        $supplierModel = new \App\Models\SupplierModel();
+        $kategoriModel = new \App\Models\KategoriModel();
+
         $data = [
-            'title'  => 'Manajemen Inventaris',
-            'produk' => $produkModel->orderBy('id_produk', 'DESC')->findAll()
+            'title'      => 'Manajemen Inventaris',
+            'produk' => $produkModel->orderBy('id_produk', 'ASC')->findAll(),
+            'suppliers'  => $supplierModel->findAll(),
+            'kategori'   => $kategoriModel->findAll(),
+            'validation' => \Config\Services::validation()
         ];
+
         return view('inventaris/input_inventaris', $data);
     }
 
-    public function tambah_produk()
-    {
-        $data = [
-            'title' => 'Tambah Produk Baru',
-            'validation' => \Config\Services::validation()
-        ];
-        return view('inventaris/v_tambah_produk', $data);
-    }
-
+    /**
+     * Menyimpan data produk BARU dari modal
+     */
     public function store_produk()
     {
-        $produkModel = new ProdukModel();
+        $produkModel = new \App\Models\ProdukModel();
+
         $rules = [
-            'nama_produk' => 'required',
-            'harga'       => 'required|numeric',
-            'stok'        => 'required|integer',
-            'gambar_produk' => [
-                'label' => 'Foto Produk',
-                'rules' => 'is_image[gambar_produk]'
-                    . '|mime_in[gambar_produk,image/jpg,image/jpeg,image/png,image/webp]'
-                    . '|max_size[gambar_produk,2048]',
-            ],
+            'kode_produk'   => 'required',
+            'nama_produk'   => 'required',
+            'id_kategori'   => 'required|numeric',
+            'id_supplier'   => 'required|numeric',
+            'harga'         => 'required|numeric',
+            'stok'          => 'required|integer',
+            'tanggal_masuk' => 'required|valid_date',
         ];
 
         if (!$this->validate($rules)) {
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
-            return redirect()->to('karyawan/inventaris/tambah')->withInput();
+            log_message('debug', 'VALIDATION FAILED: ' . json_encode($this->validator->getErrors()));
+            session()->setFlashdata('error', 'Validasi gagal. Periksa input.');
+            return redirect()->to('/karyawan/inventaris')->withInput();
         }
 
         $img = $this->request->getFile('gambar_produk');
         $namaGambar = 'default.jpg';
-
         if ($img && $img->isValid() && !$img->hasMoved()) {
             $namaGambar = $img->getRandomName();
             $img->move('uploads/produk/', $namaGambar);
         }
 
         $data = [
+            'kode_produk'   => $this->request->getPost('kode_produk'),
             'nama_produk'   => $this->request->getPost('nama_produk'),
+            'id_kategori'   => $this->request->getPost('id_kategori'),
+            'id_supplier'   => $this->request->getPost('id_supplier'),
             'harga'         => $this->request->getPost('harga'),
             'stok'          => $this->request->getPost('stok'),
+            'tanggal_masuk' => $this->request->getPost('tanggal_masuk'),
             'gambar_produk' => $namaGambar,
         ];
 
         $produkModel->insert($data);
-
-        // [PERBAIKAN] Redirect ke rute 'karyawan/'
-        return redirect()->to('/karyawan/inventaris')->with('success', 'Produk berhasil ditambahkan.');
+        session()->setFlashdata('success', 'Produk berhasil ditambahkan.');
+        return redirect()->to('/karyawan/inventaris');
     }
 
-    public function edit_produk($id_produk)
-    {
-        $produkModel = new ProdukModel();
-        $produk = $produkModel->find($id_produk);
-
-        if (!$produk) {
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
-            return redirect()->to('/karyawan/inventaris')->with('error', 'Produk tidak ditemukan.');
-        }
-
-        $data = [
-            'title'  => 'Edit Produk',
-            'produk' => $produk,
-            'validation' => \Config\Services::validation()
-        ];
-        return view('inventaris/v_edit_produk', $data);
-    }
-
+    /**
+     * Memperbarui data produk dari modal
+     */
     public function update_produk($id_produk)
     {
         $produkModel = new ProdukModel();
+
         $rules = [
-            'nama_produk' => 'required',
-            'harga'       => 'required|numeric',
-            'stok'        => 'required|integer',
+            'kode_produk'   => "required|is_unique[produk.kode_produk,id_produk,{$id_produk}]",
+            'nama_produk'   => 'required',
+            'id_kategori'   => 'required|numeric',
+            'harga'         => 'required|numeric',
+            'stok'          => 'required|integer',
+            'id_supplier'   => 'required|numeric',
+            'tanggal_masuk' => 'required|valid_date',
+            'gambar_produk' => [
+                'label' => 'Foto Produk',
+                'rules' => 'permit_empty|is_image[gambar_produk]'
+                    . '|mime_in[gambar_produk,image/jpg,image/jpeg,image/png,image/webp]'
+                    . '|max_size[gambar_produk,2048]',
+            ],
         ];
 
         if (!$this->validate($rules)) {
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
-            return redirect()->to('karyawan/inventaris/edit/' . $id_produk)->withInput();
+            return redirect()->to('karyawan/inventaris')->withInput()->with('error', 'Validasi gagal.');
+        }
+
+        $produkLama = $produkModel->find($id_produk);
+        if (!$produkLama) {
+            return redirect()->to('/karyawan/inventaris')->with('error', 'Produk tidak ditemukan.');
+        }
+
+        $namaGambar = $produkLama['gambar_produk'];
+        $img = $this->request->getFile('gambar_produk');
+
+        if ($img && $img->isValid() && !$img->hasMoved()) {
+            if ($namaGambar != 'default.jpg' && file_exists('uploads/produk/' . $namaGambar)) {
+                unlink('uploads/produk/' . $namaGambar);
+            }
+            $namaGambar = $img->getRandomName();
+            $img->move('uploads/produk/', $namaGambar);
         }
 
         $data = [
-            'nama_produk' => $this->request->getPost('nama_produk'),
-            'harga'       => $this->request->getPost('harga'),
-            'stok'        => $this->request->getPost('stok')
+            'kode_produk'   => $this->request->getPost('kode_produk'),
+            'nama_produk'   => $this->request->getPost('nama_produk'),
+            'id_kategori'   => $this->request->getPost('id_kategori'),
+            'harga'         => $this->request->getPost('harga'),
+            'stok'          => $this->request->getPost('stok'),
+            'id_supplier'   => $this->request->getPost('id_supplier'),
+            'tanggal_masuk' => $this->request->getPost('tanggal_masuk'),
+            'gambar_produk' => $namaGambar,
         ];
 
         $produkModel->update($id_produk, $data);
-
-        // [PERBAIKAN] Redirect ke rute 'karyawan/'
         return redirect()->to('/karyawan/inventaris')->with('success', 'Produk berhasil diperbarui.');
     }
 
+    /**
+     * Menghapus data produk
+     */
     public function delete_produk($id_produk)
     {
         $produkModel = new ProdukModel();
@@ -133,28 +157,64 @@ class InventarisController extends BaseController
                     unlink($imagePath);
                 }
             }
+
             $produkModel->delete($id_produk);
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
             return redirect()->to('/karyawan/inventaris')->with('success', 'Produk berhasil dihapus.');
         } else {
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
             return redirect()->to('/karyawan/inventaris')->with('error', 'Produk gagal dihapus atau tidak ditemukan.');
         }
     }
 
+    /**
+     * Menampilkan detail produk
+     */
+    public function detail_produk($id_produk)
+    {
+        $produkModel   = new \App\Models\ProdukModel();
+        $supplierModel = new \App\Models\SupplierModel();
+        $kategoriModel = new \App\Models\KategoriModel();
+
+        $produk = $produkModel->find($id_produk);
+        if (!$produk) {
+            return redirect()->to('/karyawan/inventaris')->with('error', 'Produk tidak ditemukan.');
+        }
+
+        $kategori = $kategoriModel->find($produk['id_kategori']);
+        $supplier = $supplierModel->find($produk['id_supplier']);
+
+        $data = [
+            'title'     => 'Detail Produk',
+            'produk'    => $produk,
+            'kategori'  => $kategori,
+            'supplier'  => $supplier,
+        ];
+
+        return view('inventaris/detail_produk', $data);
+    }
+
+    /**
+     * Menampilkan halaman restok supplier
+     */
     public function restok_supplier()
     {
-        $restokModel = new RestokModel();
+        $restokModel   = new \App\Models\RestokModel();
+        $supplierModel = new \App\Models\SupplierModel();
+
         $data = [
             'title'       => 'Restok Barang Supplier',
-            'data_restok' => $restokModel->orderBy('id_restok', 'DESC')->findAll()
+            'data_restok' => $restokModel->orderBy('id_restok', 'DESC')->findAll(),
+            'suppliers'   => $supplierModel->orderBy('nama_supplier', 'ASC')->findAll() // 🔹 tambahan penting
         ];
+
         return view('inventaris/restok_supplier', $data);
     }
 
+
+    /**
+     * Menyimpan/Update data restok dari modal
+     */
     public function store_restok()
     {
-        // (Fungsi ini sepertinya belum ada di Karyawan.php, tapi saya perbaiki redirect-nya)
         $restokModel = new RestokModel();
         $data = [
             'nama_supplier' => $this->request->getPost('nama_supplier'),
@@ -173,24 +233,129 @@ class InventarisController extends BaseController
             $restokModel->update($id_restok, $data);
             $message = 'Data restok berhasil diperbarui.';
         }
-
-        // [PERBAIKAN] Redirect ke rute 'karyawan/'
         return redirect()->to('/karyawan/inventaris/restok')->with('success', $message);
     }
 
+    public function detail_restok($id_restok)
+    {
+        $restokModel = new RestokModel();
+        $supplierModel = new SupplierModel();
+
+        $restok = $restokModel->find($id_restok);
+
+        if (!$restok) {
+            return redirect()->to('/karyawan/inventaris/restok')->with('error', 'Data restok tidak ditemukan.');
+        }
+
+        // Ambil data supplier berdasarkan nama supplier
+        $supplier = $supplierModel->where('nama_supplier', $restok['nama_supplier'])->first();
+
+        $data = [
+            'title'    => 'Detail Restok Supplier',
+            'restok'   => $restok,
+            'supplier' => $supplier,
+        ];
+
+        return view('inventaris/detail_restok', $data);
+    }
+
+    /**
+     * Menghapus data restok
+     */
     public function delete_restok($id_restok)
     {
-        // (Fungsi ini sepertinya belum ada di Karyawan.php, tapi saya perbaiki redirect-nya)
         $restokModel = new RestokModel();
         $restok = $restokModel->find($id_restok);
 
         if ($restok) {
             $restokModel->delete($id_restok);
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
             return redirect()->to('/karyawan/inventaris/restok')->with('success', 'Data restok berhasil dihapus.');
         } else {
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
             return redirect()->to('/karyawan/inventaris/restok')->with('error', 'Data tidak ditemukan.');
         }
+    }
+
+    /**
+     * Halaman daftar supplier
+     */
+    public function supplier()
+    {
+        $supplierModel = new \App\Models\SupplierModel();
+        $data = [
+            'title'     => 'Data Supplier',
+            'suppliers' => $supplierModel->orderBy('id_supplier', 'ASC')->findAll()
+        ];
+        return view('inventaris/supplier', $data);
+    }
+
+    public function store_supplier()
+    {
+        $supplierModel = new \App\Models\SupplierModel();
+
+        $validation = \Config\Services::validation();
+        $rules = [
+            'nama_supplier' => 'required|is_unique[supplier.nama_supplier]',
+            'alamat'        => 'required',
+            'no_telp'       => 'required|numeric'
+        ];
+
+        if (!$this->validate($rules)) {
+            session()->setFlashdata('error', implode('<br>', $validation->getErrors()));
+            return redirect()->back()->withInput();
+        }
+
+        $supplierModel->save([
+            'nama_supplier' => $this->request->getPost('nama_supplier'),
+            'alamat'        => $this->request->getPost('alamat'),
+            'no_telp'       => $this->request->getPost('no_telp'),
+        ]);
+
+        session()->setFlashdata('success', 'Supplier berhasil ditambahkan.');
+        return redirect()->to('karyawan/inventaris/supplier');
+    }
+
+    public function update_supplier($id_supplier)
+    {
+        $supplierModel = new \App\Models\SupplierModel();
+        $supplierModel->update($id_supplier, [
+            'nama_supplier' => $this->request->getPost('nama_supplier'),
+            'alamat'        => $this->request->getPost('alamat'),
+            'no_telp'       => $this->request->getPost('no_telp'),
+        ]);
+
+        session()->setFlashdata('success', 'Data supplier berhasil diperbarui.');
+        return redirect()->to('karyawan/inventaris/supplier');
+    }
+
+    public function delete_supplier($id_supplier)
+    {
+        $supplierModel = new SupplierModel();
+
+        if (!$supplierModel->find($id_supplier)) {
+            return redirect()->back()->with('error', 'Data supplier tidak ditemukan.');
+        }
+
+        $supplierModel->delete($id_supplier);
+
+        // 🔥 Penting: kembali ke halaman data supplier (bukan kembali ke detail)
+        return redirect()->to('karyawan/inventaris/supplier')->with('success', 'Supplier berhasil dihapus.');
+    }
+
+
+    public function detail_supplier($id_supplier)
+    {
+        $supplierModel = new SupplierModel();
+        $supplier = $supplierModel->find($id_supplier);
+
+        if (!$supplier) {
+            return redirect()->to('/karyawan/inventaris')->with('error', 'Supplier tidak ditemukan.');
+        }
+
+        $data = [
+            'title'    => 'Detail Supplier',
+            'supplier' => $supplier
+        ];
+
+        return view('inventaris/detail_supplier', $data);
     }
 }
