@@ -189,7 +189,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">Rp</span>
                                 </div>
-                                <input type="number" class="form-control" id="harga" name="harga" required>
+                                <input type="number" class="form-control" id="harga" name="harga" required min="0">
                             </div>
                         </div>
                     </div>
@@ -197,7 +197,7 @@
                     <!-- STOK -->
                     <div class="form-group">
                         <label for="stok">Kuantitas (Stok)</label>
-                        <input type="number" class="form-control" id="stok" name="stok" required>
+                        <input type="number" class="form-control" id="stok" name="stok" required min="0">
                     </div>
 
                     <!-- GAMBAR -->

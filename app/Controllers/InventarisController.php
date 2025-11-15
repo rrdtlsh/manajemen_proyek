@@ -91,8 +91,8 @@ class InventarisController extends BaseController
             'nama_produk'   => 'required',
             'id_kategori'   => 'required|numeric',
             'id_supplier'   => 'required|numeric',
-            'harga'         => 'required|numeric',
-            'stok'          => 'required|integer',
+            'harga'         => 'required|numeric|greater_than_equal_to[0]',
+            'stok'          => 'required|integer|greater_than_equal_to[0]',
             'tanggal_masuk' => 'required|valid_date',
         ];
 
@@ -344,7 +344,7 @@ class InventarisController extends BaseController
         $rules = [
             'nama_supplier' => 'required|is_unique[supplier.nama_supplier]',
             'alamat'        => 'required',
-            'no_telp'       => 'required|numeric'
+            'no_telp'       => 'required|is_natural|exact_length[12]'
         ];
 
         if (!$this->validate($rules)) {

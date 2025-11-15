@@ -116,7 +116,15 @@
 
                     <div class="form-group">
                         <label for="no_telp">No Telepon</label>
-                        <input type="text" class="form-control" id="no_telp" name="no_telp" required>
+                        <input type="text"
+                                class="form-control"
+                                id="no_telp"
+                                name="no_telp"
+                                required
+                                maxlength="12"
+                                minlength="12"
+                                pattern="[0-9]{12}"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                     </div>
 
                 </div>
