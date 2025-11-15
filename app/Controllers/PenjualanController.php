@@ -120,6 +120,25 @@ class PenjualanController extends BaseController
             $penjualanModel->insert($dataPenjualan);
             $idPenjualanBaru = $penjualanModel->getInsertID();
 
+            // Ambil error DB jika ada
+            $dbError = $db->error();
+
+            if ($idPenjualanBaru <= 0 || ($dbError && isset($dbError['code']) && $dbError['code'] != 0)) {
+                echo "<pre>";
+                echo "== DEBUG INSERT PENJUALAN ==\n";
+                echo "idPenjualanBaru: ";
+                var_export($idPenjualanBaru);
+                echo "\n\n\$dataPenjualan:\n";
+                print_r($dataPenjualan);
+                echo "\n\nDB Error:\n";
+                print_r($dbError);
+                echo "</pre>";
+                // pastikan transaksi di-rollback
+                $db->transRollback();
+                exit;
+            }
+
+
             $items = json_decode($cartItems, true);
             $dataDetailBatch = [];
 
@@ -142,6 +161,17 @@ class PenjualanController extends BaseController
 
             if (!empty($dataDetailBatch)) {
                 $detailModel->insertBatch($dataDetailBatch);
+                $dbError = $db->error();
+
+                if ($dbError['code'] != 0) {
+                    echo "<pre>";
+                    echo "== ERROR MYSQL DETAIL ==\n";
+                    print_r($dbError);
+                    echo "\n== DATA DETAIL BATCH ==\n";
+                    print_r($dataDetailBatch);
+                    echo "</pre>";
+                    exit;
+                }
             }
 
             $jumlah_dibayar = ($statusBayarEnum == 'Lunas') ? $totalHarga : $jumlahDP;
@@ -291,6 +321,17 @@ class PenjualanController extends BaseController
         }
         if (!empty($dataDetailBatch)) {
             $detailModel->insertBatch($dataDetailBatch);
+            $dbError = $db->error();
+
+            if ($dbError['code'] != 0) {
+                echo "<pre>";
+                echo "== ERROR MYSQL DETAIL ==\n";
+                print_r($dbError);
+                echo "\n== DATA DETAIL BATCH ==\n";
+                print_r($dataDetailBatch);
+                echo "</pre>";
+                exit;
+            }
         }
 
         $penjualanModel->update($id_penjualan, [
