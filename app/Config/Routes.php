@@ -83,12 +83,20 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
         $routes->get('inventaris/delete_supplier/(:num)', 'InventarisController::delete_supplier/$1');
 
         // --- Rute Keuangan ---
-        // [PERBAIKAN] Mengarah ke KeuanganController
+        // default halaman keuangan = dashboard
+        $routes->get('keuangan', 'KeuanganController::dashboard');
+
+        // halaman-halaman lainnya
+        $routes->get('keuangan/dashboard', 'KeuanganController::dashboard');
         $routes->get('keuangan/pemasukan', 'KeuanganController::pemasukan');
         $routes->get('keuangan/pengeluaran', 'KeuanganController::pengeluaran');
         $routes->get('keuangan/laporan', 'KeuanganController::laporanKeuangan');
-        $routes->get('input_keuangan', 'KeuanganController::input_keuangan');
-        $routes->post('store_keuangan', 'KeuanganController::store_keuangan');
+        $routes->get('keuangan/pemasukan/export/pdf', 'KeuanganController::exportPemasukanPDF');
+        $routes->get('keuangan/pemasukan/export/excel', 'KeuanganController::exportPemasukanExcel');
+
+        $routes->get('keuangan/pengeluaran/export/pdf', 'KeuanganController::exportPengeluaranPDF');
+        $routes->get('keuangan/pengeluaran/export/excel', 'KeuanganController::exportPengeluaranExcel');
+
 
         // --- Rute Owner untuk Approval Restok ---
         $routes->get('owner/restok', 'OwnerRestokController::index');

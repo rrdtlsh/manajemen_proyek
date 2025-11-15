@@ -18,6 +18,17 @@
         <h6 class="m-0 font-weight-bold text-white">Rincian Pemasukan</h6>
     </div>
     <div class="card-body">
+        <!-- TOMBOL EKSPOR -->
+        <div class="text-right mb-3">
+            <a href="<?= base_url('karyawan/keuangan/pemasukan/export/pdf'); ?>" class="btn btn-danger btn-sm">
+                Export PDF
+            </a>
+
+            <a href="<?= base_url('karyawan/keuangan/pemasukan/export/excel'); ?>" class="btn btn-success btn-sm">
+                Export Excel
+            </a>
+        </div>
+        <!-- / TOMBOL EKSPOR -->
         <div class="table-responsive">
             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>

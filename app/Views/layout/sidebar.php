@@ -44,28 +44,31 @@ if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuan
 
         <?php // === MENU KEUANGAN ===
         elseif ($userRole == 'keuangan') : ?>
-            <li class="nav-item <?= (strpos($currentPath, 'karyawan/keuangan/laporan') !== false) ? 'active' : ''; ?>">
-                <a class="nav-link" href="<?= base_url('karyawan/keuangan/laporan'); ?>">
+            <li class="nav-item <?= (strpos($currentPath, 'karyawan/keuangan/dashboard') !== false) ? 'active' : ''; ?>">
+                <a class="nav-link" href="<?= base_url('karyawan/keuangan/dashboard'); ?>">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard Keuangan</span>
                 </a>
             </li>
+
             <li class="nav-item <?= (strpos($currentPath, 'karyawan/keuangan/pemasukan') !== false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('karyawan/keuangan/pemasukan'); ?>">
                     <i class="fas fa-fw fa-arrow-down"></i>
                     <span>Pemasukan</span>
                 </a>
             </li>
+
             <li class="nav-item <?= (strpos($currentPath, 'karyawan/keuangan/pengeluaran') !== false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('karyawan/keuangan/pengeluaran'); ?>">
                     <i class="fas fa-fw fa-arrow-up"></i>
                     <span>Pengeluaran</span>
                 </a>
             </li>
-            <li class="nav-item <?= (strpos($currentPath, 'karyawan/input_keuangan') !== false) ? 'active' : ''; ?>">
-                <a class="nav-link" href="<?= base_url('karyawan/input_keuangan'); ?>">
-                    <i class="fas fa-fw fa-edit"></i>
-                    <span>Input Manual</span>
+
+            <li class="nav-item <?= (strpos($currentPath, 'karyawan/keuangan/laporan') !== false) ? 'active' : ''; ?>">
+                <a class="nav-link" href="<?= base_url('karyawan/keuangan/laporan'); ?>">
+                    <i class="fas fa-fw fa-file-invoice-dollar"></i>
+                    <span>Laporan Keuangan</span>
                 </a>
             </li>
 

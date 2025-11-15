@@ -19,7 +19,7 @@ class Karyawan extends BaseController
         if ($role === 'penjualan') {
             return redirect()->to('penjualan/dashboard');
         } elseif ($role === 'keuangan') {
-            return redirect()->to('karyawan/keuangan/laporan');
+            return redirect()->to('/karyawan/keuangan/dashboard');
         } elseif ($role === 'inventaris') {
             // Rute 'inventaris/dashboard' sudah ada di Routes.php
             return redirect()->to('inventaris/dashboard');

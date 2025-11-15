@@ -21,9 +21,6 @@
         <i class="fas fa-arrow-up mr-2" style="color: #e74a3b;"></i>
         <?= $title; ?>
     </h1>
-    <a href="<?= base_url('karyawan/input_keuangan'); ?>" class="btn btn-primary btn-sm shadow-sm">
-        <i class="fas fa-plus fa-sm text-white-50 mr-1"></i> Input Pengeluaran Manual
-    </a>
 </div>
 
 <div class="card shadow mb-4">
@@ -31,6 +28,15 @@
         <h6 class="m-0 font-weight-bold text-white">Rincian Pengeluaran</h6>
     </div>
     <div class="card-body">
+        <div class="text-right mb-3">
+            <a href="<?= base_url('karyawan/keuangan/pengeluaran/export/pdf'); ?>" class="btn btn-danger btn-sm">
+                Export PDF
+            </a>
+
+            <a href="<?= base_url('karyawan/keuangan/pengeluaran/export/excel'); ?>" class="btn btn-success btn-sm">
+                Export Excel
+            </a>
+        </div>
         <div class="table-responsive">
             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>

@@ -15,13 +15,15 @@
 
 <!-- GREETING -->
 <div class="card shadow-sm mb-4" style="border-left: 5px solid #2d8659;">
-    <div class="card-body p-3 d-flex align-items-center">
-        <i class="fas fa-warehouse fa-3x mr-3" style="color:#2d8659;"></i>
-        <div>
-            <h4 class="font-weight-bold" style="color:#2d8659;">
-                Selamat Datang, <?= esc(session()->get('username')) ?>!
-            </h4>
-            <p class="mb-0 text-gray-700">Ringkasan inventaris hari ini.</p>
+    <div class="card-body p-3">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-user-circle fa-3x mr-3" style="color: #2d8659;"></i>
+            <div>
+                <h4 class="h5 mb-0 font-weight-bold" style="color: #2d8659;">
+                    Selamat Datang, <?= esc(session()->get('username')) ?>!
+                </h4>
+                <p class="mb-0 text-gray-700">Ini adalah ringkasan pekerjaan Anda hari ini</p>
+            </div>
         </div>
     </div>
 </div>
