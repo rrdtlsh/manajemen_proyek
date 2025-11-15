@@ -21,46 +21,42 @@ const btnSimpanPelanggan = $('#btn-simpan-pelanggan');
 const formAddPelanggan = $('#form-add-pelanggan');
 const modalErrors = $('#modal-errors');
 
-// =======================================================
-// [VALIDASI OTOMATIS] Fungsi untuk Cek Form & Status Bayar
-// =======================================================
 function validateForm() {
     let isValid = true;
     let currentTotal = parseFloat(totalHidden.value) || 0;
-    let currentDP = parseFloat(inputDP.value) || 0;
+    
+    let currentDP = parseFloat(inputDP.value) || 0; 
 
-    // 1. Cek Keranjang
+    const sudahDibayarEl = document.getElementById('sudah_dibayar_sebelumnya');
+    let sudahDibayar = parseFloat(sudahDibayarEl.value) || 0;
+    
+    let totalDibayarSekarang = sudahDibayar + currentDP;
+
     if (cart.length === 0) {
         isValid = false;
     }
 
-    // 2. Cek Tanggal
     if (inputTanggal.value === '') {
         isValid = false;
     }
 
-    // 3. Cek Pelanggan
     if (selectPelanggan.val() === null || selectPelanggan.val() === '') {
         isValid = false;
     }
 
-    // 4. [LOGIKA OTOMATIS] Tentukan status berdasarkan DP vs Total
-    if (currentDP >= currentTotal && currentTotal > 0) {
+ 
+    if (totalDibayarSekarang >= (currentTotal - 1) && currentTotal > 0) { // <-- LOGIKA BARU
         statusBayarSelect.value = 'lunas';
         statusBayarHidden.value = 'lunas';
-        inputDP.removeAttribute('required');
     } else {
         statusBayarSelect.value = 'belum_lunas';
         statusBayarHidden.value = 'belum_lunas';
-        inputDP.setAttribute('required', 'required');
-
-        // 5. Validasi Ulang: jika status jadi 'belum_lunas', DP harus diisi
-        if (inputDP.value === '' || isNaN(currentDP) || currentDP <= 0) {
-            isValid = false;
-        }
     }
 
-    // 6. Aktifkan atau Non-aktifkan tombol
+    if (inputDP.value === '' || isNaN(currentDP) || currentDP < 0) { // <-- LOGIKA BARU
+         isValid = false;
+    }
+
     btnBayar.disabled = !isValid;
 }
 

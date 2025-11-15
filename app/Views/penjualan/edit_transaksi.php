@@ -107,10 +107,24 @@
                     </div>
 
                     <div class="total-belanja-card penjualan-total">
-                        <div class="total-label">Total Belanja</div>
+                        <div class="total-label">Total Belanja (Baru)</div>
                         <div class="total-value" id="total-belanja-display">Rp 0</div>
                     </div>
-
+                    <div class="total-belanja-card penjualan-sisa mt-2">
+                        <div class="total-label">Total Sudah Dibayar</div>
+                        <div class="total-value">
+                            <?= 'Rp ' . number_format($sudah_dibayar, 0, ',', '.'); ?>
+                    </div>
+                    </div>
+                    <div class="total-belanja-card penjualan-sisa-kuning mt-2"> 
+                        <div class="total-label">Sisa Tagihan (Awal)</div>
+                        <div class="total-value" id="sisa-tagihan-display">
+                            <?= 'Rp ' . number_format($sisa_tagihan, 0, ',', '.'); ?>
+                        </div>
+                        <small class="form-text text-muted text-right">
+                            Sisa tagihan akan disesuaikan jika keranjang diubah.
+                        </small>
+                    </div>
                     <hr class="my-4">
 
                     <div class="form-row mb-3">
@@ -132,12 +146,17 @@
                     </div>
 
                     <div class="form-group" id="input-dp">
-                        <label for="jumlah_dp" class="font-weight-bold text-gray-700">Jumlah Bayar/DP (Rp)*</label>
-                        <input type="number" class="form-control" id="jumlah_dp" name="jumlah_dp" placeholder="Masukkan jumlah bayar" value="<?= $penjualan['jumlah_dp']; ?>" required>
+                        <label for="jumlah_dp" class="font-weight-bold text-gray-700">Jumlah Pelunasan (Rp)*</label>
+                        <input type="number" class="form-control" id="jumlah_dp" name="jumlah_dp" 
+                                placeholder="Masukkan jumlah pelunasan baru" value="0" required>
+                        <small class="form-text text-muted">
+                                 Masukkan '0' jika hanya mengubah keranjang tanpa membayar.
+                         </small>
                     </div>
 
                     <input type="hidden" name="total" id="total_belanja_hidden">
                     <input type="hidden" name="cart_items" id="cart_items_hidden">
+                    <input type="hidden" id="sudah_dibayar_sebelumnya" value="<?= $sudah_dibayar; ?>">
 
                     <div class="row mt-4">
                         <div class="col-6">
