@@ -24,7 +24,8 @@
     if (
         $role == 'Penjualan' || $role == 'penjualan' ||
         $role == 'inventaris' || $role == 'Inventaris'  ||
-        $role == 'Keuangan' || $role == 'keuangan'
+        $role == 'Keuangan' || $role == 'keuangan'||
+        $role == 'pemilik' || $role == 'Pemilik' 
     ) : ?>
         <link href="<?= base_url('css/penjualan.css') ?>" rel="stylesheet">
     <?php endif; ?>

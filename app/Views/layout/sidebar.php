@@ -8,8 +8,8 @@ $currentPath = uri_string();
 ?>
 
 <?php
-// --- BLOK UNTUK KARYAWAN (PENJUALAN, KEUANGAN, INVENTARIS) ---
-if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuangan') :
+// --- BLOK UNTUK SEMUA ROLE (KARYAWAN + PEMILIK) ---
+if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuangan' || $userRole == 'pemilik') : // <-- 'pemilik' DIMASUKKAN DI SINI
 ?>
     <ul class="navbar-nav sidebar penjualan-sidebar sidebar-dark accordion" id="accordionSidebar">
 
@@ -50,21 +50,18 @@ if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuan
                     <span>Dashboard Keuangan</span>
                 </a>
             </li>
-
             <li class="nav-item <?= (strpos($currentPath, 'karyawan/keuangan/pemasukan') !== false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('karyawan/keuangan/pemasukan'); ?>">
                     <i class="fas fa-fw fa-arrow-down"></i>
                     <span>Pemasukan</span>
                 </a>
             </li>
-
             <li class="nav-item <?= (strpos($currentPath, 'karyawan/keuangan/pengeluaran') !== false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('karyawan/keuangan/pengeluaran'); ?>">
                     <i class="fas fa-fw fa-arrow-up"></i>
                     <span>Pengeluaran</span>
                 </a>
             </li>
-
             <li class="nav-item <?= (strpos($currentPath, 'karyawan/keuangan/laporan') !== false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('karyawan/keuangan/laporan'); ?>">
                     <i class="fas fa-fw fa-file-invoice-dollar"></i>
@@ -100,40 +97,19 @@ if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuan
             </li>
         <?php endif; ?>
 
-        <hr class="sidebar-divider d-none d-md-block">
-        <div class="text-center d-none d-md-inline mt-auto">
-            <button class="rounded-circle border-0" id="sidebarToggle"></button>
-        </div>
 
-    </ul>
-
-<?php
-// --- BLOK UNTUK OWNER (ATAU ROLE LAIN) ---
-else :
-?>
-    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?= base_url('/'); ?>">
-            <div class="sidebar-brand-icon rotate-n-15">
-                <i class="fas fa-store"></i>
-            </div>
-            <div class="sidebar-brand-text mx-3">UD. THJ</div>
-        </a>
-        <hr class="sidebar-divider my-0">
-
-        <?php if ($userRole == 'owner') : ?>
+        <?php // === MENU PEMILIK (DI DALAM BLOK HIJAU) ===
+        if ($userRole == 'pemilik') : ?>
             <li class="nav-item <?= (strpos($currentPath, 'owner') !== false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('owner'); ?>">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard Owner</span>
                 </a>
             </li>
-
             <hr class="sidebar-divider">
             <div class="sidebar-heading">
                 Analitik & Manajemen
             </div>
-
             <li class="nav-item <?= (strpos($currentPath, 'owner/laporan_penjualan') !== false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('owner/laporan_penjualan'); ?>">
                     <i class="fas fa-fw fa-chart-line"></i>
@@ -152,13 +128,21 @@ else :
                     <span>Manajemen Produk</span>
                 </a>
             </li>
-
+            <li class="nav-item <?= (strpos($currentPath, 'owner/restok-approval') !== false) ? 'active' : ''; ?>">
+                <a class="nav-link" href="<?= base_url('owner/restok-approval'); ?>">
+                    <i class="fas fa-fw fa-check-circle"></i>
+                    <span>Restok Approval</span>
+                </a>
+            </li>
         <?php endif; ?>
-
         <hr class="sidebar-divider d-none d-md-block">
-        <div class="text-center d-none d-md-inline">
+        <div class="text-center d-none d-md-inline mt-auto">
             <button class="rounded-circle border-0" id="sidebarToggle"></button>
         </div>
 
     </ul>
-<?php endif; ?>
+
+<?php
+// --- PENTING: BLOK 'else' YANG LAMA (BERISI SIDEBAR BIRU) DIHAPUS TOTAL ---
+endif;
+?>

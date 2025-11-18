@@ -12,7 +12,7 @@ class CreateUserTable extends Migration
             'id_user' => [
                 'type'           => 'INT',
                 'constraint'     => 11,
-                'unsigned'       => true, // <-- TAMBAHKAN INI
+                'unsigned'       => true, 
                 'auto_increment' => true,
             ],
             'username' => [

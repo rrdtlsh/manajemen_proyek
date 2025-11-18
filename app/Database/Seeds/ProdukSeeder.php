@@ -8,7 +8,7 @@ class ProdukSeeder extends Seeder
 {
     public function run()
     {
-        $data = [
+        $data = [ 
             [
                 'kode_produk'   => 'KP-001',
                 'nama_produk'   => 'Karpet selimut',
