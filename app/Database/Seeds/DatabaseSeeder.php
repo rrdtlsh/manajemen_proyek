@@ -8,10 +8,8 @@ class DatabaseSeeder extends Seeder
 {
     public function run()
     {
-        // 1. Matikan pengecekan foreign key
         $this->db->query('SET FOREIGN_KEY_CHECKS=0;');
 
-        // 2. Kosongkan tabel (TRUNCATE) secara langsung dengan query SQL
         $tables = [
             'stok_log',
             'detail_penjualan',
@@ -30,7 +28,7 @@ class DatabaseSeeder extends Seeder
             $this->db->query("TRUNCATE TABLE `$table`;");
         }
 
-        // 3. Aktifkan kembali foreign key
+        
         $this->db->query('SET FOREIGN_KEY_CHECKS=1;');
 
         // 4. Jalankan seeder sesuai urutan relasi
@@ -38,6 +36,9 @@ class DatabaseSeeder extends Seeder
         $this->call('KategoriSeeder');
         $this->call('SupplierSeeder');
         $this->call('ProdukSeeder');
-        // Tambahkan seeder lainnya jika ada
+        $this->call('RestokSeeder');
+        $this->call('PelangganSeeder');
+        $this->call('TransaksiSeeder');
+        $this->call('PengeluaranSeeder');
     }
 }

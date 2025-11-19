@@ -35,6 +35,20 @@ class Owner extends BaseController
         return (($current - $previous) / $previous) * 100;
     }
 
+    public function laporan_penjualan()
+    {
+        $data = [
+            'title' => 'Laporan Riwayat Penjualan',
+            'penjualan' => $this->penjualanModel
+                ->select('penjualan.*, pelanggan.nama_pelanggan')
+                ->join('pelanggan', 'pelanggan.id_pelanggan = penjualan.id_pelanggan', 'left')
+                ->orderBy('penjualan.tanggal', 'DESC')
+                ->orderBy('penjualan.id_penjualan', 'DESC')
+                ->findAll()
+        ];
+
+        return view('owner/laporan_penjualan', $data);
+    }
     public function index()
     {
         // =================================================================

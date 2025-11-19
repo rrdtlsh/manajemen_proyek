@@ -27,16 +27,21 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
 
     // --- RUTE OWNER (PEMILIK) ---
     $routes->group('owner', static function ($routes) { 
-        // Tidak perlu filter auth lagi karena parent group sudah punya
         
-        $routes->get('/', 'Owner::index'); // Mengarah ke /owner
-        $routes->get('dashboard', 'Owner::index'); // Mengarah ke /owner/dashboard
+        $routes->get('/', 'Owner::index'); 
+        $routes->get('dashboard', 'Owner::index'); 
 
-        // [PINDAHKAN KE SINI] Rute Owner untuk Approval Restok
-        // URL akan menjadi /owner/restok
+        $routes->post('restok/update_status', 'OwnerRestokController::update_status');
+        $routes->get('restok/delete/(:num)', 'OwnerRestokController::delete/$1');
         $routes->get('restok', 'OwnerRestokController::index');
         $routes->get('restok/approve/(:num)', 'OwnerRestokController::approve/$1');
         $routes->get('restok/reject/(:num)', 'OwnerRestokController::reject/$1');
+        $routes->get('manajemen_produk', 'OwnerProdukController::index');
+        $routes->post('manajemen_produk/store', 'OwnerProdukController::store');
+        $routes->post('manajemen_produk/update/(:num)', 'OwnerProdukController::update/$1');
+        $routes->get('manajemen_produk/delete/(:num)', 'OwnerProdukController::delete/$1');
+        $routes->get('laporan_penjualan', 'Owner::laporan_penjualan'); 
+        $routes->get('laporan_keuangan', 'OwnerKeuanganController::index');
     });
 
 
@@ -96,6 +101,9 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
         $routes->get('keuangan/pemasukan', 'KeuanganController::pemasukan');
         $routes->get('keuangan/pengeluaran', 'KeuanganController::pengeluaran');
         $routes->get('keuangan/laporan', 'KeuanganController::laporanKeuangan');
+        $routes->post('keuangan/store_pengeluaran', 'KeuanganController::store_pengeluaran');
+        $routes->get('keuangan/delete_pengeluaran/(:num)', 'KeuanganController::delete_pengeluaran/$1');
+        $routes->get('keuangan/get_detail/(:num)', 'KeuanganController::getDetailPenjualan/$1');
         
         // Export
         $routes->get('keuangan/pemasukan/export/pdf', 'KeuanganController::exportPemasukanPDF');
@@ -104,17 +112,13 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
         $routes->get('keuangan/pengeluaran/export/excel', 'KeuanganController::exportPengeluaranExcel');
 
         
-        // --- Rute restok owner Dihapus dari sini ---
 
     }); // Akhir grup 'karyawan'
 
-    // --- RUTE BARU UNTUK DASHBOARD ---
-    // Rute ini diperlukan agar redirect dari Karyawan::dashboard() berfungsi
-    // Ini sudah benar!
+  
     $routes->get('penjualan/dashboard', 'PenjualanController::dashboard');
     $routes->get('inventaris/dashboard', 'InventarisController::dashboard');
     
-    // Saya tambahkan juga untuk keuangan untuk jaga-jaga
     $routes->get('keuangan/dashboard', 'KeuanganController::dashboard');
 
-}); // Akhir grup '/'
+}); 

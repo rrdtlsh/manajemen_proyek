@@ -284,4 +284,57 @@ class KeuanganController extends BaseController
 
         return view('keuangan/laporan', $data);
     }
+
+    // Tambahkan method ini ke dalam Class KeuanganController
+
+    public function store_pengeluaran()
+    {
+        $keuanganModel = new KeuanganModel();
+
+        // Validasi
+        if (!$this->validate([
+            'tanggal'    => 'required|valid_date',
+            'jumlah'     => 'required|numeric|greater_than[0]',
+            'keterangan' => 'required'
+        ])) {
+            return redirect()->back()->with('error', 'Input tidak valid. Pastikan semua data terisi.');
+        }
+
+        // Simpan Data
+        $keuanganModel->insert([
+            'tanggal'     => $this->request->getPost('tanggal'),
+            'tipe'        => 'Pengeluaran',
+            'pemasukan'   => 0,
+            'pengeluaran' => $this->request->getPost('jumlah'),
+            'keterangan'  => $this->request->getPost('keterangan'),
+            'id_user'     => session()->get('user_id') // Mencatat siapa yg input
+        ]);
+
+        return redirect()->to('/karyawan/keuangan/pengeluaran')->with('success', 'Data pengeluaran berhasil disimpan.');
+    }
+
+    public function delete_pengeluaran($id)
+    {
+        $keuanganModel = new KeuanganModel();
+        
+        $item = $keuanganModel->find($id);
+        if ($item && $item['tipe'] == 'Pengeluaran') {
+            $keuanganModel->delete($id);
+            return redirect()->back()->with('success', 'Data pengeluaran dihapus.');
+        }
+
+        return redirect()->back()->with('error', 'Gagal menghapus data.');
+    }
+
+    public function getDetailPenjualan($id_penjualan)
+    {
+        $detailModel = new \App\Models\DetailPenjualanModel();
+        
+        $items = $detailModel->select('detail_penjualan.*, produk.nama_produk, produk.kode_produk')
+            ->join('produk', 'produk.id_produk = detail_penjualan.id_produk', 'left')
+            ->where('detail_penjualan.id_penjualan', $id_penjualan)
+            ->findAll();
+
+        return $this->response->setJSON($items);
+    }
 }

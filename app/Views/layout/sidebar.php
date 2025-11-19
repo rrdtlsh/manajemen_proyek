@@ -128,8 +128,8 @@ if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuan
                     <span>Manajemen Produk</span>
                 </a>
             </li>
-            <li class="nav-item <?= (strpos($currentPath, 'owner/restok-approval') !== false) ? 'active' : ''; ?>">
-                <a class="nav-link" href="<?= base_url('owner/restok-approval'); ?>">
+            <li class="nav-item <?= (strpos($currentPath, 'owner/restok') !== false) ? 'active' : ''; ?>">
+                <a class="nav-link" href="<?= base_url('owner/restok'); ?>">
                     <i class="fas fa-fw fa-check-circle"></i>
                     <span>Restok Approval</span>
                 </a>
