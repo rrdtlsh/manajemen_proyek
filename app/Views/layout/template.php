@@ -20,12 +20,17 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
 
     <?php
+    // [MODIFIKASI 1] Tambahkan 'superadmin' pada pengecekan untuk memuat CSS Hijau
     $role = session()->get('role');
+    // Normalisasi ke lowercase agar lebih mudah dicek
+    $userRole = strtolower($role ?? ''); 
+    
     if (
-        $role == 'Penjualan' || $role == 'penjualan' ||
-        $role == 'inventaris' || $role == 'Inventaris'  ||
-        $role == 'Keuangan' || $role == 'keuangan'||
-        $role == 'pemilik' || $role == 'Pemilik' 
+        $userRole == 'penjualan' ||
+        $userRole == 'inventaris' ||
+        $userRole == 'keuangan' ||
+        $userRole == 'pemilik' || 
+        $userRole == 'superadmin' // <--- TAMBAHAN DI SINI
     ) : ?>
         <link href="<?= base_url('css/penjualan.css') ?>" rel="stylesheet">
     <?php endif; ?>
@@ -33,12 +38,32 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <?= $this->renderSection('head') ?>
+
+    <?php if(session()->get('role') === 'Superadmin'): ?>
+    <style>
+        /* Style khusus Superadmin (View Only) */
+        .btn-danger, .btn-success, .btn-warning, button[type="submit"] {
+            display: none !important;
+        }
+        #filterButton, .btn-info, a[href*="export"] {
+            display: inline-block !important;
+        }
+        /* Pastikan badge status tetap terlihat meskipun btn-warning/success di-hide */
+        .badge-success, .badge-warning, .badge-danger {
+            display: inline-block !important; 
+        }
+    </style>
+    <div class="alert alert-warning text-center m-0" style="border-radius: 0;">
+        <strong>MODE SUPERADMIN (VIEW ONLY):</strong> Akses penuh sistem dengan proteksi data (Tombol Simpan/Hapus disembunyikan).
+    </div>
+    <?php endif; ?>
 </head>
 
 <body id="page-top" <?php if (
-                        $role == 'Penjualan' || $role == 'penjualan' ||
-                        $role == 'inventaris' || $role == 'Inventaris'  ||
-                        $role == 'Keuangan' || $role == 'keuangan'
+                        $userRole == 'penjualan' ||
+                        $userRole == 'inventaris' ||
+                        $userRole == 'keuangan' ||
+                        $userRole == 'superadmin' // <--- TAMBAHAN DI SINI (Pemilik biasanya default biru, tapi bisa ditambahkan jika mau)
                     ) : ?>class="penjualan-body" <?php endif; ?>>
 
     <div id="wrapper">
@@ -89,35 +114,29 @@
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/js/sb-admin-2.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         $(document).ready(function() {
-            // Cek jika ada session flashdata 'success'
             <?php if (session()->getFlashdata('success')) : ?>
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil!',
                     text: '<?= session()->getFlashdata('success'); ?>',
-                    timer: 2000, // Tampil selama 2 detik
+                    timer: 2000,
                     showConfirmButton: false
                 });
             <?php endif; ?>
 
-            // Cek jika ada session flashdata 'error'
             <?php if (session()->getFlashdata('error')) : ?>
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal!',
                     text: '<?= session()->getFlashdata('error'); ?>',
-                    showConfirmButton: true // Biarkan user klik OK
+                    showConfirmButton: true
                 });
             <?php endif; ?>
         });

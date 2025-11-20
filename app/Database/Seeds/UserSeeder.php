@@ -30,10 +30,13 @@ class UserSeeder extends Seeder
                 'password' => password_hash('12345', PASSWORD_DEFAULT),
                 'role'     => 'Pemilik'
             ],
+            [
+                'username' => 'dosentester',
+                'password' => password_hash('12345', PASSWORD_DEFAULT),
+                'role'     => 'Superadmin' 
+            ],
         ];
 
-        // Menggunakan Query Builder untuk insert data
-        // Ini akan memasukkan semua data dalam $data ke tabel 'user'
         $this->db->table('user')->insertBatch($data);
     }
 }

@@ -18,7 +18,10 @@ class AuthFilter implements FilterInterface
 
         // 2. Ambil role dari session (yang sudah di-set saat login)
         $userRole = session()->get('role');
-
+        
+        if (strtolower($userRole) === 'superadmin') {
+            return; // Langsung lolos ke controller
+        }
         // 3. Cek jika rute ini butuh role khusus (ada $arguments)
         if (!empty($arguments)) {
             $isAllowed = false;

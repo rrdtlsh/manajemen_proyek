@@ -45,12 +45,10 @@ class Login extends BaseController
 
                 $role = strtolower($user['role']);
 
-                if ($role == 'owner' || $role == 'pemilik') {
+                if ($role == 'owner' || $role == 'pemilik' || $role == 'superadmin') {
                     return redirect()->to('/owner');
                 } else {
-                    // [PERBAIKAN]
-                    // SEMUA role karyawan (Penjualan, Keuangan, Inventaris)
-                    // harus diarahkan ke 'karyawan/dashboard' terlebih dahulu.
+                
                     return redirect()->to('karyawan/dashboard');
                 }
             } else {

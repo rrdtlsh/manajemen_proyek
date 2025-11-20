@@ -3,13 +3,20 @@
 $session = session();
 $role = $session->get('role');
 // Pengecekan role yang lebih konsisten (mengubah ke huruf kecil)
-$userRole = strtolower($role ?? ''); // Tambah ?? '' untuk menghindari error jika null
+$userRole = strtolower($role ?? ''); 
 $currentPath = uri_string();
 ?>
 
 <?php
-// --- BLOK UNTUK SEMUA ROLE (KARYAWAN + PEMILIK) ---
-if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuangan' || $userRole == 'pemilik') : // <-- 'pemilik' DIMASUKKAN DI SINI
+// --- BLOK UNTUK SEMUA ROLE (KARYAWAN + PEMILIK + SUPERADMIN) ---
+if (
+    $userRole == 'penjualan' || 
+    $userRole == 'inventaris' || 
+    $userRole == 'keuangan' || 
+    $userRole == 'pemilik' || 
+    $userRole == 'owner' || 
+    $userRole == 'superadmin' // <-- Tambahan Superadmin
+) : 
 ?>
     <ul class="navbar-nav sidebar penjualan-sidebar sidebar-dark accordion" id="accordionSidebar">
 
@@ -22,7 +29,13 @@ if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuan
         <hr class="sidebar-divider my-0">
 
         <?php // === MENU PENJUALAN ===
-        if ($userRole == 'penjualan') : ?>
+        // Tampilkan jika role Penjualan ATAU Superadmin
+        if ($userRole == 'penjualan' || $userRole == 'superadmin') : ?>
+            
+            <?php if($userRole == 'superadmin'): ?>
+                <div class="sidebar-heading mt-3">Divisi Penjualan</div>
+            <?php endif; ?>
+
             <li class="nav-item <?= (strpos($currentPath, 'karyawan/dashboard') !== false || strpos($currentPath, 'penjualan/dashboard') !== false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('karyawan/dashboard'); ?>">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -41,9 +54,17 @@ if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuan
                     <span>Riwayat Penjualan</span>
                 </a>
             </li>
+        <?php endif; ?>
 
         <?php // === MENU KEUANGAN ===
-        elseif ($userRole == 'keuangan') : ?>
+        // Menggunakan IF terpisah (bukan elseif) agar Superadmin bisa melihat ini juga
+        if ($userRole == 'keuangan' || $userRole == 'superadmin') : ?>
+
+            <?php if($userRole == 'superadmin'): ?>
+                <hr class="sidebar-divider">
+                <div class="sidebar-heading">Divisi Keuangan</div>
+            <?php endif; ?>
+
             <li class="nav-item <?= (strpos($currentPath, 'karyawan/keuangan/dashboard') !== false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('karyawan/keuangan/dashboard'); ?>">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -68,9 +89,17 @@ if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuan
                     <span>Laporan Keuangan</span>
                 </a>
             </li>
+        <?php endif; ?>
 
         <?php // === MENU INVENTARIS ===
-        elseif ($userRole == 'inventaris') : ?>
+        // Menggunakan IF terpisah
+        if ($userRole == 'inventaris' || $userRole == 'superadmin') : ?>
+
+            <?php if($userRole == 'superadmin'): ?>
+                <hr class="sidebar-divider">
+                <div class="sidebar-heading">Divisi Inventaris</div>
+            <?php endif; ?>
+
             <li class="nav-item <?= (strpos($currentPath, 'karyawan/dashboard') !== false || strpos($currentPath, 'inventaris/dashboard') !== false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('karyawan/dashboard'); ?>">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -98,18 +127,20 @@ if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuan
         <?php endif; ?>
 
 
-        <?php // === MENU PEMILIK (DI DALAM BLOK HIJAU) ===
-        if ($userRole == 'pemilik') : ?>
-            <li class="nav-item <?= (strpos($currentPath, 'owner') !== false) ? 'active' : ''; ?>">
+        <?php // === MENU PEMILIK ===
+        if ($userRole == 'pemilik' || $userRole == 'owner' || $userRole == 'superadmin') : ?>
+            
+            <hr class="sidebar-divider">
+            <div class="sidebar-heading">
+                <?php echo ($userRole == 'superadmin') ? 'Area Pemilik' : 'Analitik & Manajemen'; ?>
+            </div>
+
+            <li class="nav-item <?= (strpos($currentPath, 'owner') !== false && strpos($currentPath, 'laporan') === false && strpos($currentPath, 'manajemen') === false && strpos($currentPath, 'restok') === false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('owner'); ?>">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard Owner</span>
                 </a>
             </li>
-            <hr class="sidebar-divider">
-            <div class="sidebar-heading">
-                Analitik & Manajemen
-            </div>
             <li class="nav-item <?= (strpos($currentPath, 'owner/laporan_penjualan') !== false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('owner/laporan_penjualan'); ?>">
                     <i class="fas fa-fw fa-chart-line"></i>
@@ -135,6 +166,7 @@ if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuan
                 </a>
             </li>
         <?php endif; ?>
+        
         <hr class="sidebar-divider d-none d-md-block">
         <div class="text-center d-none d-md-inline mt-auto">
             <button class="rounded-circle border-0" id="sidebarToggle"></button>
@@ -143,6 +175,5 @@ if ($userRole == 'penjualan' || $userRole == 'inventaris' || $userRole == 'keuan
     </ul>
 
 <?php
-// --- PENTING: BLOK 'else' YANG LAMA (BERISI SIDEBAR BIRU) DIHAPUS TOTAL ---
 endif;
 ?>

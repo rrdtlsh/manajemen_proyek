@@ -9,8 +9,9 @@ $username = $session->get('username') ?? 'Pengguna';
     $role == 'inventaris' || $role == 'Inventaris'  ||
     $role == 'Keuangan' || $role == 'keuangan' ||
     $role == 'pemilik' || $role == 'Pemilik' ||
-    $role == 'owner' || $role == 'Owner'
-    // <-- 'pemilik' DIMASUKKAN DI SINI
+    $role == 'owner' || $role == 'Owner' ||
+    $role == 'superadmin' || $role == 'Superadmin'
+    
 ) : ?>
     <nav class="navbar navbar-expand navbar-light topbar penjualan-topbar mb-4 static-top shadow">
         <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3 text-white">
