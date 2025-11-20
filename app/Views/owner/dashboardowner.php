@@ -155,7 +155,7 @@
     <!-- BARIS 3: OPERASIONAL (STOK & PELANGGAN) -->
     <div class="row">
         <!-- Stok Menipis -->
-        <div class="col-lg-6 mb-4">
+        <div class="col-12 mb-4">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-danger">Peringatan Stok Menipis (< 10)</h6>
@@ -164,7 +164,11 @@
                     <div class="table-responsive">
                         <table class="table table-bordered table-sm" width="100%" cellspacing="0">
                             <thead class="thead-light">
-                                <tr><th>Produk</th><th>Kategori</th><th class="text-center">Sisa</th></tr>
+                                <tr>
+                                    <th style="width: 20%; vertical-align: middle;" class="text-center">Produk</th>
+                                    <th style="width: 20%; vertical-align: middle;"class="text-center" >Kategori</th>
+                                    <th style="width: 20%; vertical-align: middle;" class="text-center">Sisa Stok</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 <?php if (!empty($lowStockProducts)) : ?>
@@ -176,7 +180,15 @@
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else : ?>
-                                    <tr><td colspan="3" class="text-center text-success font-weight-bold"><i class="fas fa-check-circle"></i> Stok Aman</td></tr>
+                                    <tr>
+                                    <td colspan="3" class="text-center py-5 bg-light">
+                                        <div class="d-flex flex-column align-items-center justify-content-center">
+                                            <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                                            <h5 class="font-weight-bold text-gray-800">Semua Stok Aman</h5>
+                                            <span class="text-muted small">Tidak ada produk dengan stok di bawah 10 unit.</span>
+                                        </div>
+                                    </td>
+                                </tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -185,64 +197,76 @@
             </div>
         </div>
 
-        <div class="row">
-        <div class="col-12 mb-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 border-bottom-warning">
-                    <h6 class="m-0 font-weight-bold text-warning">
-                        <i class="fas fa-exclamation-triangle mr-1"></i> Analisa Dead Stock (Tidak Terjual > 90 Hari)
-                    </h6>
+    <div class="col-12 mb-4">
+        <div class="card shadow mb-4 border-left-warning">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white">
+                <h6 class="m-0 font-weight-bold text-warning">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Analisa Dead Stock (Tidak Terjual > 90 Hari)
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-light border-0 shadow-sm mb-3 p-2 text-muted small">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Produk berikut memiliki stok tersedia namun tidak ada transaksi penjualan dalam 3 bulan terakhir. Pertimbangkan untuk diskon atau bundling.
                 </div>
-                <div class="card-body">
-                    <p class="mb-3 small text-muted">Produk berikut memiliki stok tersedia namun tidak ada transaksi penjualan dalam 3 bulan terakhir. Pertimbangkan untuk diskon atau bundling.</p>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover" width="100%" cellspacing="0">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>Nama Produk</th>
-                                    <th>Kategori</th>
-                                    <th class="text-center">Stok Mengendap</th>
-                                    <th class="text-right">Harga Jual</th>
-                                    <th class="text-right">Potensi Kerugian (Aset Diam)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($deadStock)) : ?>
-                                    <?php foreach ($deadStock as $item) : ?>
-                                        <tr>
-                                            <td class="font-weight-bold"><?= esc($item['nama_produk']); ?></td>
-                                            <td><?= esc($item['nama_kategori'] ?? '-'); ?></td>
-                                            <td class="text-center"><?= $item['stok']; ?></td>
-                                            <td class="text-right">
-                                                <?= number_to_currency($item['harga_jual'], 'IDR', 'id_ID', 0); ?>
-                                            </td>
-                                            <td class="text-right text-danger font-weight-bold">
-                                                <?php 
-                                                    $asetDiam = $item['stok'] * $item['harga_jual'];
-                                                    echo number_to_currency($asetDiam, 'IDR', 'id_ID', 0); 
-                                                ?>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else : ?>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover mb-0" width="100%" cellspacing="0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style="width: 35%; vertical-align: middle;" class="text-center">Nama Produk</th>
+                                <th style="width: 15%; vertical-align: middle;" class="text-center">Kategori</th>
+                                <th style="width: 15%; vertical-align: middle;" class="text-center">Stok Mengendap</th>
+                                <th style="width: 15%; vertical-align: middle;" class="text-center">Harga Jual</th>
+                                <th style="width: 20%; vertical-align: middle;" class="text-center">Potensi Kerugian</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($deadStock)) : ?>
+                                <?php foreach ($deadStock as $item) : ?>
                                     <tr>
-                                        <td colspan="5" class="text-center text-success py-4">
-                                            <i class="fas fa-check-circle fa-2x mb-2"></i><br>
-                                            Hebat! Tidak ada Dead Stock ditemukan. Semua stok bergerak lancar.
+                                        <td class="align-middle font-weight-bold text-dark text-left">
+                                            <?= esc($item['nama_produk']); ?>
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            <span class="badge badge-secondary">
+                                                <?= esc($item['nama_kategori'] ?? '-'); ?>
+                                            </span>
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            <span class="font-weight-bold text-gray-800"><?= $item['stok']; ?></span> Unit
+                                        </td>
+                                        <td class="align-middle text-right">
+                                            <?= number_to_currency($item['harga_jual'], 'IDR', 'id_ID', 0); ?>
+                                        </td>
+                                        <td class="align-middle text-right text-danger font-weight-bold">
+                                            <?php 
+                                                $asetDiam = $item['stok'] * $item['harga_jual'];
+                                                echo number_to_currency($asetDiam, 'IDR', 'id_ID', 0); 
+                                            ?>
                                         </td>
                                     </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 bg-light">
+                                        <div class="d-flex flex-column align-items-center justify-content-center">
+                                            <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                                            <h5 class="font-weight-bold text-gray-800">Kinerja Penjualan Bagus!</h5>
+                                            <span class="text-muted small">Tidak ada produk yang mengendap lebih dari 90 hari.</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
         <!-- Top Pelanggan -->
-        <div class="col-lg-6 mb-4">
+        <div class="col-12 mb-4">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-success">Top 5 Pelanggan Loyal</h6>
@@ -251,7 +275,11 @@
                     <div class="table-responsive">
                         <table class="table table-bordered table-sm" width="100%" cellspacing="0">
                             <thead class="thead-light">
-                                <tr><th>Nama Pelanggan</th><th class="text-center">Trx</th><th class="text-right">Total Belanja</th></tr>
+                                 <tr>
+                                <th style="width: 35%; vertical-align: middle;" class="text-center">Nama Pelanggan</th>
+                                <th style="width: 15%; vertical-align: middle;" class="text-center">Trx</th>
+                                <th style="width: 15%; vertical-align: middle;" class="text-center">Total Belanja</th>
+                            </tr>
                             </thead>
                             <tbody>
                                 <?php if (!empty($topCustomers)) : ?>
@@ -279,22 +307,33 @@
     </div>
 
     <!-- BARIS 4: ANALISIS LANJUTAN -->
-    <div class="row">
-        <!-- Grafik Kategori -->
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Pendapatan per Kategori</h6></div>
-                <div class="card-body"><div class="chart-bar"><canvas id="categorySalesChart"></canvas></div></div>
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4 h-100">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-success">Pendapatan per Kategori</h6>
             </div>
-        </div>
-        <!-- Grafik Pembayaran -->
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-info">Metode Pembayaran</h6></div>
-                <div class="card-body"><div class="chart-pie pt-4"><canvas id="paymentMethodChart"></canvas></div></div>
+            <div class="card-body">
+                <div class="chart-bar">
+                    <canvas id="categorySalesChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4 h-100">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-warning">Metode Pembayaran</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-pie pt-4">
+                    <canvas id="paymentMethodChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 </div>
 
