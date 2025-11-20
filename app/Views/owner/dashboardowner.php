@@ -159,7 +159,6 @@
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-danger">Peringatan Stok Menipis (< 10)</h6>
-                    <a href="<?= base_url('owner/restok-approval') ?>" class="btn btn-sm btn-danger shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Restok</a>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
