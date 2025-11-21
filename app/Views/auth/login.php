@@ -56,14 +56,6 @@
                             required>
                     </div>
 
-                    <div class="form-options">
-                        <div class="remember-me">
-                            <input type="checkbox" id="remember" name="remember">
-                            <label for="remember">Ingat saya</label>
-                        </div>
-                        <a href="#" class="forgot-password">Lupa kata sandi?</a>
-                    </div>
-
                     <button type="submit" class="login-button">Masuk</button>
                 </form>
             </div>
