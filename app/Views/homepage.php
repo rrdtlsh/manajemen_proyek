@@ -268,7 +268,7 @@
                     <li class="nav-item"><a class="nav-link" href="#sejadah">Sejadah</a></li>
                     <li class="nav-item"><a class="nav-link" href="#about">Tentang Kami</a></li>
                     <li class="nav-item ms-lg-3">
-                        <a href="https://wa.me/6282149586655" target="_blank" class="btn btn-success rounded-pill px-4 py-2 fw-bold">
+                        <a href="https://wa.me/6282149586655?text=Halo,%20saya%20tertarik%20dengan%20produk%20di%20Toko%20H.Jali" target="_blank" class="btn btn-success rounded-pill px-4 py-2 fw-bold">
                             <i class="bi bi-whatsapp me-2"></i> Hubungi Kami
                         </a>
                     </li>
