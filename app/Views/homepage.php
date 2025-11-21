@@ -497,7 +497,7 @@
                                     <a href="https://wa.me/6282149586655?text=Halo,%20saya%20tertarik%20dengan%20produk%20di%20Toko%20H.Jali" target="_blank" class="btn btn-light btn-lg fw-bold shadow-sm text-success">
                                         <i class="bi bi-whatsapp me-2"></i> Chat WhatsApp
                                     </a>
-                                    <a href="https://www.google.com/maps?ll=-3.324713,114.59441&z=17&t=m&hl=en&gl=ID&mapclient=embed&cid=11207744710097877714" target="_blank" class="btn btn-outline-light btn-lg fw-bold">
+                                    <a href="https://www.google.com/maps/place/TOKO+H.JALI/@-3.3247132,114.5896095,17z/data=!3m1!4b1!4m6!3m5!1s0x2de423003e29bd57:0x9b4caea68c6a5ad2!8m2!3d-3.3247132!4d114.5944804!16s%2Fg%2F11w9nz_h7f?entry=ttu&g_ep=EgoyMDI1MTExNy4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="btn btn-outline-light btn-lg fw-bold">
                                         <i class="bi bi-map me-2"></i> Petunjuk Arah
                                     </a>
                                 </div>
