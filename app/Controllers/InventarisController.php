@@ -86,8 +86,11 @@ class InventarisController extends BaseController
     {
         $produkModel = new \App\Models\ProdukModel();
 
+        // 1. PERBAIKAN DI SINI (Menambahkan is_unique)
+        // Format: is_unique[nama_tabel.nama_kolom]
+        // Asumsi nama tabel Anda adalah 'produk' berdasarkan error log sebelumnya.
         $rules = [
-            'kode_produk'   => 'required',
+            'kode_produk'   => 'required|is_unique[produk.kode_produk]', 
             'nama_produk'   => 'required',
             'id_kategori'   => 'required|numeric',
             'id_supplier'   => 'required|numeric',
@@ -96,14 +99,27 @@ class InventarisController extends BaseController
             'tanggal_masuk' => 'required|valid_date',
         ];
 
-        if (!$this->validate($rules)) {
+        // 2. OPSI TAMBAHAN: Pesan Error Kustom (Agar bahasa Indonesia)
+        $errors = [
+            'kode_produk' => [
+                'required'  => 'Kode produk wajib diisi.',
+                'is_unique' => 'Gagal! Kode produk ini sudah terdaftar di database.' // Pesan ini yang akan muncul nanti
+            ]
+        ];
+
+        // Masukkan $errors ke dalam fungsi validate
+        if (!$this->validate($rules, $errors)) {
             log_message('debug', 'VALIDATION FAILED: ' . json_encode($this->validator->getErrors()));
-            session()->setFlashdata('error', 'Validasi gagal. Periksa input.');
-            return redirect()->to('/karyawan/inventaris')->withInput();
+            
+            // Mengirim error spesifik ke session agar bisa dipanggil di View
+            // withInput() penting agar isian form tidak hilang semua saat reload
+            return redirect()->to('/karyawan/inventaris')->withInput()->with('errors', $this->validator->getErrors());
         }
 
+        // --- Bagian ke bawah ini sudah benar, tidak perlu diubah ---
         $img = $this->request->getFile('gambar_produk');
         $namaGambar = 'default.jpg';
+        
         if ($img && $img->isValid() && !$img->hasMoved()) {
             $namaGambar = $img->getRandomName();
             $img->move('uploads/produk/', $namaGambar);
@@ -122,8 +138,9 @@ class InventarisController extends BaseController
 
         $produkModel->insert($data);
         session()->setFlashdata('success', 'Produk berhasil ditambahkan.');
-        return redirect()->to('/karyawan/inventaris');
-    }
+        // Disarankan ganti return redirect()->to(...) dengan ini:
+        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            }
 
     /**
      * Memperbarui data produk dari modal
@@ -337,30 +354,43 @@ class InventarisController extends BaseController
     }
 
     public function store_supplier()
-    {
-        $supplierModel = new \App\Models\SupplierModel();
+        {
+            $supplierModel = new \App\Models\SupplierModel();
+            // $validation = \Config\Services::validation(); // Baris ini sebenarnya tidak wajib jika menggunakan $this->validate
 
-        $validation = \Config\Services::validation();
-        $rules = [
-            'nama_supplier' => 'required|is_unique[supplier.nama_supplier]',
-            'alamat'        => 'required',
-            'no_telp'       => 'required|is_natural|exact_length[12]'
-        ];
+            // 1. Definisi Rules
+            $rules = [
+                'nama_supplier' => 'required|is_unique[supplier.nama_supplier]',
+                'alamat'        => 'required',
+                'no_telp'       => 'required|is_natural|exact_length[12]'
+            ];
 
-        if (!$this->validate($rules)) {
-            session()->setFlashdata('error', implode('<br>', $validation->getErrors()));
-            return redirect()->back()->withInput();
+            // 2. Definisi Pesan Error Custom (Bahasa Indonesia)
+            $errors = [
+                'nama_supplier' => [
+                    'required'  => 'Nama Supplier wajib diisi.',
+                    'is_unique' => 'Nama Supplier ini sudah terdaftar.'
+                ]
+            ];
+
+            // 3. Masukkan $errors sebagai parameter kedua di fungsi validate()
+            if (!$this->validate($rules, $errors)) {
+                $validation = \Config\Services::validation();
+                
+                // Mengambil error dan menjadikannya flashdata
+                session()->setFlashdata('error', implode('<br>', $validation->getErrors()));
+                return redirect()->back()->withInput();
+            }
+
+            $supplierModel->save([
+                'nama_supplier' => $this->request->getPost('nama_supplier'),
+                'alamat'        => $this->request->getPost('alamat'),
+                'no_telp'       => $this->request->getPost('no_telp'),
+            ]);
+
+            session()->setFlashdata('success', 'Supplier berhasil ditambahkan.');
+            return redirect()->to('karyawan/inventaris/supplier');
         }
-
-        $supplierModel->save([
-            'nama_supplier' => $this->request->getPost('nama_supplier'),
-            'alamat'        => $this->request->getPost('alamat'),
-            'no_telp'       => $this->request->getPost('no_telp'),
-        ]);
-
-        session()->setFlashdata('success', 'Supplier berhasil ditambahkan.');
-        return redirect()->to('karyawan/inventaris/supplier');
-    }
 
     public function update_supplier($id_supplier)
     {
@@ -385,7 +415,7 @@ class InventarisController extends BaseController
 
         $supplierModel->delete($id_supplier);
 
-        // 🔥 Penting: kembali ke halaman data supplier (bukan kembali ke detail)
+        //kembali ke halaman data supplier (bukan kembali ke detail)
         return redirect()->to('karyawan/inventaris/supplier')->with('success', 'Supplier berhasil dihapus.');
     }
 

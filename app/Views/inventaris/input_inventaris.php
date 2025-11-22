@@ -144,11 +144,23 @@
 
                 <div class="modal-body">
                     <!-- KODE PRODUK & TANGGAL MASUK -->
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="kode_produk">Kode Produk</label>
-                            <input type="text" class="form-control" id="kode_produk" name="kode_produk" placeholder="Contoh: BR-001" required>
+                <?php $errors = session()->getFlashdata('errors'); ?>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="kode_produk">Kode Produk</label>
+                        
+                        <input type="text" 
+                            class="form-control <?= session('errors.kode_produk') ? 'is-invalid' : '' ?>" 
+                            id="kode_produk" 
+                            name="kode_produk" 
+                            placeholder="Contoh: BR-001" 
+                            value="<?= old('kode_produk') ?>" 
+                            required>
+                        
+                        <div class="invalid-feedback">
+                            <?= (isset($errors['kode_produk'])) ? $errors['kode_produk'] : '' ?>
                         </div>
+                    </div>
                         <div class="form-group col-md-6">
                             <label for="tanggal_masuk">Tanggal Masuk</label>
                             <input type="date" class="form-control" id="tanggal_masuk" name="tanggal_masuk" required>
@@ -159,7 +171,13 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="nama_produk">Nama Produk</label>
-                            <input type="text" class="form-control" id="nama_produk" name="nama_produk" required>
+                            <input type="text" 
+                                class="form-control" 
+                                id="nama_produk" 
+                                name="nama_produk" 
+                                oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
+                                title="Nama produk tidak boleh mengandung angka"
+                                required>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="id_kategori">Kategori Produk</label>
@@ -203,29 +221,73 @@
                     <!-- GAMBAR -->
                     <div class="form-group">
                         <label>Gambar Produk</label>
+
                         <div id="gambar-preview-container" class="mb-2" style="display: none;">
                             <img id="gambar-preview" src="" alt="Preview Gambar"
-                                style="width: 150px; height: 150px; object-fit: cover; border-radius: 5px;">
+                                style="width: 150px; height: 150px; object-fit: cover; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                         </div>
+
                         <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="gambar_produk" name="gambar_produk">
+                            <input type="file" 
+                                class="custom-file-input" 
+                                id="gambar_produk" 
+                                name="gambar_produk"
+                                accept="image/*"
+                                onchange="validasiFile(this)">
+                            
                             <label class="custom-file-label" id="gambar-label" for="gambar_produk">Pilih gambar...</label>
                         </div>
-                        <small id="gambar-help" class="form-text text-muted">
-                            Maks 2MB. Kosongkan jika tidak ingin mengganti gambar (saat edit).
-                        </small>
+                        <small class="form-text text-muted">Maksimal ukuran file 2MB. Format: JPG, JPEG, PNG.</small>
+                    </div>
+
+                    <script>
+                    function validasiFile(input) {
+                        const file = input.files[0]; // Ambil file yang dipilih
+                        const limit = 2 * 1024 * 1024; // 2MB dalam Bytes
+
+                        if (file) {
+                            // 1. Cek Ukuran File
+                            if (file.size > limit) {
+                                // --- PERBAIKAN DI SINI: MENGGUNAKAN SWEETALERT2 ---
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'File Terlalu Besar!',
+                                    text: 'Maaf, ukuran gambar maksimal hanya 2MB.',
+                                    footer: 'Silakan kompres gambar atau pilih gambar lain.',
+                                    confirmButtonColor: '#d33', // Warna tombol merah
+                                    confirmButtonText: 'Oke, Mengerti'
+                                });
+
+                                // Reset input
+                                input.value = ""; 
+                                document.getElementById('gambar-label').innerHTML = "Pilih gambar..."; 
+                                document.getElementById('gambar-preview-container').style.display = "none"; 
+                                return false;
+                            } 
+                            
+                            // 2. Jika valid, update nama label dan tampilkan preview
+                            document.getElementById('gambar-label').innerHTML = file.name;
+                            
+                            // Logika menampilkan preview gambar
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                document.getElementById('gambar-preview').src = e.target.result;
+                                document.getElementById('gambar-preview-container').style.display = "block";
+                            }
+                            reader.readAsDataURL(file);
+                        }
+                    }
+                    </script>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                    <button type="submit" class="btn btn-success" id="btnSimpan">Simpan</button>
+                                </div>
+                            </form>
+
+                        </div>
                     </div>
                 </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success" id="btnSimpan">Simpan</button>
-                </div>
-            </form>
-
-        </div>
-    </div>
-</div>
 
 
 <?= $this->endSection(); ?>

@@ -133,9 +133,14 @@
 
                         <div class="col-md-6">
                             <label for="restok_nama_barang">Nama Barang</label>
-                            <input type="text" class="form-control" id="restok_nama_barang" name="nama_barang" required>
+                            <input type="text" 
+                                class="form-control" 
+                                id="restok_nama_barang" 
+                                name="nama_barang" 
+                                oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
+                                title="Hanya boleh diisi huruf dan spasi"
+                                required>
                         </div>
-                    </div>
 
 
                     <div class="form-row">

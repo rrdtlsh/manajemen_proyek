@@ -105,8 +105,13 @@
 
                     <div class="form-group">
                         <label for="nama_supplier">Nama Supplier</label>
-                        <input type="text" class="form-control" id="nama_supplier" name="nama_supplier"
-                            placeholder="Contoh: PT Sumber Jaya" required>
+                        <input type="text" 
+                            class="form-control" 
+                            id="nama_supplier" 
+                            name="nama_supplier"
+                            placeholder="Contoh: PT. Sumber Jaya Abadi" 
+                            oninput="this.value = this.value.replace(/[^a-zA-Z\s.]/g, '')"
+                            required>
                     </div>
 
                     <div class="form-group">
