@@ -86,9 +86,6 @@ class InventarisController extends BaseController
     {
         $produkModel = new \App\Models\ProdukModel();
 
-        // 1. PERBAIKAN DI SINI (Menambahkan is_unique)
-        // Format: is_unique[nama_tabel.nama_kolom]
-        // Asumsi nama tabel Anda adalah 'produk' berdasarkan error log sebelumnya.
         $rules = [
             'kode_produk'   => 'required|is_unique[produk.kode_produk]', 
             'nama_produk'   => 'required',

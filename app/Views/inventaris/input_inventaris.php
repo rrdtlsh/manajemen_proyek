@@ -232,7 +232,7 @@
                                 class="custom-file-input" 
                                 id="gambar_produk" 
                                 name="gambar_produk"
-                                accept="image/*"
+                                accept=".png, .jpg, .jpeg"
                                 onchange="validasiFile(this)">
                             
                             <label class="custom-file-label" id="gambar-label" for="gambar_produk">Pilih gambar...</label>
@@ -242,33 +242,33 @@
 
                     <script>
                     function validasiFile(input) {
-                        const file = input.files[0]; // Ambil file yang dipilih
-                        const limit = 2 * 1024 * 1024; // 2MB dalam Bytes
+                        const file = input.files[0]; 
+                        const limit = 2 * 1024 * 1024; // 2MB
 
                         if (file) {
-                            // 1. Cek Ukuran File
+                            // Daftar tipe file yang diizinkan
+                            const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+
+                            // --- Cek Ukuran File (Kode Lama Anda) ---
                             if (file.size > limit) {
-                                // --- PERBAIKAN DI SINI: MENGGUNAKAN SWEETALERT2 ---
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'File Terlalu Besar!',
                                     text: 'Maaf, ukuran gambar maksimal hanya 2MB.',
                                     footer: 'Silakan kompres gambar atau pilih gambar lain.',
-                                    confirmButtonColor: '#d33', // Warna tombol merah
+                                    confirmButtonColor: '#d33',
                                     confirmButtonText: 'Oke, Mengerti'
                                 });
 
-                                // Reset input
                                 input.value = ""; 
                                 document.getElementById('gambar-label').innerHTML = "Pilih gambar..."; 
                                 document.getElementById('gambar-preview-container').style.display = "none"; 
                                 return false;
                             } 
                             
-                            // 2. Jika valid, update nama label dan tampilkan preview
+                            // Jika lolos kedua validasi (Format & Ukuran)
                             document.getElementById('gambar-label').innerHTML = file.name;
                             
-                            // Logika menampilkan preview gambar
                             const reader = new FileReader();
                             reader.onload = function(e) {
                                 document.getElementById('gambar-preview').src = e.target.result;
