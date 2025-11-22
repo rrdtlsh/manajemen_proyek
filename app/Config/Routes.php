@@ -26,10 +26,10 @@ $routes->get('/logout', 'Login::logout');
 $routes->group('/', ['filter' => 'auth'], static function ($routes) {
 
     // --- RUTE OWNER (PEMILIK) ---
-    $routes->group('owner', static function ($routes) { 
-        
-        $routes->get('/', 'Owner::index'); 
-        $routes->get('dashboard', 'Owner::index'); 
+    $routes->group('owner', static function ($routes) {
+
+        $routes->get('/', 'Owner::index');
+        $routes->get('dashboard', 'Owner::index');
 
         $routes->post('restok/update_status', 'OwnerRestokController::update_status');
         $routes->get('restok/delete/(:num)', 'OwnerRestokController::delete/$1');
@@ -40,7 +40,7 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
         $routes->post('manajemen_produk/store', 'OwnerProdukController::store');
         $routes->post('manajemen_produk/update/(:num)', 'OwnerProdukController::update/$1');
         $routes->get('manajemen_produk/delete/(:num)', 'OwnerProdukController::delete/$1');
-        $routes->get('laporan_penjualan', 'Owner::laporan_penjualan'); 
+        $routes->get('laporan_penjualan', 'Owner::laporan_penjualan');
         $routes->get('laporan_keuangan', 'OwnerKeuanganController::index');
     });
 
@@ -93,7 +93,7 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
         $routes->get('inventaris/detail_supplier/(:num)', 'InventarisController::detail_supplier/$1');
         $routes->get('inventaris/delete_supplier/(:num)', 'InventarisController::delete_supplier/$1');
 
-        
+
         // --- Rute Keuangan ---
         // URL: /karyawan/keuangan, /karyawan/keuangan/pemasukan, dst.
         $routes->get('keuangan', 'KeuanganController::dashboard');
@@ -104,21 +104,17 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
         $routes->post('keuangan/store_pengeluaran', 'KeuanganController::store_pengeluaran');
         $routes->get('keuangan/delete_pengeluaran/(:num)', 'KeuanganController::delete_pengeluaran/$1');
         $routes->get('keuangan/get_detail/(:num)', 'KeuanganController::getDetailPenjualan/$1');
-        
+
         // Export
         $routes->get('keuangan/pemasukan/export/pdf', 'KeuanganController::exportPemasukanPDF');
-        $routes->get('keuangan/pemasuka/export/excel', 'KeuanganController::exportPemasukanExcel');
+        $routes->get('keuangan/pemasukan/export/excel', 'KeuanganController::exportPemasukanExcel');
         $routes->get('keuangan/pengeluaran/export/pdf', 'KeuanganController::exportPengeluaranPDF');
         $routes->get('keuangan/pengeluaran/export/excel', 'KeuanganController::exportPengeluaranExcel');
-
-        
-
     }); // Akhir grup 'karyawan'
 
-  
+
     $routes->get('penjualan/dashboard', 'PenjualanController::dashboard');
     $routes->get('inventaris/dashboard', 'InventarisController::dashboard');
-    
-    $routes->get('keuangan/dashboard', 'KeuanganController::dashboard');
 
-}); 
+    $routes->get('keuangan/dashboard', 'KeuanganController::dashboard');
+});
