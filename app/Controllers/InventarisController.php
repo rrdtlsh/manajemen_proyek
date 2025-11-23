@@ -433,4 +433,23 @@ class InventarisController extends BaseController
 
         return view('inventaris/detail_supplier', $data);
     }
+
+    public function cek_kode_otomatis()
+    {
+        if ($this->request->isAJAX()) {
+            $kode = $this->request->getVar('kode_produk');
+            $produkModel = new \App\Models\ProdukModel();
+
+            // Cari data berdasarkan kode
+            $data = $produkModel->where('kode_produk', $kode)->first();
+
+            if ($data) {
+                // Jika ketemu (Kode sudah dipakai)
+                return $this->response->setJSON(['status' => 'taken']);
+            } else {
+                // Jika tidak ketemu (Kode aman/tersedia)
+                return $this->response->setJSON(['status' => 'available']);
+            }
+        }
+    }
 }

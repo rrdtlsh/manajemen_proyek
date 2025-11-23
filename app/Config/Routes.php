@@ -23,6 +23,7 @@ $routes->get('/logout', 'Login::logout');
 /*
  * Rute Internal yang Dilindungi
  */
+//Auth
 $routes->group('/', ['filter' => 'auth'], static function ($routes) {
 
     // --- RUTE OWNER (PEMILIK) ---
@@ -75,6 +76,9 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
         $routes->get('inventaris/restok', 'InventarisController::restok_supplier');
         $routes->get('inventaris/detail/(:num)', 'InventarisController::detail_produk/$1');
 
+        // --- (Route untuk AJAX Cek Kode) ---
+        $routes->post('inventaris/cek-kode', 'InventarisController::cek_kode_otomatis');
+
         // Rute CRUD Produk (Modal)
         $routes->post('inventaris/store', 'InventarisController::store_produk');
         $routes->post('inventaris/store_produk', 'InventarisController::store_produk');
@@ -117,4 +121,5 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
     $routes->get('inventaris/dashboard', 'InventarisController::dashboard');
 
     $routes->get('keuangan/dashboard', 'KeuanganController::dashboard');
+    
 });

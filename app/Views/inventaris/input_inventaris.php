@@ -144,23 +144,74 @@
 
                 <div class="modal-body">
                     <!-- KODE PRODUK & TANGGAL MASUK -->
-                <?php $errors = session()->getFlashdata('errors'); ?>
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="kode_produk">Kode Produk</label>
                         
                         <input type="text" 
-                            class="form-control <?= session('errors.kode_produk') ? 'is-invalid' : '' ?>" 
-                            id="kode_produk" 
-                            name="kode_produk" 
-                            placeholder="Contoh: BR-001" 
-                            value="<?= old('kode_produk') ?>" 
-                            required>
+                        class="form-control" 
+                                id="kode_produk" 
+                                name="kode_produk" 
+                                placeholder="Contoh: BR-001" 
+                                autocomplete="off" 
+                                required>
                         
-                        <div class="invalid-feedback">
-                            <?= (isset($errors['kode_produk'])) ? $errors['kode_produk'] : '' ?>
+                        <div class="invalid-feedback" id="error-kode-msg">
+                                </div>
                         </div>
-                    </div>
+
+                        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <script>
+                        $(document).ready(function() {
+                            
+                            // Event: Saat user selesai mengetik atau pindah kolom (blur)
+                            $('#kode_produk').on('blur', function() {
+                                var kodeInput = $(this).val();
+                                var field = $(this);
+                                var msgBox = $('#error-kode-msg');s
+
+                                // Jika kosong, abaikan
+                                if (kodeInput === '') return;
+
+                                $.ajax({
+s
+                                    url: "<?= base_url('karyawan/inventaris/cek-kode') ?>", 
+                                    type: "POST",
+                                    data: {
+                                        kode_produk: kodeInput,
+                                        <?= csrf_token() ?>: "<?= csrf_hash() ?>" // Token keamanan wajib CI4
+                                    },
+                                    dataType: "json",
+                                    success: function(response) {
+                                        if (response.status === 'taken') {
+                                            // KASUS: Kode Sudah Ada
+                                            field.addClass('is-invalid'); // Bikin kotak merah
+                                            field.removeClass('is-valid'); 
+                                            msgBox.html('<strong>Gagal!</strong> Kode ' + kodeInput + ' sudah digunakan produk lain.');
+                                            
+                                            // (Opsional) Matikan tombol simpan
+                                            $('button[type="submit"]').prop('disabled', true);
+                                        } else {
+                                            // KASUS: Kode Tersedia (Aman)
+                                            field.removeClass('is-invalid');
+                                            msgBox.html('');
+                                            
+                                            // Nyalakan tombol simpan
+                                            $('button[type="submit"]').prop('disabled', false);
+                                        }
+                                    },
+                                    error: function(xhr, ajaxOptions, thrownError) {
+                                        console.error("Error validasi:", thrownError);
+                                    }
+                                });
+                            });
+
+                            $('#kode_produk').on('input', function() {
+                                $(this).removeClass('is-invalid is-valid');
+                                $('button[type="submit"]').prop('disabled', false);
+                            });
+                        });
+                        </script>
+
                         <div class="form-group col-md-6">
                             <label for="tanggal_masuk">Tanggal Masuk</label>
                             <input type="date" class="form-control" id="tanggal_masuk" name="tanggal_masuk" required>
