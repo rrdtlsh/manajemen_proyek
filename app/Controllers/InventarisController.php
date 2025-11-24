@@ -163,7 +163,7 @@ class InventarisController extends BaseController
         ];
 
         if (!$this->validate($rules)) {
-            return redirect()->to('karyawan/inventaris')->withInput()->with('error', 'Validasi gagal.');
+            return redirect()->to('karyawan/inventaris')->withInput()->with('error', 'Kode produk sudah digunakan.');
         }
 
         $produkLama = $produkModel->find($id_produk);
@@ -440,16 +440,15 @@ class InventarisController extends BaseController
             $kode = $this->request->getVar('kode_produk');
             $produkModel = new \App\Models\ProdukModel();
 
-            // Cari data berdasarkan kode
             $data = $produkModel->where('kode_produk', $kode)->first();
 
-            if ($data) {
-                // Jika ketemu (Kode sudah dipakai)
-                return $this->response->setJSON(['status' => 'taken']);
-            } else {
-                // Jika tidak ketemu (Kode aman/tersedia)
-                return $this->response->setJSON(['status' => 'available']);
-            }
+            $response = [
+                'status' => ($data) ? 'taken' : 'available',
+                // Kirim token CSRF baru agar request berikutnya tidak Error 403
+                'token' => csrf_hash() 
+            ];
+
+            return $this->response->setJSON($response);
         }
     }
 }

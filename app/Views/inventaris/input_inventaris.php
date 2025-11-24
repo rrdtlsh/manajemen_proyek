@@ -160,57 +160,67 @@
                                 </div>
                         </div>
 
-                        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <script>
-                        $(document).ready(function() {
-                            
-                            // Event: Saat user selesai mengetik atau pindah kolom (blur)
-                            $('#kode_produk').on('blur', function() {
-                                var kodeInput = $(this).val();
-                                var field = $(this);
-                                var msgBox = $('#error-kode-msg');s
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
 
-                                // Jika kosong, abaikan
-                                if (kodeInput === '') return;
+<script>
+$(document).ready(function() {
+    // Simpan nama token dan hash awal di variabel
+    var csrfName = '<?= csrf_token() ?>';
+    var csrfHash = '<?= csrf_hash() ?>'; 
 
-                                $.ajax({
-s
-                                    url: "<?= base_url('karyawan/inventaris/cek-kode') ?>", 
-                                    type: "POST",
-                                    data: {
-                                        kode_produk: kodeInput,
-                                        <?= csrf_token() ?>: "<?= csrf_hash() ?>" // Token keamanan wajib CI4
-                                    },
-                                    dataType: "json",
-                                    success: function(response) {
-                                        if (response.status === 'taken') {
-                                            // KASUS: Kode Sudah Ada
-                                            field.addClass('is-invalid'); // Bikin kotak merah
-                                            field.removeClass('is-valid'); 
-                                            msgBox.html('<strong>Gagal!</strong> Kode ' + kodeInput + ' sudah digunakan produk lain.');
-                                            
-                                            // (Opsional) Matikan tombol simpan
-                                            $('button[type="submit"]').prop('disabled', true);
-                                        } else {
-                                            // KASUS: Kode Tersedia (Aman)
-                                            field.removeClass('is-invalid');
-                                            msgBox.html('');
-                                            
-                                            // Nyalakan tombol simpan
-                                            $('button[type="submit"]').prop('disabled', false);
-                                        }
-                                    },
-                                    error: function(xhr, ajaxOptions, thrownError) {
-                                        console.error("Error validasi:", thrownError);
-                                    }
-                                });
-                            });
+    $('#kode_produk').on('blur', function() {
+        var field = $(this);
+        var kodeInput = field.val();
+        var msgBox = $('#error-kode-msg');
 
-                            $('#kode_produk').on('input', function() {
-                                $(this).removeClass('is-invalid is-valid');
-                                $('button[type="submit"]').prop('disabled', false);
-                            });
-                        });
-                        </script>
+        // Reset style dulu
+        field.removeClass('is-invalid is-valid');
+        msgBox.html('');
+        $('button[type="submit"]').prop('disabled', false);
+
+        if (kodeInput === '') return;
+
+        $.ajax({
+            url: "<?= base_url('karyawan/inventaris/cek-kode') ?>",
+            type: "POST",
+            dataType: "json",
+            data: {
+                kode_produk: kodeInput,
+                [csrfName]: csrfHash // Gunakan variabel token dinamis
+            },
+            success: function(response) {
+                // 1. UPDATE TOKEN (PENTING!)
+                // Update hash dengan yang baru dikirim dari controller
+                csrfHash = response.token; 
+                // Update juga input hidden CSRF di form utama (jika ada tombol submit form biasa)
+                $('input[name="'+csrfName+'"]').val(csrfHash);
+
+                // 2. PROSES LOGIKA TAMPILAN
+                if (response.status === 'taken') {
+                    field.addClass('is-invalid');
+                    msgBox.html('<strong>Gagal!</strong> Kode sudah digunakan produk lain.');
+                    $('button[type="submit"]').prop('disabled', true);
+                } else {
+                    field.addClass('is-valid');
+                    msgBox.html('<span class="text-success">Kode tersedia.</span>');
+                    $('button[type="submit"]').prop('disabled', false);
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                console.error("Error:", thrownError);
+                alert("Terjadi kesalahan koneksi atau Token Expired. Silakan refresh halaman.");
+            }
+        });
+    });
+
+    // Hapus error saat user mulai mengetik ulang
+    $('#kode_produk').on('input', function() {
+        $(this).removeClass('is-invalid is-valid');
+        $('#error-kode-msg').html('');
+        $('button[type="submit"]').prop('disabled', false);
+    });
+});
+</script>
 
                         <div class="form-group col-md-6">
                             <label for="tanggal_masuk">Tanggal Masuk</label>
