@@ -196,29 +196,54 @@ if (daftarProduk) {
 
 // Tombol Reset
 btnReset.addEventListener('click', function() {
-    if (cart.length === 0) {
-        Swal.fire({
-            icon: 'info',
-            title: 'Keranjang sudah kosong',
-            showConfirmButton: false,
-            timer: 1500
-        });
-        return;
-    }
+    // [PERBAIKAN] Tambahkan pemeriksaan konfirmasi sebelum mereset SEMUA
     Swal.fire({
-        title: 'Reset Keranjang?',
-        text: "Anda yakin ingin mengosongkan keranjang belanja?",
+        title: 'Reset Transaksi?',
+        text: "Anda yakin ingin menghapus semua inputan (Tanggal, Pelanggan, Keranjang, Pembayaran)?",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, Reset!',
+        confirmButtonText: 'Ya, Reset Semuanya!',
         cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
+            
+            // 1. Reset Keranjang Belanja
             cart = [];
             updateKeranjang();
-            Swal.fire('Direset!', 'Keranjang belanja telah dikosongkan.', 'success');
+
+            // 2. Reset Input Tanggal (misalnya diatur ke kosong atau default hari ini)
+            // Asumsi: Anda mungkin ingin input tanggal kosong atau kembali ke default.
+            // Jika ingin kembali ke default hari ini, Anda perlu implementasi yang berbeda
+            // Untuk mereset:
+            inputTanggal.value = ''; 
+
+            // 3. Reset Select Pelanggan (Select2)
+            // selectPelanggan.val(null).trigger('change');
+            // Jika Anda ingin elemen select tereset:
+            selectPelanggan.val(null).trigger('change'); 
+            
+            // 4. Reset Select Barang (opsional, karena hanya pencarian)
+            selectBarang.val(null).trigger('change'); 
+            
+            // 5. Reset Status & Metode Pembayaran (kembali ke opsi pertama/default)
+            // Asumsi: ID elemen-elemen ini adalah 'status_bayar' dan 'metode_bayar'
+            const selectMetodeBayar = document.getElementById('metode_bayar'); // Asumsi ada elemen ini
+            if(selectMetodeBayar) {
+                selectMetodeBayar.value = selectMetodeBayar.options[0].value;
+            }
+            
+            // Reset Status Pembayaran (ini akan memicu event change untuk DP)
+            statusBayar.value = statusBayar.options[0].value; // Kembali ke opsi pertama (misalnya 'Lunas')
+            
+            // Panggil event change secara manual untuk menyembunyikan DP jika kembali ke 'Lunas'
+            statusBayar.dispatchEvent(new Event('change')); 
+            
+            // 6. Reset Form Validasi
+            validateForm(); 
+            
+            Swal.fire('Direset!', 'Semua inputan transaksi telah dikosongkan.', 'success');
         }
     });
 });
