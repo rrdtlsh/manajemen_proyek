@@ -160,67 +160,67 @@
                                 </div>
                         </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
 
-<script>
-$(document).ready(function() {
-    // Simpan nama token dan hash awal di variabel
-    var csrfName = '<?= csrf_token() ?>';
-    var csrfHash = '<?= csrf_hash() ?>'; 
+                    <script>
+                    $(document).ready(function() {
+                        // Simpan nama token dan hash awal di variabel
+                        var csrfName = '<?= csrf_token() ?>';
+                        var csrfHash = '<?= csrf_hash() ?>'; 
 
-    $('#kode_produk').on('blur', function() {
-        var field = $(this);
-        var kodeInput = field.val();
-        var msgBox = $('#error-kode-msg');
+                        $('#kode_produk').on('blur', function() {
+                            var field = $(this);
+                            var kodeInput = field.val();
+                            var msgBox = $('#error-kode-msg');
 
-        // Reset style dulu
-        field.removeClass('is-invalid is-valid');
-        msgBox.html('');
-        $('button[type="submit"]').prop('disabled', false);
+                            // Reset style dulu
+                            field.removeClass('is-invalid is-valid');
+                            msgBox.html('');
+                            $('button[type="submit"]').prop('disabled', false);
 
-        if (kodeInput === '') return;
+                            if (kodeInput === '') return;
 
-        $.ajax({
-            url: "<?= base_url('karyawan/inventaris/cek-kode') ?>",
-            type: "POST",
-            dataType: "json",
-            data: {
-                kode_produk: kodeInput,
-                [csrfName]: csrfHash // Gunakan variabel token dinamis
-            },
-            success: function(response) {
-                // 1. UPDATE TOKEN (PENTING!)
-                // Update hash dengan yang baru dikirim dari controller
-                csrfHash = response.token; 
-                // Update juga input hidden CSRF di form utama (jika ada tombol submit form biasa)
-                $('input[name="'+csrfName+'"]').val(csrfHash);
+                            $.ajax({
+                                url: "<?= base_url('karyawan/inventaris/cek-kode') ?>",
+                                type: "POST",
+                                dataType: "json",
+                                data: {
+                                    kode_produk: kodeInput,
+                                    [csrfName]: csrfHash // Gunakan variabel token dinamis
+                                },
+                                success: function(response) {
+                                    // 1. UPDATE TOKEN (PENTING!)
+                                    // Update hash dengan yang baru dikirim dari controller
+                                    csrfHash = response.token; 
+                                    // Update juga input hidden CSRF di form utama (jika ada tombol submit form biasa)
+                                    $('input[name="'+csrfName+'"]').val(csrfHash);
 
-                // 2. PROSES LOGIKA TAMPILAN
-                if (response.status === 'taken') {
-                    field.addClass('is-invalid');
-                    msgBox.html('<strong>Gagal!</strong> Kode sudah digunakan produk lain.');
-                    $('button[type="submit"]').prop('disabled', true);
-                } else {
-                    field.addClass('is-valid');
-                    msgBox.html('<span class="text-success">Kode tersedia.</span>');
-                    $('button[type="submit"]').prop('disabled', false);
-                }
-            },
-            error: function(xhr, ajaxOptions, thrownError) {
-                console.error("Error:", thrownError);
-                alert("Terjadi kesalahan koneksi atau Token Expired. Silakan refresh halaman.");
-            }
-        });
-    });
+                                    // 2. PROSES LOGIKA TAMPILAN
+                                    if (response.status === 'taken') {
+                                        field.addClass('is-invalid');
+                                        msgBox.html('<strong>Gagal!</strong> Kode sudah digunakan produk lain.');
+                                        $('button[type="submit"]').prop('disabled', true);
+                                    } else {
+                                        field.addClass('is-valid');
+                                        msgBox.html('<span class="text-success">Kode tersedia.</span>');
+                                        $('button[type="submit"]').prop('disabled', false);
+                                    }
+                                },
+                                error: function(xhr, ajaxOptions, thrownError) {
+                                    console.error("Error:", thrownError);
+                                    alert("Terjadi kesalahan koneksi atau Token Expired. Silakan refresh halaman.");
+                                }
+                            });
+                        });
 
-    // Hapus error saat user mulai mengetik ulang
-    $('#kode_produk').on('input', function() {
-        $(this).removeClass('is-invalid is-valid');
-        $('#error-kode-msg').html('');
-        $('button[type="submit"]').prop('disabled', false);
-    });
-});
-</script>
+                        // Hapus error saat user mulai mengetik ulang
+                        $('#kode_produk').on('input', function() {
+                            $(this).removeClass('is-invalid is-valid');
+                            $('#error-kode-msg').html('');
+                            $('button[type="submit"]').prop('disabled', false);
+                        });
+                    });
+                    </script>
 
                         <div class="form-group col-md-6">
                             <label for="tanggal_masuk">Tanggal Masuk</label>
@@ -310,7 +310,7 @@ $(document).ready(function() {
                             // Daftar tipe file yang diizinkan
                             const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
 
-                            // --- Cek Ukuran File (Kode Lama Anda) ---
+                            // --- Cek Ukuran File
                             if (file.size > limit) {
                                 Swal.fire({
                                     icon: 'error',

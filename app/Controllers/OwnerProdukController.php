@@ -139,4 +139,18 @@ class OwnerProdukController extends BaseController
 
         return redirect()->back()->with('error', 'Gagal menghapus. Produk tidak ditemukan.');
     }
+
+    public function cek_kode_otomatis()
+    {
+        if ($this->request->isAJAX()) {
+            $kode = $this->request->getVar('kode_produk');
+            // Pastikan menggunakan $this->produkModel yang sudah didefinisikan di construct
+            $data = $this->produkModel->where('kode_produk', $kode)->first();
+
+            return $this->response->setJSON([
+                'status' => ($data) ? 'taken' : 'available',
+                'token'  => csrf_hash()
+            ]);
+        }
+    }
 }

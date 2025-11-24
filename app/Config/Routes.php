@@ -29,20 +29,28 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
     // --- RUTE OWNER (PEMILIK) ---
     $routes->group('owner', static function ($routes) {
 
+        // Dashboard
         $routes->get('/', 'Owner::index');
         $routes->get('dashboard', 'Owner::index');
 
+        // Restok Management
         $routes->post('restok/update_status', 'OwnerRestokController::update_status');
         $routes->get('restok/delete/(:num)', 'OwnerRestokController::delete/$1');
         $routes->get('restok', 'OwnerRestokController::index');
         $routes->get('restok/approve/(:num)', 'OwnerRestokController::approve/$1');
         $routes->get('restok/reject/(:num)', 'OwnerRestokController::reject/$1');
+
+        // Manajemen Produk
         $routes->get('manajemen_produk', 'OwnerProdukController::index');
         $routes->post('manajemen_produk/store', 'OwnerProdukController::store');
         $routes->post('manajemen_produk/update/(:num)', 'OwnerProdukController::update/$1');
         $routes->get('manajemen_produk/delete/(:num)', 'OwnerProdukController::delete/$1');
+        $routes->post('manajemen_produk/cek-kode', 'OwnerProdukController::cek_kode_otomatis');
+
+        // Laporan
         $routes->get('laporan_penjualan', 'Owner::laporan_penjualan');
         $routes->get('laporan_keuangan', 'OwnerKeuanganController::index');
+        
     });
 
 

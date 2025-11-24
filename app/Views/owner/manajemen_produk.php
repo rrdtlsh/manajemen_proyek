@@ -18,19 +18,6 @@
     </button>
 </div>
 
-<?php if (session()->getFlashdata('success')) : ?>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <?= session()->getFlashdata('success'); ?>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-    </div>
-<?php endif; ?>
-<?php if (session()->getFlashdata('error')) : ?>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= session()->getFlashdata('error'); ?>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-    </div>
-<?php endif; ?>
-
 <div class="card shadow mb-4">
     <div class="card-header py-3" style="background-color: #2d8659; color: white;">
         <h6 class="m-0 font-weight-bold text-white">Daftar Stok Produk</h6>
@@ -62,9 +49,7 @@
                                 </div>
                             </td>
                             <td><?= esc($p['kode_produk']); ?></td>
-                            <td>
-                                <strong><?= esc($p['nama_produk']); ?></strong>
-                            </td>
+                            <td><strong><?= esc($p['nama_produk']); ?></strong></td>
                             <td>Rp <?= number_format($p['harga'], 0, ',', '.'); ?></td>
                             <td class="<?= ($p['stok'] <= 5) ? 'text-danger font-weight-bold' : ''; ?>">
                                 <?= esc($p['stok']); ?>
@@ -86,10 +71,9 @@
                                         <i class="fas fa-edit"></i>
                                     </button>
 
-                                    <a href="<?= base_url('owner/manajemen_produk/delete/' . $p['id_produk']); ?>"
-                                        class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Yakin ingin menghapus produk ini?');">
-                                        <i class="fas fa-trash"></i>
+                                    <a href="<?= base_url('owner/manajemen_produk/delete/' . $p['id_produk']); ?>" 
+                                       class="btn btn-danger btn-sm btn-hapus">
+                                       <i class="fas fa-trash"></i>
                                     </a>
                                 </div>
                             </td>
@@ -104,7 +88,6 @@
 <div class="modal fade" id="modalProduk" tabindex="-1" role="dialog" aria-labelledby="modalProdukLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-
             <form id="formProduk" action="<?= base_url('owner/manajemen_produk/store'); ?>" method="POST" enctype="multipart/form-data">
                 <?= csrf_field(); ?>
                 
@@ -119,7 +102,8 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="kode_produk">Kode Produk</label>
-                            <input type="text" class="form-control" id="kode_produk" name="kode_produk" placeholder="Contoh: BR-001" required>
+                            <input type="text" class="form-control" id="kode_produk" name="kode_produk" placeholder="Contoh: BR-001" autocomplete="off" required>
+                            <div class="invalid-feedback" id="error-kode-msg"></div>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="tanggal_masuk">Tanggal Masuk</label>
@@ -156,9 +140,7 @@
                         <div class="form-group col-md-6">
                             <label for="harga">Harga</label>
                             <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">Rp</span>
-                                </div>
+                                <div class="input-group-prepend"><span class="input-group-text">Rp</span></div>
                                 <input type="number" class="form-control" id="harga" name="harga" required min="0">
                             </div>
                         </div>
@@ -172,16 +154,13 @@
                     <div class="form-group">
                         <label>Gambar Produk</label>
                         <div id="gambar-preview-container" class="mb-2" style="display: none;">
-                            <img id="gambar-preview" src="" alt="Preview Gambar"
-                                style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px; border:1px solid #ddd;">
+                            <img id="gambar-preview" src="" alt="Preview Gambar" style="width: 150px; height: 150px; object-fit: cover; border-radius: 5px;">
                         </div>
                         <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="gambar_produk" name="gambar_produk">
+                            <input type="file" class="custom-file-input" id="gambar_produk" name="gambar_produk" accept=".png, .jpg, .jpeg" onchange="validasiFile(this)">
                             <label class="custom-file-label" id="gambar-label" for="gambar_produk">Pilih gambar...</label>
                         </div>
-                        <small class="form-text text-muted">
-                            Format: JPG/PNG. Maks 2MB. Kosongkan jika tidak ingin mengganti gambar saat edit.
-                        </small>
+                        <small class="form-text text-muted">Maksimal ukuran file 2MB. Format: JPG, JPEG, PNG.</small>
                     </div>
                 </div>
 
@@ -190,30 +169,133 @@
                     <button type="submit" class="btn btn-success">Simpan</button>
                 </div>
             </form>
-
         </div>
     </div>
 </div>
-
 <?= $this->endSection(); ?>
-
 <?= $this->section('script'); ?>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
+    // --- FUNGSI VALIDASI FILE (Diluar document.ready agar bisa dipanggil HTML) ---
+    function validasiFile(input) {
+        const file = input.files[0];
+        const limit = 2 * 1024 * 1024; // 2MB
+
+        if (file) {
+            if (file.size > limit) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File Terlalu Besar!',
+                    text: 'Maaf, ukuran gambar maksimal hanya 2MB.',
+                    confirmButtonColor: '#d33'
+                });
+                input.value = "";
+                document.getElementById('gambar-label').innerHTML = "Pilih gambar...";
+                document.getElementById('gambar-preview-container').style.display = "none";
+                return false;
+            }
+
+            // Preview Gambar
+            document.getElementById('gambar-label').innerHTML = file.name;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('gambar-preview').src = e.target.result;
+                document.getElementById('gambar-preview-container').style.display = "block";
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // --- DOCUMENT READY ---
     $(document).ready(function() {
+        
+        // 1. Inisialisasi DataTable
         $('#dataTableInventaris').DataTable();
 
-        // Reset form saat tombol tambah diklik
+        // 2. SweetAlert untuk Tombol Hapus (.btn-hapus)
+        // Gunakan 'body' on click agar tetap jalan meskipun di halaman 2 datatable
+        $('body').on('click', '.btn-hapus', function(e) {
+            e.preventDefault();
+            const href = $(this).attr('href');
+
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data produk ini akan dihapus permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.location.href = href;
+                }
+            });
+        });
+
+        // 3. AJAX Cek Kode Produk
+        var csrfName = '<?= csrf_token() ?>';
+        var csrfHash = '<?= csrf_hash() ?>';
+
+        $('#kode_produk').on('blur', function() {
+            var field = $(this);
+            var kodeInput = field.val();
+            var msgBox = $('#error-kode-msg');
+
+            field.removeClass('is-invalid is-valid');
+            msgBox.html('');
+            $('button[type="submit"]').prop('disabled', false);
+
+            if (kodeInput === '') return;
+
+            $.ajax({
+                url: "<?= base_url('owner/manajemen_produk/cek-kode') ?>", // Pastikan route owner
+                type: "POST",
+                dataType: "json",
+                data: {
+                    kode_produk: kodeInput,
+                    [csrfName]: csrfHash
+                },
+                success: function(response) {
+                    csrfHash = response.token;
+                    $('input[name="' + csrfName + '"]').val(csrfHash);
+
+                    if (response.status === 'taken') {
+                        field.addClass('is-invalid');
+                        msgBox.html('<strong>Gagal!</strong> Kode sudah digunakan.');
+                        $('button[type="submit"]').prop('disabled', true);
+                    } else {
+                        field.addClass('is-valid');
+                        msgBox.html('<span class="text-success">Kode tersedia.</span>');
+                    }
+                },
+                error: function() {
+                    console.log("Error AJAX Cek Kode");
+                }
+            });
+        });
+
+        // Reset error saat ngetik ulang
+        $('#kode_produk').on('input', function() {
+            $(this).removeClass('is-invalid is-valid');
+            $('#error-kode-msg').html('');
+            $('button[type="submit"]').prop('disabled', false);
+        });
+
+        // 4. Logika Modal Tambah/Edit
         $('#btnTambahProduk').click(function() {
             $('#formProduk').attr('action', '<?= base_url('owner/manajemen_produk/store'); ?>');
             $('#modalProdukLabel').text('Tambah Produk Baru');
             $('#formProduk')[0].reset();
             $('#gambar-preview-container').hide();
             $('#gambar-label').text('Pilih gambar...');
+            $('#kode_produk').removeClass('is-invalid is-valid'); // Reset validasi visual
         });
 
-        // Isi modal saat tombol edit diklik
         $('.btn-edit').click(function() {
             const id = $(this).data('id');
             const kode = $(this).data('kode_produk');
@@ -227,7 +309,6 @@
 
             $('#formProduk').attr('action', '<?= base_url('owner/manajemen_produk/update/'); ?>' + id);
             $('#modalProdukLabel').text('Edit Produk');
-
             $('#kode_produk').val(kode);
             $('#nama_produk').val(nama);
             $('#id_kategori').val(kategori);
@@ -235,6 +316,9 @@
             $('#stok').val(stok);
             $('#id_supplier').val(supplier);
             $('#tanggal_masuk').val(tanggal);
+            
+            // Saat edit, hapus class valid/invalid sisa ajax sebelumnya
+            $('#kode_produk').removeClass('is-invalid is-valid');
 
             if (gambar) {
                 $('#gambar-preview').attr('src', gambar);
@@ -243,12 +327,29 @@
                 $('#gambar-preview-container').hide();
             }
         });
-
-        // Custom input file label
-        $(".custom-file-input").on("change", function() {
-            var fileName = $(this).val().split("\\").pop();
-            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-        });
     });
 </script>
+
+<?php if (session()->getFlashdata('success')) : ?>
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '<?= session()->getFlashdata('success'); ?>',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    </script>
+<?php endif; ?>
+
+<?php if (session()->getFlashdata('error')) : ?>
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '<?= session()->getFlashdata('error'); ?>',
+        });
+    </script>
+<?php endif; ?>
+
 <?= $this->endSection(); ?>

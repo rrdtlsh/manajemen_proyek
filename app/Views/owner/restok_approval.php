@@ -60,15 +60,6 @@
 
     <h1 class="h3 mb-4 page-title">Daftar Restok Supplier</h1>
 
-    <?php if (session()->getFlashdata('success')) : ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <?= session()->getFlashdata('success'); ?>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    <?php endif; ?>
-
     <div class="card shadow mb-4">
         <div class="card-body">
             <div class="table-responsive">
@@ -120,11 +111,9 @@
                                         <i class="fas fa-file-alt mr-1"></i> Detail
                                     </button>
 
-                                    <a href="<?= base_url('owner/restok/delete/' . $r['id_restok']); ?>" 
-                                       class="btn btn-danger btn-sm btn-action"
-                                       onclick="return confirm('Yakin ingin menghapus data ini?');">
-                                        <i class="fas fa-trash mr-1"></i> Hapus
-                                    </a>
+                                <a href="<?= base_url('owner/restok/delete/' . $r['id_restok']); ?>" 
+                                class="btn btn-danger btn-sm btn-action btn-hapus"> <i class="fas fa-trash mr-1"></i> Hapus
+                                </a>
                                 </td>
                             </tr>
 
@@ -163,12 +152,15 @@
 <?= $this->section('script'); ?>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     $(document).ready(function() {
+        // 1. Inisialisasi DataTable
         $('#dataTableRestok').DataTable({
             "language": {
                 "search": "Cari:",
-                "lengthMenu": "Menampilkan _MENU_ Hasil Per halaman",
+                "lengthMenu": "Menampilkan _MENU_ data per halaman",
                 "zeroRecords": "Data tidak ditemukan",
                 "info": "Halaman _PAGE_ dari _PAGES_",
                 "infoEmpty": "Tidak ada data",
@@ -180,6 +172,51 @@
                 }
             }
         });
+
+        // 2. Event Listener Tombol Hapus (Delegation untuk DataTables)
+        // Kita pakai $('body').on() supaya tombol di halaman 2, 3, dst tetap bisa diklik
+        $('body').on('click', '.btn-hapus', function(e) {
+            e.preventDefault();
+            const href = $(this).attr('href');
+
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data restok ini akan dihapus permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.location.href = href;
+                }
+            });
+        });
     });
 </script>
+
+<?php if (session()->getFlashdata('success')) : ?>
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '<?= session()->getFlashdata('success'); ?>',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    </script>
+<?php endif; ?>
+
+<?php if (session()->getFlashdata('error')) : ?>
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '<?= session()->getFlashdata('error'); ?>',
+        });
+    </script>
+<?php endif; ?>
+
 <?= $this->endSection(); ?>
