@@ -2,17 +2,10 @@
 
 <?= $this->section('head'); ?>
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.20/dist/sweetalert2.min.css">
 <?= $this->endSection(); ?>
 
 <?= $this->section('content'); ?>
-
-<?php if (session()->getFlashdata('success')) : ?>
-    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-left: 4px solid #2d8659;">
-        <i class="fas fa-check-circle mr-2"></i>
-        <?= session()->getFlashdata('success'); ?>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-    </div>
-<?php endif; ?>
 
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">
@@ -48,7 +41,8 @@
                         <th>Keterangan</th>
                         <th>Tipe</th>
                         <th>Jumlah</th>
-                        <th>Aksi</th> </tr>
+                        <th>Aksi</th>
+                    </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($laporan as $item) : ?>
@@ -62,9 +56,9 @@
                                 Rp <?= number_format($item['pengeluaran'], 0, ',', '.'); ?>
                             </td>
                             <td class="text-center">
-                                <a href="<?= base_url('karyawan/keuangan/delete_pengeluaran/' . $item['id_keuangan']); ?>" 
-                                   class="btn btn-danger btn-sm btn-circle"
-                                   onclick="return confirm('Yakin ingin menghapus data pengeluaran ini?');">
+                                <a href="#" 
+                                    class="btn btn-danger btn-sm btn-circle btn-hapus-pengeluaran"
+                                    data-url="<?= base_url('karyawan/keuangan/delete_pengeluaran/' . $item['id_keuangan']); ?>">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </td>
@@ -118,12 +112,50 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.20/dist/sweetalert2.all.min.js"></script>
+
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 <script>
     $(document).ready(function() {
+        // 3. PERBAIKAN: SweetAlert untuk Flashdata Success
+        <?php if (session()->getFlashdata('success')) : ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '<?= session()->getFlashdata('success'); ?>',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        <?php endif; ?>
+
+        // Inisialisasi DataTables
         $('#dataTable').DataTable({
-            "order": [[ 0, "desc" ]] // Urutkan tanggal terbaru
+            "order": [
+                [0, "desc"]
+            ] // Urutkan tanggal terbaru
+        });
+
+        // 4. PERBAIKAN: SweetAlert untuk Konfirmasi Hapus
+        $('.btn-hapus-pengeluaran').on('click', function(e) {
+            e.preventDefault();
+            const deleteUrl = $(this).data('url');
+
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: "Anda yakin ingin menghapus data pengeluaran ini secara permanen?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Jika dikonfirmasi, redirect ke URL hapus
+                    window.location.href = deleteUrl;
+                }
+            });
         });
     });
 </script>
