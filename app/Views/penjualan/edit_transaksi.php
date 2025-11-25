@@ -117,12 +117,12 @@
                     </div>
                     </div>
                     <div class="total-belanja-card penjualan-sisa-kuning mt-2"> 
-                        <div class="total-label">Sisa Tagihan (Awal)</div>
+                        <div class="total-label">Sisa Tagihan (Baru)</div>
                         <div class="total-value" id="sisa-tagihan-display">
                             <?= 'Rp ' . number_format($sisa_tagihan, 0, ',', '.'); ?>
                         </div>
                         <small class="form-text text-muted text-right">
-                            Sisa tagihan akan disesuaikan jika keranjang diubah.
+                            Sisa tagihan ini dihitung berdasarkan keranjang dan pembayaran Anda.
                         </small>
                     </div>
                     <hr class="my-4">
@@ -130,7 +130,7 @@
                     <div class="form-row mb-3">
                         <div class="form-group col-md-6">
                             <label for="status_bayar" class="font-weight-bold text-gray-700">Status Pembayaran*</label>
-                            <select id="status_bayar" class="form-control disabled-select">
+                            <select id="status_bayar" class="form-control" disabled>
                                 <option value="lunas">Lunas</option>
                                 <option value="belum_lunas">Belum Lunas (DP)</option>
                             </select>
@@ -146,17 +146,19 @@
                     </div>
 
                     <div class="form-group" id="input-dp">
-                        <label for="jumlah_dp" class="font-weight-bold text-gray-700">Jumlah Pelunasan (Rp)*</label>
+                        <label for="jumlah_dp" class="font-weight-bold text-gray-700">Jumlah Pelunasan/DP Baru (Rp)*</label>
                         <input type="number" class="form-control" id="jumlah_dp" name="jumlah_dp" 
-                                placeholder="Masukkan jumlah pelunasan baru" value="0" required>
+                                placeholder="Masukkan jumlah pembayaran baru (0 jika tidak ada)" value="0" required>
                         <small class="form-text text-muted">
-                                 Masukkan '0' jika hanya mengubah keranjang tanpa membayar.
-                         </small>
+                            Masukkan '0' jika hanya mengubah keranjang tanpa melakukan pembayaran tambahan.
+                       </small>
                     </div>
 
                     <input type="hidden" name="total" id="total_belanja_hidden">
                     <input type="hidden" name="cart_items" id="cart_items_hidden">
                     <input type="hidden" id="sudah_dibayar_sebelumnya" value="<?= $sudah_dibayar; ?>">
+                    <input type="hidden" id="sisa-tagihan-hidden" value="<?= $sisa_tagihan; ?>"> <!-- FIELD BARU -->
+
 
                     <div class="row mt-4">
                         <div class="col-6">

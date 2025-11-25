@@ -384,14 +384,6 @@ class PenjualanController extends BaseController
             'jumlah_dp'         => ($statusBayarEnum == 'Lunas') ? 0 : $total_dibayar_sekarang, 
         ]);
 
-        // *** MODIFIKASI UPDATE TABEL KEUANGAN ***
-        // Logika lama Anda meng-update record keuangan yg ada.
-        // Logika baru ini akan MENAMBAH record keuangan baru JIKA ada pelunasan.
-        // Ini lebih baik untuk audit.
-        
-        // Hapus logika lama (if $keuanganRecord) ...
-
-        // Logika BARU: Cukup tambahkan record baru JIKA ada pelunasan
         if ($jumlah_pelunasan_baru > 0) {
             
             // Tentukan Tipe Pemasukan
