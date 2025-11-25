@@ -87,27 +87,44 @@ class InventarisController extends BaseController
         $produkModel = new \App\Models\ProdukModel();
 
         $rules = [
-            'kode_produk'   => 'required|is_unique[produk.kode_produk]', 
-            'nama_produk'   => 'required',
+            'kode_produk'   => 'required|is_unique[produk.kode_produk]|alpha_numeric|max_length[10]',
+            'nama_produk'   => 'required|max_length[50]',
             'id_kategori'   => 'required|numeric',
             'id_supplier'   => 'required|numeric',
-            'harga'         => 'required|numeric|greater_than_equal_to[0]',
-            'stok'          => 'required|integer|greater_than_equal_to[0]',
+            'harga'         => 'required|integer|greater_than_equal_to[0]|less_than[1000000000000]',
+            'stok'          => 'required|integer|greater_than[0]|less_than[1000000000000]',
             'tanggal_masuk' => 'required|valid_date',
         ];
 
         // 2. OPSI TAMBAHAN: Pesan Error Kustom (Agar bahasa Indonesia)
         $errors = [
             'kode_produk' => [
-                'required'  => 'Kode produk wajib diisi.',
-                'is_unique' => 'Gagal! Kode produk ini sudah terdaftar di database.' // Pesan ini yang akan muncul nanti
+                'required'      => 'Kode produk wajib diisi.',
+                'is_unique'     => 'Gagal! Kode produk ini sudah terdaftar.',
+                'alpha_numeric' => 'Kode produk hanya boleh berisi huruf dan angka (tanpa spasi/simbol).',
+                'max_length'    => 'Kode produk maksimal 10 karakter.'
+            ],
+            'nama_produk' => [
+                'required'   => 'Nama produk wajib diisi.',
+                'max_length' => 'Nama produk maksimal 50 karakter.'
+            ],
+            'harga' => [
+                'required' => 'Harga wajib diisi.',
+                'integer'  => 'Harga harus berupa angka bulat (tanpa titik/koma).',
+                'less_than' => 'Harga tidak boleh melebihi 1 Triliun.'
+            ],
+            'stok' => [
+                'required'     => 'Stok wajib diisi.',
+                'integer'      => 'Stok harus berupa angka bulat.',
+                'greater_than' => 'Stok harus lebih dari 0.',
+                'less_than'    => 'Stok tidak boleh melebihi 1 Milyar.'
             ]
         ];
 
         // Masukkan $errors ke dalam fungsi validate
         if (!$this->validate($rules, $errors)) {
             log_message('debug', 'VALIDATION FAILED: ' . json_encode($this->validator->getErrors()));
-            
+
             // Mengirim error spesifik ke session agar bisa dipanggil di View
             // withInput() penting agar isian form tidak hilang semua saat reload
             return redirect()->to('/karyawan/inventaris')->withInput()->with('errors', $this->validator->getErrors());
@@ -116,7 +133,7 @@ class InventarisController extends BaseController
         // --- Bagian ke bawah ini sudah benar, tidak perlu diubah ---
         $img = $this->request->getFile('gambar_produk');
         $namaGambar = 'default.jpg';
-        
+
         if ($img && $img->isValid() && !$img->hasMoved()) {
             $namaGambar = $img->getRandomName();
             $img->move('uploads/produk/', $namaGambar);
@@ -137,7 +154,7 @@ class InventarisController extends BaseController
         session()->setFlashdata('success', 'Produk berhasil ditambahkan.');
         // Disarankan ganti return redirect()->to(...) dengan ini:
         return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-            }
+    }
 
     /**
      * Memperbarui data produk dari modal
@@ -147,12 +164,12 @@ class InventarisController extends BaseController
         $produkModel = new ProdukModel();
 
         $rules = [
-            'kode_produk'   => "required|is_unique[produk.kode_produk,id_produk,{$id_produk}]",
-            'nama_produk'   => 'required',
+            'kode_produk'   => "required|alpha_numeric|max_length[10]|is_unique[produk.kode_produk,id_produk,{$id_produk}]",
+            'nama_produk'   => 'required|max_length[50]',
             'id_kategori'   => 'required|numeric',
-            'harga'         => 'required|numeric',
-            'stok'          => 'required|integer',
             'id_supplier'   => 'required|numeric',
+            'harga'         => 'required|integer|greater_than_equal_to[0]|less_than[1000000000000]',
+            'stok'          => 'required|integer|greater_than[0]|less_than[1000000000]',
             'tanggal_masuk' => 'required|valid_date',
             'gambar_produk' => [
                 'label' => 'Foto Produk',
@@ -162,10 +179,36 @@ class InventarisController extends BaseController
             ],
         ];
 
-        if (!$this->validate($rules)) {
-            return redirect()->to('karyawan/inventaris')->withInput()->with('error', 'Kode produk sudah digunakan.');
+        $errors = [
+            'kode_produk' => [
+                'required'      => 'Kode produk wajib diisi.',
+                'is_unique'     => 'Gagal! Kode produk ini sudah terdaftar.',
+                'alpha_numeric' => 'Kode produk hanya boleh huruf dan angka.',
+                'max_length'    => 'Kode produk maksimal 10 karakter.'
+            ],
+            'nama_produk' => [
+                'required'   => 'Nama produk wajib diisi.',
+                'max_length' => 'Nama produk maksimal 50 karakter.'
+            ],
+            'stok' => [
+                'required'     => 'Stok wajib diisi.',
+                'integer'      => 'Stok harus berupa angka bulat.',
+                'greater_than' => 'Stok harus lebih dari 0.',
+                'less_than'    => 'Stok tidak boleh melebihi 1 Milyar.' // Pesan Error Baru
+            ],
+            'harga' => [
+                'integer' => 'Harga harus angka bulat.'
+            ]
+        ];
+
+        if (!$this->validate($rules, $errors)) {
+            // Mengirim pesan error spesifik pertama yang ditemukan
+            $validationErrors = $this->validator->getErrors();
+            $firstError = reset($validationErrors);
+            return redirect()->to('karyawan/inventaris')->withInput()->with('error', 'Gagal Update: ' . $firstError);
         }
 
+        // --- Proses update database ke bawah tetap sama ---
         $produkLama = $produkModel->find($id_produk);
         if (!$produkLama) {
             return redirect()->to('/karyawan/inventaris')->with('error', 'Produk tidak ditemukan.');
@@ -351,43 +394,43 @@ class InventarisController extends BaseController
     }
 
     public function store_supplier()
-        {
-            $supplierModel = new \App\Models\SupplierModel();
-            // $validation = \Config\Services::validation(); // Baris ini sebenarnya tidak wajib jika menggunakan $this->validate
+    {
+        $supplierModel = new \App\Models\SupplierModel();
+        // $validation = \Config\Services::validation(); // Baris ini sebenarnya tidak wajib jika menggunakan $this->validate
 
-            // 1. Definisi Rules
-            $rules = [
-                'nama_supplier' => 'required|is_unique[supplier.nama_supplier]',
-                'alamat'        => 'required',
-                'no_telp'       => 'required|is_natural|exact_length[12]'
-            ];
+        // 1. Definisi Rules
+        $rules = [
+            'nama_supplier' => 'required|is_unique[supplier.nama_supplier]',
+            'alamat'        => 'required',
+            'no_telp'       => 'required|is_natural|exact_length[12]'
+        ];
 
-            // 2. Definisi Pesan Error Custom (Bahasa Indonesia)
-            $errors = [
-                'nama_supplier' => [
-                    'required'  => 'Nama Supplier wajib diisi.',
-                    'is_unique' => 'Nama Supplier ini sudah terdaftar.'
-                ]
-            ];
+        // 2. Definisi Pesan Error Custom (Bahasa Indonesia)
+        $errors = [
+            'nama_supplier' => [
+                'required'  => 'Nama Supplier wajib diisi.',
+                'is_unique' => 'Nama Supplier ini sudah terdaftar.'
+            ]
+        ];
 
-            // 3. Masukkan $errors sebagai parameter kedua di fungsi validate()
-            if (!$this->validate($rules, $errors)) {
-                $validation = \Config\Services::validation();
-                
-                // Mengambil error dan menjadikannya flashdata
-                session()->setFlashdata('error', implode('<br>', $validation->getErrors()));
-                return redirect()->back()->withInput();
-            }
+        // 3. Masukkan $errors sebagai parameter kedua di fungsi validate()
+        if (!$this->validate($rules, $errors)) {
+            $validation = \Config\Services::validation();
 
-            $supplierModel->save([
-                'nama_supplier' => $this->request->getPost('nama_supplier'),
-                'alamat'        => $this->request->getPost('alamat'),
-                'no_telp'       => $this->request->getPost('no_telp'),
-            ]);
-
-            session()->setFlashdata('success', 'Supplier berhasil ditambahkan.');
-            return redirect()->to('karyawan/inventaris/supplier');
+            // Mengambil error dan menjadikannya flashdata
+            session()->setFlashdata('error', implode('<br>', $validation->getErrors()));
+            return redirect()->back()->withInput();
         }
+
+        $supplierModel->save([
+            'nama_supplier' => $this->request->getPost('nama_supplier'),
+            'alamat'        => $this->request->getPost('alamat'),
+            'no_telp'       => $this->request->getPost('no_telp'),
+        ]);
+
+        session()->setFlashdata('success', 'Supplier berhasil ditambahkan.');
+        return redirect()->to('karyawan/inventaris/supplier');
+    }
 
     public function update_supplier($id_supplier)
     {
@@ -445,7 +488,7 @@ class InventarisController extends BaseController
             $response = [
                 'status' => ($data) ? 'taken' : 'available',
                 // Kirim token CSRF baru agar request berikutnya tidak Error 403
-                'token' => csrf_hash() 
+                'token' => csrf_hash()
             ];
 
             return $this->response->setJSON($response);
