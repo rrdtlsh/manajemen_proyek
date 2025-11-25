@@ -18,35 +18,19 @@
     </button>
 </div>
 
-<?php if (session()->getFlashdata('success')) : ?>
-    <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: "<?= session()->getFlashdata('success'); ?>",
-            timer: 2500,
-            showConfirmButton: false
-        });
-    </script>
-<?php endif; ?>
-
-<?php if (session()->getFlashdata('error')) : ?>
-    <script>
-        Swal.fire({
-            icon: 'error',
-            title: 'Gagal!',
-            text: "<?= session()->getFlashdata('error'); ?>",
-        });
-    </script>
-<?php endif; ?>
-
 <?php $validation = \Config\Services::validation(); ?>
-<?php if ($validation->getErrors()) : ?>
+<?php if (session()->getFlashdata('errors') || session()->getFlashdata('error')) : ?>
     <div class="alert alert-danger" role="alert">
         <ul class="mb-0">
-            <?php foreach ($validation->getErrors() as $error) : ?>
-                <li><?= esc($error) ?></li>
-            <?php endforeach ?>
+            <?php 
+            if(session()->getFlashdata('errors')){
+                foreach (session()->getFlashdata('errors') as $error) : ?>
+                    <li><?= esc($error) ?></li>
+                <?php endforeach;
+            } else {
+                echo '<li>'.session()->getFlashdata('error').'</li>';
+            }
+            ?>
         </ul>
     </div>
 <?php endif; ?>
@@ -62,7 +46,7 @@
                     <tr>
                         <th>No</th>
                         <th>Gambar</th>
-                        <th>Kode Produk</th>
+                        <th>Kode</th>
                         <th>Nama Produk</th>
                         <th>Harga</th>
                         <th>Stok</th>
@@ -82,10 +66,15 @@
                             <td><?= esc($p['kode_produk']); ?></td>
                             <td><?= esc($p['nama_produk']); ?></td>
                             <td>Rp <?= number_format($p['harga'], 0, ',', '.'); ?></td>
-                            <td><?= esc($p['stok']); ?></td>
+                            <td>
+                                <?php if($p['stok'] == 0): ?>
+                                    <span class="badge badge-danger">Habis</span>
+                                <?php else: ?>
+                                    <?= esc($p['stok']); ?>
+                                <?php endif; ?>
+                            </td>
                             <td>
                                 <div class="btn-aksi-group">
-
                                     <a href="<?= base_url('karyawan/inventaris/detail/' . $p['id_produk']); ?>"
                                         class="btn btn-info btn-sm">
                                         <i class="fas fa-info-circle"></i> Detail
@@ -110,7 +99,6 @@
                                         onclick="confirmDelete(<?= $p['id_produk']; ?>, '<?= base_url('karyawan/inventaris/delete/' . $p['id_produk']); ?>')">
                                         <i class="fas fa-trash"></i> Hapus
                                     </button>
-
                                 </div>
                             </td>
                         </tr>
@@ -140,7 +128,6 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="kode_produk">Kode Produk</label>
-
                             <input type="text"
                                 class="form-control"
                                 id="kode_produk"
@@ -148,140 +135,14 @@
                                 placeholder="Contoh: BR001"
                                 autocomplete="off"
                                 required
-                                maxlength="10"
-                                oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()">
-
+                                maxlength="10">
                             <div class="invalid-feedback" id="error-kode-msg"></div>
-                            <small class="form-text text-muted">Maks. 10 karakter (Huruf & Angka).</small>
+                            <small class="form-text text-muted">Maksimal 10 karakter (Huruf & Angka, Kapital).</small>
                         </div>
-
-                        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-                        <script>
-                            $(document).ready(function() {
-                                // --- 1. SETUP CSRF TOKEN (Untuk Validasi Kode) ---
-                                var csrfName = '<?= csrf_token() ?>';
-                                var csrfHash = '<?= csrf_hash() ?>';
-
-                                // --- 2. VALIDASI KODE PRODUK (AJAX) ---
-                                $('#kode_produk').on('blur', function() {
-                                    var field = $(this);
-                                    var kodeInput = field.val();
-                                    var msgBox = $('#error-kode-msg');
-                                    var btnSimpan = $('#btnSimpan');
-
-                                    // Reset style
-                                    field.removeClass('is-invalid is-valid');
-                                    msgBox.html('');
-
-                                    if (kodeInput === '') return;
-
-                                    $.ajax({
-                                        url: "<?= base_url('karyawan/inventaris/cek-kode') ?>",
-                                        type: "POST",
-                                        dataType: "json",
-                                        data: {
-                                            kode_produk: kodeInput,
-                                            [csrfName]: csrfHash
-                                        },
-                                        success: function(response) {
-                                            csrfHash = response.token;
-                                            $('input[name="' + csrfName + '"]').val(csrfHash);
-
-                                            if (response.status === 'taken') {
-                                                field.addClass('is-invalid');
-                                                msgBox.html('<strong>Gagal!</strong> Kode sudah digunakan produk lain.');
-                                                btnSimpan.prop('disabled', true);
-                                            } else {
-                                                field.addClass('is-valid');
-                                                msgBox.html('<span class="text-success">Kode tersedia.</span>');
-                                                cekSemuaValidasi(); // Cek apakah tombol boleh nyala
-                                            }
-                                        },
-                                        error: function(xhr, ajaxOptions, thrownError) {
-                                            console.error("Error:", thrownError);
-                                        }
-                                    });
-                                });
-
-                                // Hapus error kode saat mengetik
-                                $('#kode_produk').on('input', function() {
-                                    $(this).removeClass('is-invalid is-valid');
-                                    $('#error-kode-msg').html('');
-                                    cekSemuaValidasi();
-                                });
-
-                                // --- 3. VALIDASI HARGA (Max 1 Triliun - BLOCKING) ---
-                                $('#harga').on('input', function() {
-                                    var field = $(this);
-                                    var rawValue = field.val().replace(/[^0-9]/g, ''); // Hanya angka
-                                    var maxLimit = 1000000000000; // 1 Triliun
-                                    var msgBox = $('#error-harga-msg');
-
-                                    if (field.val() !== rawValue) {
-                                        field.val(rawValue);
-                                    }
-
-                                    if (rawValue !== '' && parseFloat(rawValue) > maxLimit) {
-                                        // MELEBIHI BATAS: Merah & Pesan Error
-                                        field.addClass('is-invalid');
-                                        msgBox.html('<strong>Gagal!</strong> Harga tidak boleh melebihi Rp 1 Triliun.');
-                                    } else {
-                                        // AMAN
-                                        field.removeClass('is-invalid');
-                                        msgBox.html('');
-                                    }
-                                    cekSemuaValidasi(); // Update status tombol simpan
-                                });
-
-                                // --- 4. VALIDASI STOK (Max 1 Milyar - BLOCKING) ---
-                                // INI BAGIAN YANG ANDA MINTA DIPERBAIKI
-                                $('#stok').on('input', function() {
-                                    var field = $(this);
-                                    var rawValue = field.val().replace(/[^0-9]/g, ''); // Hanya angka
-                                    var maxLimit = 1000000000; // 1 Milyar
-                                    var msgBox = $('#error-stok-msg');
-
-                                    // Pastikan input bersih dari simbol
-                                    if (field.val() !== rawValue) {
-                                        field.val(rawValue);
-                                    }
-
-                                    // Logika Validasi
-                                    if (rawValue === '') {
-                                        field.removeClass('is-invalid');
-                                        msgBox.html('');
-                                    } else if (parseInt(rawValue) < 1) {
-                                        // ERROR: Kurang dari 1
-                                        field.addClass('is-invalid');
-                                        msgBox.html('<strong>Gagal!</strong> Stok harus lebih dari 0 (Minimal 1).');
-                                    } else if (parseInt(rawValue) > maxLimit) {
-                                        // ERROR: Lebih dari 1 Milyar -> TAMPILKAN MERAH (BLOCKING)
-                                        field.addClass('is-invalid');
-                                        msgBox.html('<strong>Gagal!</strong> Stok tidak boleh melebihi 1 Milyar.');
-                                    } else {
-                                        // SUKSES: Hapus merah
-                                        field.removeClass('is-invalid');
-                                        msgBox.html('');
-                                    }
-                                    cekSemuaValidasi(); // Update status tombol simpan
-                                });
-
-                                // --- FUNGSI GLOBAL CEK VALIDASI TOMBOL ---
-                                function cekSemuaValidasi() {
-                                    // Tombol aktif HANYA JIKA tidak ada class 'is-invalid' di seluruh form
-                                    if ($('.is-invalid').length === 0) {
-                                        $('#btnSimpan').prop('disabled', false);
-                                    } else {
-                                        $('#btnSimpan').prop('disabled', true);
-                                    }
-                                }
-                            });
-                        </script>
 
                         <div class="form-group col-md-6">
                             <label for="tanggal_masuk">Tanggal Masuk</label>
-                            <input type="date" class="form-control" id="tanggal_masuk" name="tanggal_masuk" required>
+                            <input type="date" class="form-control" id="tanggal_masuk" name="tanggal_masuk" required value="<?= date('Y-m-d') ?>">
                         </div>
                     </div>
 
@@ -292,10 +153,10 @@
                                 class="form-control"
                                 id="nama_produk"
                                 name="nama_produk"
-                                oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
-                                title="Nama produk tidak boleh mengandung angka"
                                 required
-                                maxlength="50"> <small class="form-text text-muted">Maksimal 50 huruf.</small>
+                                maxlength="20"
+                                placeholder="Nama Produk">
+                            <small class="form-text text-muted">Maksimal 20 karakter.</small>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="id_kategori">Kategori Produk</label>
@@ -330,110 +191,32 @@
                                     id="harga"
                                     name="harga"
                                     required
-                                    inputmode="numeric"
                                     placeholder="0"
-                                    maxlength="16">
+                                    maxlength="15">
                                 <div id="error-harga-msg" class="invalid-feedback"></div>
                             </div>
-                            <small class="form-text text-muted">Hanya angka (tanpa titik/koma). Maksimal Rp 1.000.000.000.000</small>
+                            <small class="form-text text-muted">Hanya angka. Maksimal Rp 1 Miliar.</small>
                         </div>
                     </div>
 
-                    <script>
-                        $(document).ready(function() {
-                            $('#harga').on('input', function() {
-                                var field = $(this);
-                                var rawValue = field.val().replace(/[^0-9]/g, ''); // Ambil hanya angka
-                                var maxLimit = 1000000000000; // 1 Triliun
-                                var msgBox = $('#error-harga-msg');
-                                var btnSimpan = $('#btnSimpan');
-
-                                // Set nilai bersih kembali ke input
-                                field.val(rawValue);
-
-                                if (rawValue !== '' && parseFloat(rawValue) > maxLimit) {
-                                    // Tampilkan Peringatan
-                                    field.addClass('is-invalid');
-                                    msgBox.html('<strong>Gagal!</strong> Harga tidak boleh melebihi Rp 1 Triliun.');
-                                    btnSimpan.prop('disabled', true);
-                                } else {
-                                    // Hapus Peringatan
-                                    field.removeClass('is-invalid');
-                                    msgBox.html('');
-
-                                    // Cek apakah ada input lain yang invalid (misal kode produk) sebelum enable tombol
-                                    if ($('.is-invalid').length === 0) {
-                                        btnSimpan.prop('disabled', false);
-                                    }
-                                }
-                            });
-                        });
-                    </script>
-
                     <div class="form-group">
                         <label for="stok">Kuantitas (Stok)</label>
-                        <input type="number"
+                        <input type="text"
                             class="form-control"
                             id="stok"
                             name="stok"
                             required
-                            min="1"
                             placeholder="Minimal 1">
-
                         <div id="error-stok-msg" class="invalid-feedback"></div>
-                        <small class="form-text text-muted">Wajib diisi. Minimal 1. Maksimal 1 Milyar.</small>
+                        <small class="form-text text-muted">Hanya angka. Wajib diisi > 0. Maksimal 1.000 unit.</small>
                     </div>
-
-                    <script>
-                        $(document).ready(function() {
-                            $('#stok').on('input', function() {
-                                var field = $(this);
-                                var rawValue = field.val().replace(/[^0-9]/g, ''); // Pastikan hanya angka
-                                var maxLimit = 1000000000; // 1 Milyar (1.000.000.000)
-                                var msgBox = $('#error-stok-msg');
-                                var btnSimpan = $('#btnSimpan');
-
-                                // Kembalikan nilai bersih
-                                if (field.val() !== rawValue) {
-                                    field.val(rawValue);
-                                }
-
-                                // Validasi Logika
-                                if (rawValue !== '' && parseInt(rawValue) > maxLimit) {
-                                    rawValue = maxLimit.toString();
-                                    field.val(rawValue);
-                                } else if (parseInt(rawValue) < 1) {
-                                    // ERROR: Kurang dari 1
-                                    field.addClass('is-invalid');
-                                    msgBox.html('<strong>Gagal!</strong> Stok harus lebih dari 0 (Minimal 1).');
-                                    btnSimpan.prop('disabled', true);
-                                } else if (parseInt(rawValue) > maxLimit) {
-                                    // ERROR: Lebih dari 1 Milyar -> STOP INPUT / TAMPILKAN ERROR
-                                    field.addClass('is-invalid');
-                                    msgBox.html('<strong>Gagal!</strong> Stok tidak boleh melebihi 1 Milyar.');
-                                    btnSimpan.prop('disabled', true); // Tombol Simpan STOP/Mati
-                                } else {
-                                    // SUKSES: Aman
-                                    field.removeClass('is-invalid');
-                                    msgBox.html('');
-
-                                    // Cek apakah ada error lain (misal di Harga/Kode) sebelum nyalakan tombol
-                                    if ($('.is-invalid').length === 0) {
-                                        btnSimpan.prop('disabled', false);
-                                    }
-                                }
-                            });
-                        });
-                    </script>
 
                     <div class="form-group">
                         <label>Gambar Produk</label>
-
                         <div id="gambar-preview-container" class="mb-2" style="display: none;">
                             <img id="gambar-preview" src="" alt="Preview Gambar"
                                 style="width: 150px; height: 150px; object-fit: cover; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                         </div>
-
                         <div class="custom-file">
                             <input type="file"
                                 class="custom-file-input"
@@ -441,50 +224,10 @@
                                 name="gambar_produk"
                                 accept=".png, .jpg, .jpeg"
                                 onchange="validasiFile(this)">
-
                             <label class="custom-file-label" id="gambar-label" for="gambar_produk">Pilih gambar...</label>
                         </div>
                         <small class="form-text text-muted">Maksimal ukuran file 2MB. Format: JPG, JPEG, PNG.</small>
                     </div>
-
-                    <script>
-                        function validasiFile(input) {
-                            const file = input.files[0];
-                            const limit = 2 * 1024 * 1024; // 2MB
-
-                            if (file) {
-                                // Daftar tipe file yang diizinkan
-                                const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-
-                                // --- Cek Ukuran File
-                                if (file.size > limit) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'File Terlalu Besar!',
-                                        text: 'Maaf, ukuran gambar maksimal hanya 2MB.',
-                                        footer: 'Silakan kompres gambar atau pilih gambar lain.',
-                                        confirmButtonColor: '#d33',
-                                        confirmButtonText: 'Oke, Mengerti'
-                                    });
-
-                                    input.value = "";
-                                    document.getElementById('gambar-label').innerHTML = "Pilih gambar...";
-                                    document.getElementById('gambar-preview-container').style.display = "none";
-                                    return false;
-                                }
-
-                                // Jika lolos kedua validasi (Format & Ukuran)
-                                document.getElementById('gambar-label').innerHTML = file.name;
-
-                                const reader = new FileReader();
-                                reader.onload = function(e) {
-                                    document.getElementById('gambar-preview').src = e.target.result;
-                                    document.getElementById('gambar-preview-container').style.display = "block";
-                                }
-                                reader.readAsDataURL(file);
-                            }
-                        }
-                    </script>
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
@@ -497,14 +240,43 @@
     </div>
 </div>
 
-
 <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+
 <script>
-    const BASE_URL = "<?= base_url('karyawan/inventaris'); ?>";
+    var BASE_URL = "<?= base_url('karyawan/inventaris'); ?>";
+    var CHECK_CODE_URL = "<?= base_url('karyawan/inventaris/cek-kode'); ?>";
+    
+    // Variable Token CSRF agar bisa dibaca file eksternal
+    var csrfName = '<?= csrf_token() ?>';
+    var csrfHash = '<?= csrf_hash() ?>';
 </script>
+
 <script src="<?= base_url('js/input_inventaris.js') ?>"></script>
+
+<?php if (session()->getFlashdata('success')) : ?>
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: "<?= session()->getFlashdata('success'); ?>",
+            timer: 2500,
+            showConfirmButton: false
+        });
+    </script>
+<?php endif; ?>
+
+<?php if (session()->getFlashdata('error')) : ?>
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: "<?= session()->getFlashdata('error'); ?>",
+        });
+    </script>
+<?php endif; ?>
+
 <?= $this->endSection(); ?>

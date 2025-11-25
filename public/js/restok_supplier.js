@@ -1,6 +1,6 @@
-// public/js/restok_supplier.js
 $(document).ready(function () {
-    // Inisialisasi DataTable (tetap menggunakan sorting existing)
+    
+    // 1. Inisialisasi DataTable
     $('#dataTableRestok').DataTable({
         "order": [
             [0, "asc"]
@@ -8,10 +8,9 @@ $(document).ready(function () {
         autoWidth: false
     });
 
-    // Element modal / form
+    // Definisi Element
     const $modal = $('#modalInputRestok');
     const $form = $('#formRestok');
-
     const $inputHarga = $('#restok_harga');
     const $inputJumlah = $('#restok_jumlah');
     const $inputTotal = $('#restok_total');
@@ -19,20 +18,79 @@ $(document).ready(function () {
     const $inputNamaBarang = $('#restok_nama_barang');
     const $hiddenId = $('#restok_id_hidden');
 
-    // Hitung total (harga * qty)
+    // ===========================================
+    //       LOGIKA VALIDASI INPUT (STRICT)
+    // ===========================================
+
+    // Helper: Membersihkan input non-angka DAN menghapus 0 di depan
+    function sanitizeNumberInput(inputField) {
+        let val = inputField.val();
+        
+        let cleanVal = val.replace(/[^0-9]/g, '');
+        cleanVal = cleanVal.replace(/^0+/, '');
+        if (val !== cleanVal) {
+            inputField.val(cleanVal);
+        }
+        
+        return cleanVal;
+    }
+
+    // A. Validasi NAMA BARANG (Max 20 Karakter)
+    $inputNamaBarang.on('input', function() {
+        let val = $(this).val();
+        if(val.length > 20) {
+            $(this).val(val.substring(0, 20));
+        }
+    });
+
+    // B. Validasi HARGA (Hanya Angka, Tidak Boleh 0, Max 1 Triliun)
+    $inputHarga.on('input', function() {
+        let cleanVal = sanitizeNumberInput($(this));
+        const maxLimit = 1000000000000; // 1 Triliun
+
+        // Jika input kosong (karena user ketik 0), biarkan kosong
+        if (cleanVal === '') {
+            // Tidak perlu set value lagi, sanitize sudah menghapusnya
+        } 
+        // Cek batas maksimal
+        else if (parseInt(cleanVal) > maxLimit) {
+            $(this).val(maxLimit.toString());
+        }
+        
+        hitungTotal();
+    });
+
+    // C. Validasi JUMLAH/QTY (Hanya Angka, Tidak Boleh 0, Max 9999)
+    $inputJumlah.on('input', function() {
+        let cleanVal = sanitizeNumberInput($(this));
+        const maxLimit = 9999;
+
+        if (cleanVal === '') {
+            // Biarkan kosong
+        } 
+        else if (parseInt(cleanVal) > maxLimit) {
+            $(this).val(maxLimit.toString());
+        }
+        
+        hitungTotal();
+    });
+
+    // Fungsi Hitung Total
     function hitungTotal() {
-        const harga = parseFloat($inputHarga.val()) || 0;
+        // Ambil nilai, jika kosong atau NaN set ke 0 untuk perhitungan
+        const harga = parseInt($inputHarga.val()) || 0;
         const jumlah = parseInt($inputJumlah.val()) || 0;
-        $inputTotal.val(harga * jumlah);
+        
+        const total = harga * jumlah;
+
+        // Tampilkan format Rupiah
+        $inputTotal.val(new Intl.NumberFormat('id-ID').format(total));
     }
 
-    if ($inputHarga.length && $inputJumlah.length && $inputTotal.length) {
-        $inputHarga.on('input', hitungTotal);
-        $inputJumlah.on('input', hitungTotal);
-    }
+    // ===========================================
+    //           LOGIKA MODAL (EDIT)
+    // ===========================================
 
-    // --- EDIT handler ---
-    // Tombol edit pada tiap baris harus punya class .btn-edit dan data-* attributes seperti di view
     $(document).on('click', '.btn-edit', function (e) {
         e.preventDefault();
 
@@ -41,55 +99,38 @@ $(document).ready(function () {
         const barang = $(this).data('barang') ?? '';
         const qty = $(this).data('qty') ?? '';
         const harga_satuan = $(this).data('harga_satuan') ?? '';
-        const total_harga = $(this).data('total_harga') ?? '';
-
-        // Isi form modal dengan data
+        
+        // Isi form modal
         $hiddenId.val(id);
-        $inputSupplier.val(supplier);
         $inputNamaBarang.val(barang);
         $inputJumlah.val(qty);
         $inputHarga.val(harga_satuan);
-        $inputTotal.val(total_harga);
-
-        // Pastikan option supplier terpilih (nilai option adalah nama_supplier)
+        
+        // Set Dropdown Supplier
         if ($inputSupplier.find('option[value="' + supplier + '"]').length) {
             $inputSupplier.val(supplier);
         } else {
-            // Jika option tidak ada, reset ke pilihan kosong
             $inputSupplier.val('');
         }
 
-        // Ubah judul modal
+        hitungTotal(); // Refresh total saat modal dibuka
+
         $modal.find('#modalInputRestokLabel').text('Edit Data Restok');
-
-        // Tampilkan modal (jika tombol edit tidak memicu data-toggle)
         $modal.modal('show');
-
-        // Form action dibiarkan sama (store_restok) — controller akan cek id_restok untuk update/insert
-        // jika Anda ingin ubah action: $form.attr('action', '/karyawan/inventaris/store_restok');
     });
 
-    // --- RESET modal saat ditutup (agar tidak mengosongkan jika validasi gagal client ingin mempertahankan nilai) ---
-    // Kita reset hanya saat tombol "Tambah" diklik atau saat modal benar-benar ditutup
-    // --- RESET modal saat tombol TAMBAH ditekan saja ---
-    $('#btnTambahRestok').on('click', function () {
+    // Reset saat tombol Tambah diklik
+    $('button[data-target="#modalInputRestok"]').not('.btn-edit').on('click', function () {
+        $form[0].reset();
         $hiddenId.val('');
-        $inputSupplier.val('');
-        $inputNamaBarang.val('');
-        $inputJumlah.val('');
-        $inputHarga.val('');
-        $inputTotal.val('');
         $modal.find('#modalInputRestokLabel').text('Input Barang Supplier');
+        // Reset total manual karena reset() form tidak mentrigger event input
+        $inputTotal.val(''); 
     });
 
-
-    // Jika modal ditutup, keep state minimal (tidak otomatis clear to preserve withInput server-side)
-    $modal.on('hidden.bs.modal', function () {
-        // hide preview / keep fields as-is
-    });
-
-    // --- CONFIRM DELETE fungsi ---
-    // Akan redirect ke endpoint delete restok (pakai origin agar bekerja baik di local)
+    // ===========================================
+    //           CONFIRM DELETE
+    // ===========================================
     window.confirmDeleteRestok = function (id) {
         Swal.fire({
             title: "Hapus Data Restok?",
@@ -101,12 +142,7 @@ $(document).ready(function () {
             confirmButtonText: "Ya, hapus!"
         }).then((result) => {
             if (result.isConfirmed) {
-                // Gunakan origin + path (sesuaikan bila aplikasi memakai index.php di URL)
-                const base = window.location.origin;
-                // Jika aplikasi dijalankan di subfolder, kita coba gunakan location.pathname untuk membangun base
-                // namun biasanya origin + '/karyawan/inventaris/delete_restok/' sudah cukup
-                const deleteUrl = base + '/karyawan/inventaris/delete_restok/' + id;
-                window.location.href = deleteUrl;
+                window.location.href = '/karyawan/inventaris/delete_restok/' + id;
             }
         });
     };

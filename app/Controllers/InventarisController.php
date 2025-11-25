@@ -88,11 +88,11 @@ class InventarisController extends BaseController
 
         $rules = [
             'kode_produk'   => 'required|is_unique[produk.kode_produk]|alpha_numeric|max_length[10]',
-            'nama_produk'   => 'required|max_length[50]',
+            'nama_produk'   => 'required|max_length[20]',
             'id_kategori'   => 'required|numeric',
             'id_supplier'   => 'required|numeric',
-            'harga'         => 'required|integer|greater_than_equal_to[0]|less_than[1000000000000]',
-            'stok'          => 'required|integer|greater_than[0]|less_than[1000000000000]',
+            'harga'         => 'required|integer|greater_than[0]|less_than_equal_to[1000000000]',
+            'stok'          => 'required|integer|greater_than[0]|less_than_equal_to[1000]',
             'tanggal_masuk' => 'required|valid_date',
         ];
 
@@ -130,7 +130,6 @@ class InventarisController extends BaseController
             return redirect()->to('/karyawan/inventaris')->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // --- Bagian ke bawah ini sudah benar, tidak perlu diubah ---
         $img = $this->request->getFile('gambar_produk');
         $namaGambar = 'default.jpg';
 
@@ -140,7 +139,7 @@ class InventarisController extends BaseController
         }
 
         $data = [
-            'kode_produk'   => $this->request->getPost('kode_produk'),
+            'kode_produk'   => strtoupper($this->request->getPost('kode_produk')),
             'nama_produk'   => $this->request->getPost('nama_produk'),
             'id_kategori'   => $this->request->getPost('id_kategori'),
             'id_supplier'   => $this->request->getPost('id_supplier'),
@@ -152,7 +151,7 @@ class InventarisController extends BaseController
 
         $produkModel->insert($data);
         session()->setFlashdata('success', 'Produk berhasil ditambahkan.');
-        // Disarankan ganti return redirect()->to(...) dengan ini:
+
         return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
     }
 
@@ -165,11 +164,11 @@ class InventarisController extends BaseController
 
         $rules = [
             'kode_produk'   => "required|alpha_numeric|max_length[10]|is_unique[produk.kode_produk,id_produk,{$id_produk}]",
-            'nama_produk'   => 'required|max_length[50]',
+            'nama_produk'   => 'required|max_length[20]',
             'id_kategori'   => 'required|numeric',
             'id_supplier'   => 'required|numeric',
-            'harga'         => 'required|integer|greater_than_equal_to[0]|less_than[1000000000000]',
-            'stok'          => 'required|integer|greater_than[0]|less_than[1000000000]',
+            'harga'         => 'required|integer|greater_than_equal_to[0]|less_than_equal_to[1000000000]',
+            'stok'          => 'required|integer|greater_than[0]|less_than_equal_to[1000]',
             'tanggal_masuk' => 'required|valid_date',
             'gambar_produk' => [
                 'label' => 'Foto Produk',
@@ -318,13 +317,12 @@ class InventarisController extends BaseController
     {
         $restokModel = new RestokModel();
 
-        // 1. TAMBAHKAN VALIDASI DI SINI
-        // Agar nama barang maksimal 50 huruf dan qty maksimal 9999
+        // validasi input
         $rules = [
             'nama_supplier' => 'required',
             'nama_barang'   => [
                 // Regex ini melarang huruf yang sama diulang 5x berturut-turut (misal: ppppp)
-                'rules'  => 'required|max_length[50]|regex_match[/^(?!.*(.)\1{4}).*$/]',
+                'rules'  => 'required|max_length[20]|regex_match[/^(?!.*(.)\1{4}).*$/]',
                 'errors' => [
                     'max_length'  => 'Nama barang maksimal 50 karakter.',
                     'regex_match' => 'Nama barang tidak valid (spam karakter).'
@@ -336,16 +334,13 @@ class InventarisController extends BaseController
                     'less_than_equal_to' => 'Maksimal jumlah barang adalah 9.999 per transaksi.'
                 ]
             ],
-            'harga_satuan'  => 'required|numeric'
-        ];
+            'harga_satuan'  => 'required|integer|greater_than_equal_to[0]|less_than_equal_to[1000000000000]'        ];
 
         if (!$this->validate($rules)) {
             // Jika validasi gagal, kembalikan error ke modal
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // 2. HITUNG TOTAL HARGA DI BACKEND (LEBIH AMAN)
-        // Jangan ambil 'total_harga' dari post input, karena user bisa memanipulasi HTML
         $qty   = $this->request->getPost('qty');
         $harga = $this->request->getPost('harga_satuan');
         $total_fix = $qty * $harga;
@@ -355,8 +350,7 @@ class InventarisController extends BaseController
             'nama_barang'   => $this->request->getPost('nama_barang'),
             'qty'           => $qty,
             'harga_satuan'  => $harga,
-            'total_harga'   => $total_fix, // Gunakan hasil hitungan server
-
+            'total_harga'   => $total_fix, 
             // status inventaris ke owner
             'status'        => 'Menunggu',
             'status_owner'  => 'Menunggu',

@@ -18,17 +18,20 @@
 </div>
 
 <?php if (session()->getFlashdata('success')) : ?>
-    <div class="alert alert-success" role="alert">
-        <?= session()->getFlashdata('success'); ?>
-    </div>
+    <div class="alert alert-success" role="alert"><?= session()->getFlashdata('success'); ?></div>
 <?php endif; ?>
-
 <?php if (session()->getFlashdata('error')) : ?>
-    <div class="alert alert-danger" role="alert">
-        <?= session()->getFlashdata('error'); ?>
+    <div class="alert alert-danger" role="alert"><?= session()->getFlashdata('error'); ?></div>
+<?php endif; ?>
+<?php if (session()->getFlashdata('errors')) : ?>
+    <div class="alert alert-danger">
+        <ul>
+        <?php foreach (session()->getFlashdata('errors') as $error) : ?>
+            <li><?= esc($error) ?></li>
+        <?php endforeach ?>
+        </ul>
     </div>
 <?php endif; ?>
-
 
 <div class="card shadow mb-4" style="border-left: 4px solid #2d8659;">
     <div class="card-header py-3" style="background-color: #2d8659; color: white;">
@@ -58,19 +61,15 @@
                             <td><?= esc($item['qty']); ?></td>
                             <td>Rp <?= number_format($item['total_harga'], 0, ',', '.'); ?></td>
                             <td>
-                                <?php $status_class = $item['status'] == 'Disetujui' ? 'badge-success' : 'badge-warning'; ?>
+                                <?php $status_class = $item['status'] == 'Disetujui' ? 'badge-success' : ($item['status'] == 'Ditolak' ? 'badge-danger' : 'badge-warning'); ?>
                                 <span class="badge <?= $status_class; ?>"><?= esc($item['status']); ?></span>
                             </td>
                             <td>
                                 <div class="btn-aksi-group">
-
-                                    <!-- DETAIL -->
-                                    <a href="<?= base_url('karyawan/inventaris/detail_restok/' . $item['id_restok']); ?>"
-                                        class="btn btn-info btn-sm">
+                                    <a href="<?= base_url('karyawan/inventaris/detail_restok/' . $item['id_restok']); ?>" class="btn btn-info btn-sm">
                                         <i class="fas fa-info-circle"></i> Detail
                                     </a>
 
-                                    <!-- EDIT -->
                                     <?php if ($item['status'] !== 'Disetujui'): ?>
                                         <button class="btn btn-warning btn-sm btn-edit"
                                             data-id="<?= $item['id_restok']; ?>"
@@ -88,12 +87,9 @@
                                         </button>
                                     <?php endif; ?>
 
-                                    <!-- HAPUS -->
-                                    <button class="btn btn-danger btn-sm"
-                                        onclick="confirmDeleteRestok(<?= $item['id_restok']; ?>)">
+                                    <button class="btn btn-danger btn-sm" onclick="confirmDeleteRestok(<?= $item['id_restok']; ?>)">
                                         <i class="fas fa-trash"></i> Hapus
                                     </button>
-
                                 </div>
                             </td>
                         </tr>
@@ -104,7 +100,6 @@
     </div>
 </div>
 
-<!-- MODAL TAMBAH / EDIT RESTOK -->
 <div class="modal fade" id="modalInputRestok" tabindex="-1" role="dialog" aria-labelledby="modalInputRestokLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -124,134 +119,62 @@
                             <select id="restok_pt_supplier" name="nama_supplier" class="form-control" required>
                                 <option value="" disabled selected>-- Pilih Supplier --</option>
                                 <?php foreach ($suppliers as $sup): ?>
-                                    <option value="<?= esc($sup['nama_supplier']); ?>">
-                                        <?= esc($sup['nama_supplier']); ?>
-                                    </option>
+                                    <option value="<?= esc($sup['nama_supplier']); ?>"><?= esc($sup['nama_supplier']); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
 
                         <div class="col-md-6">
                             <label for="restok_nama_barang">Nama Barang</label>
-                            <input type="text"
-                                class="form-control"
-                                id="restok_nama_barang"
-                                name="nama_barang"
-                                maxlength="50"
-                                required>
-                            <small id="error_nama_barang" class="text-danger" style="display:none;">
-                                Nama barang tidak valid (terlalu banyak huruf berulang).
-                            </small>
+                            <input type="text" class="form-control" id="restok_nama_barang" name="nama_barang" maxlength="20" required>
+                            <small class="form-text text-muted">Maksimal 20 karakter.</small>
+                            <small id="error_nama_barang" class="text-danger" style="display:none;">Nama barang tidak valid (terlalu banyak huruf berulang).</small>
+                        </div>
+                    </div>
+
+                    <div class="form-row mt-3">
+                        <div class="col-md-4">
+                            <label for="restok_jumlah">Qty</label>
+                            <input type="text" class="form-control" id="restok_jumlah" name="qty" placeholder="0" inputmode="numeric" required>
+                            <small class="text-muted">Maks: 9.999</small>
                         </div>
 
-                        <div class="form-row mt-3">
-                            <div class="col-md-4">
-                                <label for="restok_jumlah">Qty</label>
-                                <input type="number"
-                                    class="form-control"
-                                    id="restok_jumlah"
-                                    name="qty"
-                                    min="1"
-                                    max="9999"
-                                    required>
-                                <small class="text-muted" style="font-size: 10px;">Maks: 9.999</small>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="restok_harga">Harga Satuan</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">Rp</span>
-                                    </div>
-                                    <input type="number" class="form-control" id="restok_harga" name="harga_satuan" min="0" required>
+                        <div class="col-md-4">
+                            <label for="restok_harga">Harga Satuan</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Rp</span>
                                 </div>
+                                <input type="text" class="form-control" id="restok_harga" name="harga_satuan" placeholder="0" inputmode="numeric" required>
                             </div>
+                        </div>
 
-                            <div class="col-md-4">
-                                <label for="restok_total">Total Harga</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">Rp</span>
-                                    </div>
-                                    <input type="text" class="form-control" id="restok_total" name="total_harga" readonly>
+                        <div class="col-md-4">
+                            <label for="restok_total">Total Harga</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Rp</span>
                                 </div>
+                                <input type="text" class="form-control" id="restok_total" name="total_harga" readonly>
                             </div>
                         </div>
+                    </div>
 
-                        <input type="hidden" id="restok_status" name="status" value="Menunggu">
-
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-save mr-1"></i> Simpan
-                            </button>
-                        </div>
+                    <input type="hidden" id="restok_status" name="status" value="Menunggu">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save mr-1"></i> Simpan</button>
+                </div>
             </form>
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Definisi Elemen
-        const elNama = document.getElementById('restok_nama_barang');
-        const elQty = document.getElementById('restok_jumlah');
-        const elHarga = document.getElementById('restok_harga');
-        const elTotal = document.getElementById('restok_total');
-        const elError = document.getElementById('error_nama_barang');
-
-        // Tombol submit (sesuaikan ID atau selector tombol simpan di modal Anda)
-        // Jika tombolnya type="submit" di dalam form, script ini akan mencegah submit jika error
-        const btnSubmit = document.querySelector('button[type="submit"]');
-
-        // 1. LOGIKA NAMA BARANG (Anti Spam "pppppp")
-        elNama.addEventListener('input', function(e) {
-            let val = this.value;
-
-            // Cek Spam: Apakah ada karakter yang diulang 5x berturut-turut?
-            const spamRegex = /(.)\1{4,}/;
-
-            if (spamRegex.test(val)) {
-                elError.style.display = 'block'; // Munculkan pesan merah
-                this.classList.add('is-invalid');
-                if (btnSubmit) btnSubmit.disabled = true; // Kunci tombol simpan
-            } else {
-                elError.style.display = 'none'; // Sembunyikan pesan merah
-                this.classList.remove('is-invalid');
-                if (btnSubmit) btnSubmit.disabled = false; // Buka tombol simpan
-            }
-        });
-
-        // 2. LOGIKA HITUNG OTOMATIS (Qty x Harga)
-        function hitungTotal() {
-            let qty = parseFloat(elQty.value) || 0;
-            let harga = parseFloat(elHarga.value) || 0;
-
-            // Validasi Paksa: Jika user input lebih dari 9999, reset ke 9999
-            if (qty > 9999) {
-                qty = 9999;
-                elQty.value = 9999;
-                alert('Maksimal Qty adalah 9.999');
-            }
-
-            let total = qty * harga;
-
-            // Format ke Rupiah (Pemisah ribuan titik)
-            // Contoh output: "10.000.000"
-            elTotal.value = total.toLocaleString('id-ID');
-        }
-
-        // Pasang Event Listener (Jalankan saat mengetik)
-        elQty.addEventListener('input', hitungTotal);
-        elHarga.addEventListener('input', hitungTotal);
-    });
-</script>
 
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
-
 <script src="<?= base_url('js/restok_supplier.js') ?>"></script>
 <?= $this->endSection() ?>
