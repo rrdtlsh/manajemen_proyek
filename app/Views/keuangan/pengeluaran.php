@@ -86,19 +86,57 @@
                         <label>Tanggal</label>
                         <input type="date" class="form-control" name="tanggal" value="<?= date('Y-m-d'); ?>" required>
                     </div>
-                    <div class="form-group">
-                        <label>Jumlah Pengeluaran (Rp)</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Rp</span>
-                            </div>
-                            <input type="number" class="form-control" name="jumlah" required min="1" placeholder="0">
+                <div class="form-group">
+                    <label>Jumlah Pengeluaran (Rp)</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Rp</span>
                         </div>
+                        <input 
+                            type="number" 
+                            class="form-control" 
+                            name="jumlah" 
+                            required 
+                            placeholder="0"
+                            oninput="
+                                this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null;
+                                if(this.value > 1000000000000) {
+                                    this.value = this.value.slice(0, -1);
+                                }
+                                if(this.value.length < 4 && this.value.length > 0) {
+                                    this.setCustomValidity('Format Input tidak valid. Minimal 4 angka (Ribuan).');
+                                } else {
+                                    this.setCustomValidity('');
+                                }
+                            "
+                            onkeydown="return event.keyCode !== 69 && event.keyCode !== 189 && event.keyCode !== 190 && event.keyCode !== 188"
+                        >
                     </div>
-                    <div class="form-group">
-                        <label>Keterangan / Keperluan</label>
-                        <textarea class="form-control" name="keterangan" rows="3" required placeholder="Contoh: Biaya Listrik, Beli ATK, Uang Kebersihan..."></textarea>
-                    </div>
+                    <small class="text-muted">Maksimal Input Rp 1.000.000.000.000.</small>
+                </div>
+                <div class="form-group">
+                    <label>Keterangan Penggunaan</label>
+                    <textarea 
+                        class="form-control" 
+                        name="keterangan" 
+                        required 
+                        placeholder="Contoh: Pembelian Alat Tulis"
+                        rows="3"
+                        oninput="
+                            let teks = this.value.trim();
+                            let jumlahKata = teks.length === 0 ? 0 : teks.split(/\s+/).length;
+                            document.getElementById('wordInfo').innerText = jumlahKata + '/20 Kata';
+                            if(jumlahKata < 2) {
+                                this.setCustomValidity('Terlalu singkat, Minimal 2 kata.');
+                            } else if(jumlahKata > 20) {
+                                this.setCustomValidity('Terlalu panjang! Maksimal 20 kata.');
+                            } else {
+                                this.setCustomValidity('');
+                            }
+                        "
+                    ></textarea>
+                    <small id="wordInfo" class="text-muted">0/20 Kata</small>
+                </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>

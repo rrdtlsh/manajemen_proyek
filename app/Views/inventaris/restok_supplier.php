@@ -124,30 +124,109 @@
                             </select>
                         </div>
 
-                        <div class="col-md-6">
-                            <label for="restok_nama_barang">Nama Barang</label>
-                            <input type="text" class="form-control" id="restok_nama_barang" name="nama_barang" maxlength="20" required>
-                            <small class="form-text text-muted">Maksimal 20 karakter.</small>
-                            <small id="error_nama_barang" class="text-danger" style="display:none;">Nama barang tidak valid (terlalu banyak huruf berulang).</small>
-                        </div>
+                    <div class="col-md-6">
+                        <label for="restok_nama_barang">Nama Barang</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="restok_nama_barang" 
+                            name="nama_barang" 
+                            maxlength="20" 
+                            required
+                            placeholder="Contoh: Gorden Motif Daun"
+                            oninput="validasiNamaBarang(this)"
+                        >
+                        <small class="form-text text-muted">Maksimal 20 Karakter.</small>
+                        
+                        <small id="error_spam" class="text-danger" style="display:none;">
+                            <i class="fas fa-exclamation-circle"></i> Jangan mengulang huruf lebih dari 2 kali
+                        </small>
+                        <small id="error_gibberish" class="text-danger" style="display:none;">
+                            <i class="fas fa-exclamation-circle"></i> Nama barang tidak terbaca
+                        </small>
                     </div>
 
-                    <div class="form-row mt-3">
-                        <div class="col-md-4">
-                            <label for="restok_jumlah">Qty</label>
-                            <input type="text" class="form-control" id="restok_jumlah" name="qty" placeholder="0" inputmode="numeric" required>
-                            <small class="text-muted">Maks: 9.999</small>
-                        </div>
+                    <script>
+                    function validasiNamaBarang(input) {
+                        input.value = input.value.replace(/[^a-zA-Z\s]/g, '');
+                        
+                        let text = input.value;
+                        let errorSpam = document.getElementById('error_spam');
+                        let errorGibberish = document.getElementById('error_gibberish');
+                        
+                        // Regex: Karakter apapun (.) ditangkap, lalu dicek apakah muncul lagi (\1) sebanyak 4 kali
+                        let isSpam = /(.)\1{2,}/.test(text);
+                        
+                        // Ini untuk menangkal asal ketik/keysmash
+                        let isGibberish = /[bcdfghjklmnpqrstvwxyz]{5,}/i.test(text);
 
-                        <div class="col-md-4">
-                            <label for="restok_harga">Harga Satuan</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">Rp</span>
-                                </div>
-                                <input type="text" class="form-control" id="restok_harga" name="harga_satuan" placeholder="0" inputmode="numeric" required>
+                        if (isSpam) {
+                            errorSpam.style.display = 'block';
+                            input.setCustomValidity('Huruf berulang terlalu banyak.');
+                        } else if (isGibberish) {
+                            errorSpam.style.display = 'none'; 
+                            errorGibberish.style.display = 'block';
+                            input.setCustomValidity('Nama barang tidak wajar.');
+                        } else {
+                            errorSpam.style.display = 'none';
+                            errorGibberish.style.display = 'none';
+                            input.setCustomValidity('');
+                        }
+                    }
+                    </script>
+
+                    <div class="col-md-4">
+                        <label for="restok_jumlah">Qty</label>
+                        <input 
+                            type="number" 
+                            class="form-control" 
+                            id="restok_jumlah" 
+                            name="qty" 
+                            placeholder="0" 
+                            inputmode="numeric" 
+                            required
+                            oninput="
+                                this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null;
+                                if (this.value > 1000) {
+                                    this.value = this.value.slice(0, -1);
+                                }
+                            "
+                            onkeydown="return event.keyCode !== 69 && event.keyCode !== 189 && event.keyCode !== 190 && event.keyCode !== 188"
+                        >
+                        <small class="text-muted">Maksimal 1000 item</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="restok_harga">Harga Satuan</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Rp</span>
                             </div>
+                            <input 
+                                type="number" 
+                                class="form-control" 
+                                id="restok_harga" 
+                                name="harga_satuan" 
+                                placeholder="0" 
+                                required
+                                oninput="
+                                    this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null;
+
+                                    if(this.value > 1000000000000) {
+                                        this.value = this.value.slice(0, -1);
+                                    }
+                                    
+                                    if(this.value.length < 4 && this.value.length > 0) {
+                                        this.setCustomValidity('Harga tidak valid. Minimal 4 angka (Ribuan).');
+                                    } else {
+                                        this.setCustomValidity('');
+                                    }
+                                "
+                                onkeydown="return event.keyCode !== 69 && event.keyCode !== 189 && event.keyCode !== 190 && event.keyCode !== 188"
+                            >
                         </div>
+                        <small class="text-muted">Maksimal Rp 1.000.000.000.000.</small>
+                    </div>
 
                         <div class="col-md-4">
                             <label for="restok_total">Total Harga</label>
