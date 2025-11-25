@@ -311,16 +311,51 @@ class InventarisController extends BaseController
     /**
      * Menyimpan/Update data restok dari modal
      */
+    /**
+     * Menyimpan/Update data restok dari modal (SUDAH DIPERBAIKI)
+     */
     public function store_restok()
     {
         $restokModel = new RestokModel();
 
+        // 1. TAMBAHKAN VALIDASI DI SINI
+        // Agar nama barang maksimal 50 huruf dan qty maksimal 9999
+        $rules = [
+            'nama_supplier' => 'required',
+            'nama_barang'   => [
+                // Regex ini melarang huruf yang sama diulang 5x berturut-turut (misal: ppppp)
+                'rules'  => 'required|max_length[50]|regex_match[/^(?!.*(.)\1{4}).*$/]',
+                'errors' => [
+                    'max_length'  => 'Nama barang maksimal 50 karakter.',
+                    'regex_match' => 'Nama barang tidak valid (spam karakter).'
+                ]
+            ],
+            'qty' => [
+                'rules'  => 'required|integer|less_than_equal_to[9999]',
+                'errors' => [
+                    'less_than_equal_to' => 'Maksimal jumlah barang adalah 9.999 per transaksi.'
+                ]
+            ],
+            'harga_satuan'  => 'required|numeric'
+        ];
+
+        if (!$this->validate($rules)) {
+            // Jika validasi gagal, kembalikan error ke modal
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        // 2. HITUNG TOTAL HARGA DI BACKEND (LEBIH AMAN)
+        // Jangan ambil 'total_harga' dari post input, karena user bisa memanipulasi HTML
+        $qty   = $this->request->getPost('qty');
+        $harga = $this->request->getPost('harga_satuan');
+        $total_fix = $qty * $harga;
+
         $data = [
             'nama_supplier' => $this->request->getPost('nama_supplier'),
             'nama_barang'   => $this->request->getPost('nama_barang'),
-            'qty'           => $this->request->getPost('qty'),
-            'harga_satuan'  => $this->request->getPost('harga_satuan'),
-            'total_harga'   => $this->request->getPost('total_harga'),
+            'qty'           => $qty,
+            'harga_satuan'  => $harga,
+            'total_harga'   => $total_fix, // Gunakan hasil hitungan server
 
             // status inventaris ke owner
             'status'        => 'Menunggu',
@@ -334,9 +369,9 @@ class InventarisController extends BaseController
             $restokModel->insert($data);
             $message = 'Permintaan restok berhasil dibuat (Menunggu persetujuan owner).';
         } else {
-            // UPDATE (staf hanya boleh edit data restok, tidak bisa edit approval owner)
+            // UPDATE
             $restokModel->update($id_restok, $data);
-            $message = 'Data restok berhasil diperbarui (status approval tidak berubah).';
+            $message = 'Data restok berhasil diperbarui.';
         }
 
         return redirect()->to('/karyawan/inventaris/restok')->with('success', $message);
