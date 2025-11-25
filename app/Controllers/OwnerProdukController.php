@@ -140,17 +140,40 @@ class OwnerProdukController extends BaseController
         return redirect()->back()->with('error', 'Gagal menghapus. Produk tidak ditemukan.');
     }
 
+// ... (kode atas tetap sama) ...
+
+    // --- GANTI FUNGSI YANG PALING BAWAH INI ---
     public function cek_kode_otomatis()
     {
+        // Pastikan request datang dari AJAX
         if ($this->request->isAJAX()) {
+            
+            // 1. Ambil input kode dari view
             $kode = $this->request->getVar('kode_produk');
-            // Pastikan menggunakan $this->produkModel yang sudah didefinisikan di construct
+            
+            // 2. Cek ke database menggunakan model yang sudah ada di construct
             $data = $this->produkModel->where('kode_produk', $kode)->first();
 
-            return $this->response->setJSON([
-                'status' => ($data) ? 'taken' : 'available',
-                'token'  => csrf_hash()
-            ]);
+            // 3. Tentukan status dan pesan
+            if ($data) {
+                // KASUS: KODE SUDAH ADA (TAKEN)
+                $response = [
+                    'status'  => 'taken',
+                    // Kalimat ini yang akan muncul merah di bawah input
+                    'message' => 'Kode <strong>' . esc($kode) . '</strong> sudah ada di database. Ganti yang lain.', 
+                    'token'   => csrf_hash() // Wajib kirim token baru
+                ];
+            } else {
+                // KASUS: KODE AMAN (AVAILABLE)
+                $response = [
+                    'status'  => 'available',
+                    'message' => 'Kode tersedia.',
+                    'token'   => csrf_hash()
+                ];
+            }
+
+            // 4. Kirim respon JSON ke JavaScript
+            return $this->response->setJSON($response);
         }
     }
 }

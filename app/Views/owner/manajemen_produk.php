@@ -102,9 +102,104 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="kode_produk">Kode Produk</label>
-                            <input type="text" class="form-control" id="kode_produk" name="kode_produk" placeholder="Contoh: BR-001" autocomplete="off" required>
+
+                            <input type="text"
+                                class="form-control"
+                                id="kode_produk"
+                                name="kode_produk"
+                                placeholder="Contoh: BR001"
+                                autocomplete="off"
+                                required
+                                maxlength="10"
+                                oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()">
+
                             <div class="invalid-feedback" id="error-kode-msg"></div>
+                            <small class="form-text text-muted">Maks. 10 karakter (Huruf & Angka).</small>
                         </div>
+
+                        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+                        <script>
+                            $(document).ready(function() {
+                                var csrfName = '<?= csrf_token() ?>';
+                                var csrfHash = '<?= csrf_hash() ?>';
+                                
+                                var btnSimpan = $('button[type="submit"]'); 
+                                var inputKode = $('#kode_produk');
+                                var msgBox = $('#error-kode-msg');
+
+                                // 1. EVENT SAAT KURSOR KELUAR (CEK KE SERVER)
+                                inputKode.on('blur', function() {
+                                    var field = $(this);
+                                    var kodeInput = field.val().trim();
+
+                                    // Reset dulu
+                                    field.removeClass('is-invalid is-valid');
+                                    msgBox.html('');
+
+                                    if (kodeInput === '') return;
+
+                                    // KUNCI TOMBOL SAAT LOADING
+                                    btnSimpan.prop('disabled', true);
+                                    btnSimpan.text('Mengecek...'); 
+
+                                    $.ajax({
+                                        url: "<?= base_url('owner/manajemen_produk/cek-kode-otomatis') ?>", 
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: {
+                                            kode_produk: kodeInput,
+                                            [csrfName]: csrfHash
+                                        },
+                                        success: function(response) {
+                                            csrfHash = response.token;
+                                            $('input[name="' + csrfName + '"]').val(csrfHash);
+                                            
+                                            // Kembalikan teks tombol
+                                            btnSimpan.text('Simpan');
+
+                                            if (response.status === 'taken') {
+                                                // KODE SUDAH ADA -> KUNCI TOMBOL
+                                                field.addClass('is-invalid'); 
+                                                msgBox.html(response.message); 
+                                                btnSimpan.prop('disabled', true); // <--- INI SENGAJA DIKUNCI
+                                            } else {
+                                                // KODE AMAN -> BUKA TOMBOL
+                                                field.addClass('is-valid'); 
+                                                
+                                                // Cek apakah kolom lain ada yang error? Kalau bersih, nyalakan tombol
+                                                if ($('.is-invalid').length === 0) {
+                                                    btnSimpan.prop('disabled', false); // <--- TOMBOL BISA DITEKAN
+                                                }
+                                            }
+                                        },
+                                        error: function() {
+                                            btnSimpan.text('Simpan');
+                                            field.addClass('is-invalid');
+                                            btnSimpan.prop('disabled', true); // Error koneksi = Kunci tombol
+                                        }
+                                    });
+                                });
+
+                                // 2. EVENT SAAT MENGETIK ULANG (RESET TOMBOL)
+                                // Ini penting agar saat user hapus/edit, tombol langsung "Ready" lagi
+                                inputKode.on('input', function() {
+                                    var field = $(this);
+                                    
+                                    // Hapus warna merah/hijau saat ngetik
+                                    field.removeClass('is-invalid is-valid');
+                                    msgBox.html('');
+
+                                    // Langsung nyalakan tombol saat user mulai memperbaiki input
+                                    // (Nanti akan dicek lagi saat user selesai ngetik/blur)
+                                    if ($('.is-invalid').length === 0) {
+                                        btnSimpan.prop('disabled', false);
+                                        btnSimpan.text('Simpan');
+                                    }
+                                });
+                            });
+                        </script>
+
                         <div class="form-group col-md-6">
                             <label for="tanggal_masuk">Tanggal Masuk</label>
                             <input type="date" class="form-control" id="tanggal_masuk" name="tanggal_masuk" value="<?= date('Y-m-d'); ?>" required>
@@ -114,8 +209,17 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="nama_produk">Nama Produk</label>
-                            <input type="text" class="form-control" id="nama_produk" name="nama_produk" required>
+                            <input type="text"
+                                class="form-control"
+                                id="nama_produk"
+                                name="nama_produk"
+                                placeholder="Karpet Motif Daun"
+                                oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')"
+                                title="Nama produk tidak boleh mengandung angka"
+                                required
+                                maxlength="20"> <small class="form-text text-muted">Maksimal 20 huruf.</small>
                         </div>
+
                         <div class="form-group col-md-6">
                             <label for="id_kategori">Kategori Produk</label>
                             <select id="id_kategori" name="id_kategori" class="form-control" required>
@@ -137,19 +241,130 @@
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="form-group col-md-6">
-                            <label for="harga">Harga</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend"><span class="input-group-text">Rp</span></div>
-                                <input type="number" class="form-control" id="harga" name="harga" required min="0">
+
+                    <div class="form-group col-md-6">
+                        <label for="harga">Harga</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Rp</span>
                             </div>
+                            <input type="number"
+                                class="form-control"
+                                id="harga"
+                                name="harga"
+                                required
+                                placeholder="0"
+                                oninput="
+
+                                    this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null;
+
+                                    if(this.value > 1000000000000) {
+                                        this.value = this.value.slice(0, -1);
+                                    }
+
+                                    if(this.value.length < 4 && this.value.length > 0) {
+                                        this.setCustomValidity('Harga tidak valid. Minimal 4 angka (Ribuan).');
+                                    } else {
+                                        this.setCustomValidity('');
+                                    }
+                                "
+                                onkeydown="return event.keyCode !== 69 && event.keyCode !== 189 && event.keyCode !== 190 && event.keyCode !== 188"
+                            >
+                            <div id="error-harga-msg" class="invalid-feedback"></div>
                         </div>
+                        <small class="form-text text-muted">Maksimal Input Rp 1.000.000.000.000</small>
                     </div>
+                    </div>
+
+                    <script>
+                        $(document).ready(function() {
+                            $('#harga').on('input', function() {
+                                var field = $(this);
+                                var rawValue = field.val().replace(/[^0-9]/g, '');
+                                var maxLimit = 1000000000000;
+                                var msgBox = $('#error-harga-msg');
+                                var btnSimpan = $('#btnSimpan');
+
+                                field.val(rawValue);
+
+                                if (rawValue !== '' && parseFloat(rawValue) > maxLimit) {
+
+                                    field.addClass('is-invalid');
+                                    msgBox.html('<strong>Gagal!</strong> Harga tidak boleh melebihi Rp 1 Triliun.');
+                                    btnSimpan.prop('disabled', true);
+                                } else {
+                                    field.removeClass('is-invalid');
+                                    msgBox.html('');
+
+                                    if ($('.is-invalid').length === 0) {
+                                        btnSimpan.prop('disabled', false);
+                                    }
+                                }
+                            });
+                        });
+                    </script>
 
                     <div class="form-group">
                         <label for="stok">Kuantitas (Stok)</label>
-                        <input type="number" class="form-control" id="stok" name="stok" required min="0">
+                        <input type="number"
+                            class="form-control"
+                            id="stok"
+                            name="stok"
+                            required
+                            min="1"
+                            max="1000"
+                            oninput="
+                                this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null;
+
+                                if (this.value > 1000) {
+                                    this.value = this.value.slice(0, -1);
+                                }
+                            "
+                            onkeydown="return event.keyCode !== 69 && event.keyCode !== 189 && event.keyCode !== 190 && event.keyCode !== 188"
+                        >
+
+                        <div id="error-stok-msg" class="invalid-feedback"></div>
+                        <small class="form-text text-muted">Maksimal 1000 item.</small>
                     </div>
+
+                    <script>
+                        $(document).ready(function() {
+                            $('#stok').on('input', function() {
+                                var field = $(this);
+                                var rawValue = field.val().replace(/[^0-9]/g, '');
+                                var maxLimit = 1000000000;
+                                var msgBox = $('#error-stok-msg');
+                                var btnSimpan = $('#btnSimpan');
+
+                                if (field.val() !== rawValue) {
+                                    field.val(rawValue);
+                                }
+
+                                if (rawValue !== '' && parseInt(rawValue) > maxLimit) {
+                                    rawValue = maxLimit.toString();
+                                    field.val(rawValue);
+                                } else if (parseInt(rawValue) < 1) {
+
+                                    field.addClass('is-invalid');
+                                    msgBox.html('<strong>Gagal!</strong> Stok harus lebih dari 0 (Minimal 1).');
+                                    btnSimpan.prop('disabled', true);
+                                } else if (parseInt(rawValue) > maxLimit) {
+
+                                    field.addClass('is-invalid');
+                                    msgBox.html('<strong>Gagal!</strong> Stok tidak boleh melebihi 1 Milyar.');
+                                    btnSimpan.prop('disabled', true);
+                                } else {
+
+                                    field.removeClass('is-invalid');
+                                    msgBox.html('');
+
+                                    if ($('.is-invalid').length === 0) {
+                                        btnSimpan.prop('disabled', false);
+                                    }
+                                }
+                            });
+                        });
+                    </script>
 
                     <div class="form-group">
                         <label>Gambar Produk</label>
