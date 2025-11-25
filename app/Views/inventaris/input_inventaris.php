@@ -159,19 +159,20 @@
 
                         <script>
                             $(document).ready(function() {
-                                // Simpan nama token dan hash awal di variabel
+                                // --- 1. SETUP CSRF TOKEN (Untuk Validasi Kode) ---
                                 var csrfName = '<?= csrf_token() ?>';
                                 var csrfHash = '<?= csrf_hash() ?>';
 
+                                // --- 2. VALIDASI KODE PRODUK (AJAX) ---
                                 $('#kode_produk').on('blur', function() {
                                     var field = $(this);
                                     var kodeInput = field.val();
                                     var msgBox = $('#error-kode-msg');
+                                    var btnSimpan = $('#btnSimpan');
 
-                                    // Reset style dulu
+                                    // Reset style
                                     field.removeClass('is-invalid is-valid');
                                     msgBox.html('');
-                                    $('button[type="submit"]').prop('disabled', false);
 
                                     if (kodeInput === '') return;
 
@@ -181,45 +182,100 @@
                                         dataType: "json",
                                         data: {
                                             kode_produk: kodeInput,
-                                            [csrfName]: csrfHash // Gunakan variabel token dinamis
+                                            [csrfName]: csrfHash
                                         },
                                         success: function(response) {
-                                            // 1. UPDATE TOKEN (PENTING!)
                                             csrfHash = response.token;
                                             $('input[name="' + csrfName + '"]').val(csrfHash);
 
-                                            // 2. PROSES LOGIKA TAMPILAN
                                             if (response.status === 'taken') {
                                                 field.addClass('is-invalid');
                                                 msgBox.html('<strong>Gagal!</strong> Kode sudah digunakan produk lain.');
-                                                $('button[type="submit"]').prop('disabled', true);
+                                                btnSimpan.prop('disabled', true);
                                             } else {
                                                 field.addClass('is-valid');
                                                 msgBox.html('<span class="text-success">Kode tersedia.</span>');
-
-                                                // Cek apakah ada error lain (seperti harga) sebelum enable tombol
-                                                if ($('.is-invalid').length === 0) {
-                                                    $('button[type="submit"]').prop('disabled', false);
-                                                }
+                                                cekSemuaValidasi(); // Cek apakah tombol boleh nyala
                                             }
                                         },
                                         error: function(xhr, ajaxOptions, thrownError) {
                                             console.error("Error:", thrownError);
-                                            alert("Terjadi kesalahan koneksi atau Token Expired. Silakan refresh halaman.");
                                         }
                                     });
                                 });
 
-                                // Hapus error saat user mulai mengetik ulang
+                                // Hapus error kode saat mengetik
                                 $('#kode_produk').on('input', function() {
                                     $(this).removeClass('is-invalid is-valid');
                                     $('#error-kode-msg').html('');
-
-                                    // Cek error lain sebelum enable
-                                    if ($('.is-invalid').length === 0) {
-                                        $('button[type="submit"]').prop('disabled', false);
-                                    }
+                                    cekSemuaValidasi();
                                 });
+
+                                // --- 3. VALIDASI HARGA (Max 1 Triliun - BLOCKING) ---
+                                $('#harga').on('input', function() {
+                                    var field = $(this);
+                                    var rawValue = field.val().replace(/[^0-9]/g, ''); // Hanya angka
+                                    var maxLimit = 1000000000000; // 1 Triliun
+                                    var msgBox = $('#error-harga-msg');
+
+                                    if (field.val() !== rawValue) {
+                                        field.val(rawValue);
+                                    }
+
+                                    if (rawValue !== '' && parseFloat(rawValue) > maxLimit) {
+                                        // MELEBIHI BATAS: Merah & Pesan Error
+                                        field.addClass('is-invalid');
+                                        msgBox.html('<strong>Gagal!</strong> Harga tidak boleh melebihi Rp 1 Triliun.');
+                                    } else {
+                                        // AMAN
+                                        field.removeClass('is-invalid');
+                                        msgBox.html('');
+                                    }
+                                    cekSemuaValidasi(); // Update status tombol simpan
+                                });
+
+                                // --- 4. VALIDASI STOK (Max 1 Milyar - BLOCKING) ---
+                                // INI BAGIAN YANG ANDA MINTA DIPERBAIKI
+                                $('#stok').on('input', function() {
+                                    var field = $(this);
+                                    var rawValue = field.val().replace(/[^0-9]/g, ''); // Hanya angka
+                                    var maxLimit = 1000000000; // 1 Milyar
+                                    var msgBox = $('#error-stok-msg');
+
+                                    // Pastikan input bersih dari simbol
+                                    if (field.val() !== rawValue) {
+                                        field.val(rawValue);
+                                    }
+
+                                    // Logika Validasi
+                                    if (rawValue === '') {
+                                        field.removeClass('is-invalid');
+                                        msgBox.html('');
+                                    } else if (parseInt(rawValue) < 1) {
+                                        // ERROR: Kurang dari 1
+                                        field.addClass('is-invalid');
+                                        msgBox.html('<strong>Gagal!</strong> Stok harus lebih dari 0 (Minimal 1).');
+                                    } else if (parseInt(rawValue) > maxLimit) {
+                                        // ERROR: Lebih dari 1 Milyar -> TAMPILKAN MERAH (BLOCKING)
+                                        field.addClass('is-invalid');
+                                        msgBox.html('<strong>Gagal!</strong> Stok tidak boleh melebihi 1 Milyar.');
+                                    } else {
+                                        // SUKSES: Hapus merah
+                                        field.removeClass('is-invalid');
+                                        msgBox.html('');
+                                    }
+                                    cekSemuaValidasi(); // Update status tombol simpan
+                                });
+
+                                // --- FUNGSI GLOBAL CEK VALIDASI TOMBOL ---
+                                function cekSemuaValidasi() {
+                                    // Tombol aktif HANYA JIKA tidak ada class 'is-invalid' di seluruh form
+                                    if ($('.is-invalid').length === 0) {
+                                        $('#btnSimpan').prop('disabled', false);
+                                    } else {
+                                        $('#btnSimpan').prop('disabled', true);
+                                    }
+                                }
                             });
                         </script>
 
