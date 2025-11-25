@@ -55,6 +55,7 @@ function validateForm() {
 
     if (inputDP.value === '' || isNaN(currentDP) || currentDP < 0) { // <-- LOGIKA BARU
          isValid = false;
+         currentDP = 0;
     }
 
     btnBayar.disabled = !isValid;

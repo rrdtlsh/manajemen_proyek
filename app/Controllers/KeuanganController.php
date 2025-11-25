@@ -86,7 +86,6 @@ class KeuanganController extends BaseController
             'laporan' => $keuanganModel
                 ->whereIn('tipe', ['Pemasukan', 'DP'])
                 ->orderBy('tanggal', 'DESC')
-                ->orderBy('id_keuangan', 'DESC')
                 ->findAll()
         ];
         return view('keuangan/pemasukan', $data);
@@ -100,7 +99,6 @@ class KeuanganController extends BaseController
             'laporan' => $keuanganModel
                 ->where('tipe', 'Pengeluaran')
                 ->orderBy('tanggal', 'DESC')
-                ->orderBy('id_keuangan', 'DESC')
                 ->findAll()
         ];
         return view('keuangan/pengeluaran', $data);
@@ -112,8 +110,7 @@ class KeuanganController extends BaseController
 
         $rows = $keuanganModel
             ->where('pemasukan >', 0)
-            ->orderBy('tanggal', 'DESC')
-            ->orderBy('id_keuangan', 'DESC')
+            ->orderBy('tanggal', 'DESC')   // GANTI DI SINI
             ->findAll();
 
         $data = [
@@ -137,7 +134,6 @@ class KeuanganController extends BaseController
         $rows = $keuanganModel
             ->where('pengeluaran >', 0)
             ->orderBy('tanggal', 'DESC')   // ← PERBAIKAN DI SINI
-            ->orderBy('id_keuangan', 'DESC')
             ->findAll();
 
         $data = [
@@ -157,10 +153,7 @@ class KeuanganController extends BaseController
     public function exportPemasukanExcel()
     {
         $model = new \App\Models\KeuanganModel();
-        $rows = $model->where('pemasukan >', 0)
-        ->orderBy('tanggal', 'DESC')
-        ->orderBy('id_keuangan', 'DESC')
-        ->findAll();
+        $rows = $model->where('pemasukan >', 0)->findAll();
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -201,7 +194,6 @@ class KeuanganController extends BaseController
         $rows = $model
             ->where('tipe', 'Pengeluaran')
             ->orderBy('tanggal', 'DESC')
-            ->orderBy('id_keuangan', 'DESC')
             ->findAll();
 
         // Membuat file Excel
@@ -264,7 +256,7 @@ class KeuanganController extends BaseController
         }
 
         $keuanganBuilder = $keuanganModel->where('tanggal >=', $startDate)->where('tanggal <=', $endDate);
-        $laporan = (clone $keuanganBuilder)->orderBy('tanggal', 'DESC')->findAll();
+        $laporan = (clone $keuanganBuilder)->orderBy('tanggal', 'ASC')->findAll();
 
         $totalPemasukan = (clone $keuanganBuilder)->whereIn('tipe', ['Pemasukan', 'DP'])->selectSum('pemasukan')->first()['pemasukan'] ?? 0;
         $totalPengeluaran = (clone $keuanganBuilder)->where('tipe', 'Pengeluaran')->selectSum('pengeluaran')->first()['pengeluaran'] ?? 0;
