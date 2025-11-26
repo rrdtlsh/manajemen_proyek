@@ -68,17 +68,35 @@ class PenjualanController extends BaseController
         $db = \Config\Database::connect();
 
         $statusBayar = $this->request->getPost('status_bayar');
-        $jumlahDP    = $this->request->getPost('jumlah_dp');
+        $jumlahDP    = $this->request->getPost('jumlah_dp')?: null;
         $cartItems   = $this->request->getPost('cart_items');
         $idPelanggan = $this->request->getPost('id_pelanggan');
         $tanggal     = $this->request->getPost('tanggal');
+        $note        = $this->request->getPost('note'); 
 
         $rules = [
             'tanggal'      => 'required|valid_date',
             'id_pelanggan' => 'required|numeric|greater_than[0]',
             'status_bayar' => 'required|in_list[lunas,belum_lunas]',
             'cart_items'   => 'required|min_length[3]',
+            'note' => [
+                'label'  => 'Catatan',
+                'rules'  => 'permit_empty|regex_match[/^[a-zA-Z0-9 ]+$/]',
+                'errors' => [
+                    'regex_match' => 'Catatan tidak boleh mengandung karakter spesial (simbol).'
+                ]
+            ],
+            'jumlah_dp' => [
+                'label'  => 'Jumlah DP',
+                'rules'  => 'permit_empty|integer|greater_than_equal_to[0]|less_than_equal_to[1000000000]',
+                'errors' => [
+                    'integer'            => 'Jumlah DP harus berupa angka bulat tanpa titik atau koma.',
+                    'less_than_equal_to' => 'Jumlah DP maksimal Rp 1.000.000.000 (1 Miliar).',
+                    'greater_than_equal_to' => 'Jumlah DP tidak boleh negatif.'
+                ]
+            ]
         ];
+
         $messages = [
             'tanggal.required'      => 'Tanggal transaksi wajib diisi.',
             'id_pelanggan.required' => 'Pelanggan wajib dipilih.',
@@ -88,9 +106,12 @@ class PenjualanController extends BaseController
         if (!$this->validate($rules, $messages)) {
             return redirect()->back()->withInput()->with('error', $this->validator->listErrors());
         }
-        if ($statusBayar == 'belum_lunas' && (empty($jumlahDP) || !is_numeric($jumlahDP) || $jumlahDP <= 0)) {
+        $jumlahDP = (float) ($jumlahDP ?? 0);
+
+        if ($statusBayar == 'belum_lunas' && ($jumlahDP <= 0)) {
             return redirect()->back()->withInput()->with('error', 'Jumlah DP wajib diisi dan harus lebih dari 0 jika status Belum Lunas.');
         }
+
         if (empty($cartItems) || $cartItems == '[]') {
             return redirect()->back()->with('error', 'Keranjang belanja tidak boleh kosong.');
         }
@@ -278,11 +299,9 @@ class PenjualanController extends BaseController
 
         $penjualan = $penjualanModel->find($id_penjualan);
         if (!$penjualan) {
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
             return redirect()->to('karyawan/riwayat_penjualan')->with('error', 'Transaksi ini tidak dapat diperbarui.');
         }
 
-        // *** LOGIKA BARU DIMULAI DI SINI ***
 
         // 1. Ambil data dari FORM
         $cart_items_json = $this->request->getPost('cart_items');
@@ -291,13 +310,35 @@ class PenjualanController extends BaseController
         // Ini adalah total belanja BARU (hasil kalkulasi JS jika cart diubah)
         $total_belanja_baru = (float) $this->request->getPost('total'); 
         
-        // Ini adalah pembayaran BARU yg diinput user (misal 500.000)
-        // Kita tetap pakai 'jumlah_dp' sesuai nama field di view
-        $jumlah_pelunasan_baru = (float) ($this->request->getPost('jumlah_dp') ?? 0);
+        $jumlah_pelunasan_baru = ($this->request->getPost('jumlah_dp') ?? 0);
         
         $metode_bayar_form = $this->request->getPost('metode_pembayaran');
         $tanggal_form = $this->request->getPost('tanggal');
         $id_pelanggan_form = $this->request->getPost('id_pelanggan');
+        $catatan = $this->request->getPost('catatan');
+
+        $rulesUpdate = [
+            'jumlah_dp' => [
+                'label'  => 'Jumlah Bayar/Pelunasan',
+                'rules'  => 'permit_empty|integer|less_than_equal_to[1000000000]|greater_than_equal_to[0]',
+                'errors' => [
+                    'integer'            => 'Jumlah bayar harus angka bulat (tanpa titik/koma).',
+                    'less_than_equal_to' => 'Jumlah bayar maksimal 1 Miliar.',
+                ]
+            ],
+            'catatan' => [
+                'label'  => 'Catatan',
+                'rules'  => 'permit_empty|regex_match[/^[a-zA-Z0-9 ]+$/]',
+                'errors' => [
+                    'regex_match' => 'Catatan tidak boleh mengandung karakter spesial.'
+                ]
+            ]
+        ];
+
+        if (!$this->validate($rulesUpdate)) {
+            return redirect()->back()->withInput()->with('error', $this->validator->listErrors());
+        }
+        $jumlah_pelunasan_baru = (float) ($jumlah_pelunasan_baru ?? 0);
 
         // 2. Ambil data LAMA (dari DB)
         $sudah_dibayar_sebelumnya = (float) $penjualan['jumlah_dp'];
@@ -325,6 +366,8 @@ class PenjualanController extends BaseController
         }
 
         // 4. Validasi
+
+
         if ($jumlah_pelunasan_baru < 0) {
             return redirect()->back()->withInput()->with('error', 'Jumlah pelunasan tidak boleh negatif.');
         }
@@ -533,13 +576,12 @@ class PenjualanController extends BaseController
 
     public function addPelanggan()
     {
-        // [PERBAIKAN] Aturan validasi diperketat
         $rules = [
             'nama_pelanggan' => [
                 'label' => 'Nama Pelanggan',
-                'rules' => 'required|min_length[3]|alpha_space', // Hanya huruf dan spasi
+                'rules' => 'required|min_length[3]|max_length[20]|regex_match[/^[a-zA-Z ]+$/]', // Hanya huruf dan spasi
                 'errors' => [
-                    'alpha_space' => 'Nama pelanggan hanya boleh berisi huruf dan spasi.'
+                    'alpha_space' => 'Nama pelanggan hanya boleh berisi huruf dan spasi (tanpa angka/simbol).'
                 ]
             ],
             'no_hp'          => [
@@ -551,9 +593,10 @@ class PenjualanController extends BaseController
             ],
             'alamat'         => [
                 'label' => 'Alamat',
-                'rules' => 'required|min_length[5]', // Dibuat wajib diisi
+                'rules' => 'required|min_length[5]|regex_match[/^[a-zA-Z0-9 ]+$/]', // Dibuat wajib diisi
                 'errors' => [
-                    'required' => 'Alamat wajib diisi.'
+                    'required' => 'Alamat wajib diisi.',
+                    'regex_match' => 'Alamat tidak boleh mengandung tanda baca (titik, koma, garis miring, dll).'
                 ]
             ],
         ];

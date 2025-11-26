@@ -13,6 +13,33 @@ const statusBayar = document.getElementById('status_bayar');
 // [PERBAIKAN] Ambil <input> DP-nya, bukan <div>-nya
 const inputDPDiv = document.getElementById('input-dp'); // Ini div
 const inputDP = document.getElementById('jumlah_dp'); // Ini input number-nya
+inputDP.addEventListener('keydown', function(event) {
+        // Daftar tombol yang dilarang keras
+        const forbiddenKeys = ['-', '+', '.', 'e', 'E', ',', 'ArrowDown']; 
+        
+        // Jika tombol yang ditekan ada di daftar terlarang, batalkan aksi (cegah input)
+        if (forbiddenKeys.includes(event.key)) {
+            event.preventDefault();
+        }
+    });
+
+    // 2. MEMBATASI JUMLAH MAKSIMAL (LOGIKA MENTOK)
+    inputDP.addEventListener('input', function() {
+        const maxLimit = 1000000000; // 1 Miliar
+        
+        // Hapus karakter non-digit jika ada yang lolos (misal dari copy-paste)
+        this.value = this.value.replace(/[^0-9]/g, '');
+
+        // Cek jika kosong biar tidak error saat parsing
+        if (this.value === '') return;
+
+        // Cek batas maksimal
+        if (parseInt(this.value) > maxLimit) {
+            this.value = maxLimit; // Paksa kembali ke 1 Miliar
+        }
+    });
+
+
 
 // Elemen DOM untuk Validasi
 const inputTanggal = document.getElementById('tanggal');

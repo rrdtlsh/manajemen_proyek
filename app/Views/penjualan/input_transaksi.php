@@ -134,9 +134,17 @@
 
                     <div class="form-group" id="input-dp" style="display: none;">
                         <label for="jumlah_dp" class="font-weight-bold text-gray-700">Jumlah DP (Rp)*</label>
-                        <input type="number" class="form-control" id="jumlah_dp" name="jumlah_dp" placeholder="Masukkan jumlah DP">
+                        <input type="number" 
+                            class="form-control" 
+                            id="jumlah_dp" 
+                            name="jumlah_dp" 
+                            placeholder="Masukkan jumlah DP" 
+                            min="0" 
+                            max="1000000000">
+                        <small class="text-muted">Maksimal input: Rp 1.000.000.000</small>
                     </div>
-
+                    
+                    
                     <input type="hidden" name="total_belanja" id="total_belanja_hidden">
                     <input type="hidden" name="cart_items" id="cart_items_hidden">
 
@@ -172,7 +180,7 @@
                     <div id="modal-errors" class="alert alert-danger" style="display: none;"></div>
                     <div class="form-group">
                         <label for="nama_pelanggan">Nama Pelanggan*</label>
-                        <input type="text" class="form-control" id="nama_pelanggan" name="nama_pelanggan" required
+                        <input type="text" class="form-control" id="nama_pelanggan" name="nama_pelanggan"  required maxlength="20"
                             oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '');">
                     </div>
                     <div class="form-group">
