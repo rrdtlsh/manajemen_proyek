@@ -108,9 +108,7 @@ class PenjualanController extends BaseController
         }
         $jumlahDP = (float) ($jumlahDP ?? 0);
 
-        if ($statusBayar == 'belum_lunas' && ($jumlahDP <= 0)) {
-            return redirect()->back()->withInput()->with('error', 'Jumlah DP wajib diisi dan harus lebih dari 0 jika status Belum Lunas.');
-        }
+    
 
         if (empty($cartItems) || $cartItems == '[]') {
             return redirect()->back()->with('error', 'Keranjang belanja tidak boleh kosong.');
@@ -593,9 +591,10 @@ class PenjualanController extends BaseController
             ],
             'alamat'         => [
                 'label' => 'Alamat',
-                'rules' => 'required|min_length[5]|regex_match[/^[a-zA-Z0-9 ]+$/]', // Dibuat wajib diisi
+                'rules' => 'required|min_length[5]|max_length[50]|regex_match[/^[a-zA-Z0-9 ]+$/]', // Dibuat wajib diisi
                 'errors' => [
                     'required' => 'Alamat wajib diisi.',
+                    'max_length' => 'Alamat maksimal 50 karakter.',
                     'regex_match' => 'Alamat tidak boleh mengandung tanda baca (titik, koma, garis miring, dll).'
                 ]
             ],
