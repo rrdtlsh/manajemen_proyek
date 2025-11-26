@@ -2,6 +2,7 @@
 
 <?= $this->section('head'); ?>
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<link rel="stylesheet" href="<?= base_url('css/pengeluaran.css'); ?>">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.20/dist/sweetalert2.min.css">
 <?= $this->endSection(); ?>
 
@@ -86,6 +87,7 @@
                         <label>Tanggal</label>
                         <input type="date" class="form-control" name="tanggal" value="<?= date('Y-m-d'); ?>" required>
                     </div>
+
                 <div class="form-group">
                     <label>Jumlah Pengeluaran (Rp)</label>
                     <div class="input-group">
@@ -114,30 +116,93 @@
                     </div>
                     <small class="text-muted">Maksimal Input Rp 1.000.000.000.000.</small>
                 </div>
-                <div class="form-group">
-                    <label>Keterangan Penggunaan</label>
-                    <textarea 
-                        class="form-control" 
-                        name="keterangan" 
-                        required 
-                        placeholder="Contoh: Pembelian Alat Tulis"
-                        rows="3"
-                        oninput="
-                            let teks = this.value.trim();
-                            let jumlahKata = teks.length === 0 ? 0 : teks.split(/\s+/).length;
-                            document.getElementById('wordInfo').innerText = jumlahKata + '/20 Kata';
-                            if(jumlahKata < 2) {
-                                this.setCustomValidity('Terlalu singkat, Minimal 2 kata.');
-                            } else if(jumlahKata > 20) {
-                                this.setCustomValidity('Terlalu panjang! Maksimal 20 kata.');
-                            } else {
-                                this.setCustomValidity('');
-                            }
-                        "
-                    ></textarea>
-                    <small id="wordInfo" class="text-muted">0/20 Kata</small>
-                </div>
-                </div>
+                
+<div class="form-group">
+    <label>Keterangan Pengeluaran</label>
+    <textarea 
+        class="form-control" 
+        name="keterangan" 
+        required 
+        placeholder="Contoh: Pembelian Alat Tulis"
+        rows="3"
+        maxlength="100"
+        oninput="validasiKeterangan(this)"
+    ></textarea>
+    <small id="wordInfo" class="text-muted">0/100 Karakter</small>
+    <small id="errorMsg" class="text-danger d-block mt-1" style="font-size: 85%;"></small>
+</div>
+
+<script>
+    function validasiKeterangan(input) {
+        let teks = input.value;
+        let errorMsg = document.getElementById('errorMsg');
+        let wordInfo = document.getElementById('wordInfo');
+        
+        // --- VALIDASI 1: Hapus Simbol (Hanya Huruf, Angka & Spasi) ---
+        if (/[^a-zA-Z0-9\s]/.test(teks)) {
+            // Hapus karakter terlarang
+            teks = teks.replace(/[^a-zA-Z0-9\s]/g, '');
+            input.value = teks; 
+            errorMsg.innerText = "Simbol tidak diperbolehkan (Hanya Huruf & Angka).";
+        } else {
+            // Hapus pesan error simbol jika sudah bersih
+            if (errorMsg.innerText.includes("Simbol")) {
+                errorMsg.innerText = "";
+            }
+        }
+
+// --- VALIDASI 2: Auto-Correct Huruf Berulang (Maksimal 2 huruf sama) ---
+        // Regex: /(.)\1{2,}/g artinya mencari huruf yg diulang 3 kali atau lebih
+        if (/(.)\1{2,}/.test(teks)) {
+            // Lakukan penggantian otomatis
+            // '$1$1' artinya: Ambil huruf tersebut ($1), dan tulis ulang cukup 2 kali saja
+            teks = teks.replace(/(.)\1{2,}/g, '$1$1');
+            
+            // Update tampilan input seketika
+            input.value = teks;
+            
+            errorMsg.innerText = "Huruf berulang tidak valid.";
+        } else {
+            // Hapus pesan error jika tidak ada spam, TAPI jangan hapus error simbol/limit
+            if (errorMsg.innerText.includes("Huruf berulang")) {
+                errorMsg.innerText = "";
+            }
+        }
+
+        // --- VALIDASI 3: Update Counter & Cek Limit ---
+        // Hitung jumlah karakter langsung
+        let jumlahKarakter = teks.length;
+        
+        // Update teks counter
+        if(wordInfo) {
+            wordInfo.innerText = jumlahKarakter + '/100 Karakter';
+        }
+
+        // Cek Maksimal (Backup Logic jika maxlength ditembus via paste)
+        if (jumlahKarakter >= 100) {
+             errorMsg.innerText = "Maksimal 100 karakter";
+             // Jika paste teks panjang, potong paksa ke 100
+             if(jumlahKarakter > 100) {
+                input.value = teks.substring(0, 100);
+                wordInfo.innerText = '100/100 Karakter';
+             }
+        } 
+        // Cek Minimal (Misal minimal 10 karakter agar valid)
+        else if (jumlahKarakter < 10 && jumlahKarakter > 0) {
+            input.setCustomValidity('Terlalu singkat, Minimal 10 karakter.');
+             // Hapus pesan error max jika ada
+             if (errorMsg.innerText.includes("Maksimal")) errorMsg.innerText = "";
+        } 
+        else {
+            // Jika aman (antara 10 - 99 karakter)
+            input.setCustomValidity(''); 
+            if (errorMsg.innerText.includes("Maksimal") || errorMsg.innerText.includes("Terdeteksi")) {
+                errorMsg.innerText = "";
+            }
+        }
+    }
+</script>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-danger">Simpan</button>
