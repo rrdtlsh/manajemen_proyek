@@ -4,6 +4,18 @@
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 <link href="<?= base_url('css/input_inventaris.css') ?>" rel="stylesheet">
 <?= $this->endSection(); ?>
+<?php
+function formatKode($kode) {
+    // Ambil huruf depan, misalnya "KP"
+    $prefix = substr($kode, 0, 2);
+
+    // Ambil angka belakang
+    $angka = substr($kode, 2);
+
+    // Gabungkan dengan tanda minus
+    return $prefix . '-' . $angka;
+}
+?>
 
 <?= $this->section('content'); ?>
 
@@ -248,7 +260,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">Rp</span>
                             </div>
-                            <input type="number"
+                            <input type="text"
                                 class="form-control"
                                 id="harga"
                                 name="harga"
@@ -453,46 +465,53 @@
         });
 
         // 3. AJAX Cek Kode Produk
-        var csrfName = '<?= csrf_token() ?>';
-        var csrfHash = '<?= csrf_hash() ?>';
+        // 3. AJAX Cek Kode Produk
+var csrfName = '<?= csrf_token() ?>';
+var csrfHash = '<?= csrf_hash() ?>';
 
-        $('#kode_produk').on('blur', function() {
-            var field = $(this);
-            var kodeInput = field.val();
-            var msgBox = $('#error-kode-msg');
+$('#kode_produk').on('blur', function() {
+    var field = $(this);
+    var kodeInput = field.val();
+    var msgBox = $('#error-kode-msg');
 
-            field.removeClass('is-invalid is-valid');
-            msgBox.html('');
-            $('button[type="submit"]').prop('disabled', false);
+    // Reset tampilan awal
+    field.removeClass('is-invalid is-valid');
+    msgBox.html('');
+    $('button[type="submit"]').prop('disabled', false);
 
-            if (kodeInput === '') return;
+    if (kodeInput === '') return;
 
-            $.ajax({
-                url: "<?= base_url('owner/manajemen_produk/cek-kode') ?>", // Pastikan route owner
-                type: "POST",
-                dataType: "json",
-                data: {
-                    kode_produk: kodeInput,
-                    [csrfName]: csrfHash
-                },
-                success: function(response) {
-                    csrfHash = response.token;
-                    $('input[name="' + csrfName + '"]').val(csrfHash);
+    $.ajax({
+        url: "<?= base_url('owner/manajemen_produk/cek-kode') ?>",
+        type: "POST",
+        dataType: "json",
+        data: {
+            kode_produk: kodeInput,
+            [csrfName]: csrfHash
+        },
+        success: function(response) {
+            csrfHash = response.token;
+            $('input[name="' + csrfName + '"]').val(csrfHash);
 
-                    if (response.status === 'taken') {
-                        field.addClass('is-invalid');
-                        msgBox.html('<strong>Gagal!</strong> Kode sudah digunakan.');
-                        $('button[type="submit"]').prop('disabled', true);
-                    } else {
-                        field.addClass('is-valid');
-                        msgBox.html('<span class="text-success">Kode tersedia.</span>');
-                    }
-                },
-                error: function() {
-                    console.log("Error AJAX Cek Kode");
-                }
-            });
-        });
+            if (response.status === 'taken') {
+                // Kode terpakai → merah
+                field.removeClass('is-valid').addClass('is-invalid');
+                msgBox.html('<strong class="text-danger">Kode sudah digunakan.</strong>');
+                $('button[type="submit"]').prop('disabled', true);
+
+            } else {
+                // Kode tersedia → hijau + centang
+                field.removeClass('is-invalid').addClass('is-valid');
+                msgBox.html('<span class="text-success">Kode tersedia.</span>');
+                $('button[type="submit"]').prop('disabled', false);
+            }
+        },
+        error: function() {
+            console.log("Error AJAX Cek Kode");
+        }
+    });
+});
+
 
         // Reset error saat ngetik ulang
         $('#kode_produk').on('input', function() {
