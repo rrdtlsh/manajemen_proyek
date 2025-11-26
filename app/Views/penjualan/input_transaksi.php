@@ -190,7 +190,7 @@
                     </div>
                     <div class="form-group">
                         <label for="alamat">Alamat</label>
-                        <textarea class="form-control" id="alamat" name="alamat" rows="3"></textarea>
+                        <textarea class="form-control" id="alamat" name="alamat" rows="3" maxlength="50" placeholder="Max. 50 huruf"></textarea>
                     </div>
                 </form>
             </div>
