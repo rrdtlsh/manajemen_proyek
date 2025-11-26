@@ -334,7 +334,8 @@ class InventarisController extends BaseController
                     'less_than_equal_to' => 'Maksimal jumlah barang adalah 9.999 per transaksi.'
                 ]
             ],
-            'harga_satuan'  => 'required|integer|greater_than_equal_to[0]|less_than_equal_to[1000000000000]'        ];
+            'harga_satuan'  => 'required|integer|greater_than_equal_to[0]|less_than_equal_to[1000000000000]'
+        ];
 
         if (!$this->validate($rules)) {
             // Jika validasi gagal, kembalikan error ke modal
@@ -350,7 +351,7 @@ class InventarisController extends BaseController
             'nama_barang'   => $this->request->getPost('nama_barang'),
             'qty'           => $qty,
             'harga_satuan'  => $harga,
-            'total_harga'   => $total_fix, 
+            'total_harga'   => $total_fix,
             // status inventaris ke owner
             'status'        => 'Menunggu',
             'status_owner'  => 'Menunggu',
@@ -425,28 +426,38 @@ class InventarisController extends BaseController
     public function store_supplier()
     {
         $supplierModel = new \App\Models\SupplierModel();
-        // $validation = \Config\Services::validation(); // Baris ini sebenarnya tidak wajib jika menggunakan $this->validate
 
         // 1. Definisi Rules
         $rules = [
-            'nama_supplier' => 'required|is_unique[supplier.nama_supplier]',
-            'alamat'        => 'required',
-            'no_telp'       => 'required|is_natural|exact_length[12]'
+            // Batasi nama max 20 karakter
+            'nama_supplier' => 'required|max_length[20]|is_unique[supplier.nama_supplier]',
+
+            // Batasi alamat max 50 karakter & Regex melarang @ # $ !
+            // ^[^@#$!]+$  => Artinya: Dari awal sampai akhir string TIDAK BOLEH ada karakter @, #, $, !
+            'alamat'        => 'required|max_length[50]|regex_match[/^[^@#$!]+$/]',
+
+            'no_telp'       => 'required|is_natural|max_length[12]'
         ];
 
-        // 2. Definisi Pesan Error Custom (Bahasa Indonesia)
+        // 2. Definisi Pesan Error Custom
         $errors = [
             'nama_supplier' => [
-                'required'  => 'Nama Supplier wajib diisi.',
-                'is_unique' => 'Nama Supplier ini sudah terdaftar.'
+                'required'   => 'Nama Supplier wajib diisi.',
+                'is_unique'  => 'Nama Supplier ini sudah terdaftar.',
+                'max_length' => 'Nama Supplier maksimal 20 karakter.'
+            ],
+            'alamat' => [
+                'required'    => 'Alamat wajib diisi.',
+                'max_length'  => 'Alamat maksimal 50 karakter.',
+                'regex_match' => 'Alamat tidak boleh mengandung simbol @ # $ !' // Pesan error spesifik
+            ],
+            'no_telp' => [
+                'max_length' => 'No Telp maksimal 12 angka.'
             ]
         ];
 
-        // 3. Masukkan $errors sebagai parameter kedua di fungsi validate()
         if (!$this->validate($rules, $errors)) {
             $validation = \Config\Services::validation();
-
-            // Mengambil error dan menjadikannya flashdata
             session()->setFlashdata('error', implode('<br>', $validation->getErrors()));
             return redirect()->back()->withInput();
         }
@@ -464,6 +475,36 @@ class InventarisController extends BaseController
     public function update_supplier($id_supplier)
     {
         $supplierModel = new \App\Models\SupplierModel();
+
+        // Validasi Update (sama ketatnya)
+        $rules = [
+            'nama_supplier' => "required|max_length[20]|is_unique[supplier.nama_supplier,id_supplier,{$id_supplier}]",
+            'alamat'        => 'required|max_length[50]|regex_match[/^[^@#$!]+$/]',
+            'no_telp'       => 'required|is_natural|max_length[12]'
+        ];
+
+        $errors = [
+            'nama_supplier' => [
+                'required'   => 'Nama Supplier wajib diisi.',
+                'is_unique'  => 'Nama Supplier ini sudah terdaftar.',
+                'max_length' => 'Nama Supplier maksimal 20 karakter.'
+            ],
+            'alamat' => [
+                'required'    => 'Alamat wajib diisi.',
+                'max_length'  => 'Alamat maksimal 50 karakter.',
+                'regex_match' => 'Alamat tidak boleh mengandung simbol @ # $ !'
+            ],
+            'no_telp' => [
+                'max_length' => 'No Telp maksimal 12 angka.'
+            ]
+        ];
+
+        if (!$this->validate($rules, $errors)) {
+            $validation = \Config\Services::validation();
+            session()->setFlashdata('error', implode('<br>', $validation->getErrors()));
+            return redirect()->back()->withInput();
+        }
+
         $supplierModel->update($id_supplier, [
             'nama_supplier' => $this->request->getPost('nama_supplier'),
             'alamat'        => $this->request->getPost('alamat'),
@@ -473,6 +514,7 @@ class InventarisController extends BaseController
         session()->setFlashdata('success', 'Data supplier berhasil diperbarui.');
         return redirect()->to('karyawan/inventaris/supplier');
     }
+
 
     public function delete_supplier($id_supplier)
     {
@@ -510,13 +552,21 @@ class InventarisController extends BaseController
     {
         if ($this->request->isAJAX()) {
             $kode = $this->request->getVar('kode_produk');
+            $id_produk = $this->request->getVar('id_produk'); // Tambahan: Tangkap ID
+
             $produkModel = new \App\Models\ProdukModel();
 
-            $data = $produkModel->where('kode_produk', $kode)->first();
+            // Logika: Cek kode, TAPI kecualikan produk yang sedang diedit (jika ada ID)
+            if ($id_produk) {
+                $data = $produkModel->where('kode_produk', $kode)
+                    ->where('id_produk !=', $id_produk)
+                    ->first();
+            } else {
+                $data = $produkModel->where('kode_produk', $kode)->first();
+            }
 
             $response = [
                 'status' => ($data) ? 'taken' : 'available',
-                // Kirim token CSRF baru agar request berikutnya tidak Error 403
                 'token' => csrf_hash()
             ];
 

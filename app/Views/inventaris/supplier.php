@@ -19,9 +19,28 @@
     </button>
 </div>
 
-<!-- Flashdata SweetAlert otomatis dari template.php -->
+<?php if (session()->getFlashdata('success')) : ?>
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: "<?= session()->getFlashdata('success'); ?>",
+            timer: 2500,
+            showConfirmButton: false
+        });
+    </script>
+<?php endif; ?>
 
-<!-- CARD -->
+<?php if (session()->getFlashdata('error')) : ?>
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            html: "<?= session()->getFlashdata('error'); ?>",
+        });
+    </script>
+<?php endif; ?>
+
 <div class="card shadow mb-4">
     <div class="card-header py-3" style="background-color:#2d8659; color:white;">
         <h6 class="m-0 font-weight-bold">Daftar Supplier</h6>
@@ -40,8 +59,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $i = 1; ?> <!-- nomor urut -->
-                    <?php foreach ($suppliers as $s): ?>
+                    <?php $i = 1; ?> <?php foreach ($suppliers as $s): ?>
                         <tr>
                             <td><?= $i++; ?></td>
                             <td><?= esc($s['nama_supplier']); ?></td>
@@ -51,13 +69,11 @@
                             <td>
                                 <div class="btn-aksi-group">
 
-                                    <!-- DETAIL -->
                                     <a href="<?= base_url('karyawan/inventaris/detail_supplier/' . $s['id_supplier']); ?>"
                                         class="btn btn-info btn-sm">
                                         <i class="fas fa-info-circle"></i> Detail
                                     </a>
 
-                                    <!-- EDIT -->
                                     <button class="btn btn-warning btn-sm btn-edit-supplier"
                                         data-toggle="modal"
                                         data-target="#modalSupplier"
@@ -68,7 +84,6 @@
                                         <i class="fas fa-edit"></i> Edit
                                     </button>
 
-                                    <!-- HAPUS -->
                                     <button class="btn btn-danger btn-sm"
                                         onclick="confirmDeleteSupplier(<?= $s['id_supplier']; ?>)">
                                         <i class="fas fa-trash"></i> Hapus
@@ -85,7 +100,6 @@
     </div>
 </div>
 
-<!-- MODAL ADD / EDIT SUPPLIER -->
 <div class="modal fade" id="modalSupplier" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -105,31 +119,44 @@
 
                     <div class="form-group">
                         <label for="nama_supplier">Nama Supplier</label>
-                        <input type="text" 
-                            class="form-control" 
-                            id="nama_supplier" 
+                        <input type="text"
+                            class="form-control"
+                            id="nama_supplier"
                             name="nama_supplier"
-                            placeholder="Contoh: PT. Sumber Jaya Abadi" 
-                            oninput="this.value = this.value.replace(/[^a-zA-Z\s.]/g, '')"
-                            required>
+                            placeholder="Contoh: PT. Sumber Jaya"
+                            required
+                            maxlength="20">
+                        <small class="form-text text-muted">Maksimal 20 karakter.</small>
                     </div>
 
                     <div class="form-group">
                         <label for="alamat">Alamat Supplier</label>
-                        <textarea class="form-control" id="alamat" name="alamat" required></textarea>
+                        <textarea class="form-control"
+                            id="alamat"
+                            name="alamat"
+                            required
+                            rows="3"
+                            maxlength="50"
+                            placeholder="Contoh: Jl. Merdeka No. 1, Jakarta"
+                            oninput="this.value = this.value.replace(/[@#$!]/g, '')"></textarea>
+
+                        <small class="form-text text-muted">
+                            Maksimal 50 karakter.
+                        </small>
                     </div>
 
                     <div class="form-group">
                         <label for="no_telp">No Telepon</label>
                         <input type="text"
-                                class="form-control"
-                                id="no_telp"
-                                name="no_telp"
-                                required
-                                maxlength="12"
-                                minlength="12"
-                                pattern="[0-9]{12}"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                            class="form-control"
+                            id="no_telp"
+                            name="no_telp"
+                            required
+                            maxlength="12"
+                            minlength="11"
+                            pattern="[0-9]+"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                        <small class="form-text text-muted">Hanya angka, maksimal 12 digit.</small>
                     </div>
 
                 </div>

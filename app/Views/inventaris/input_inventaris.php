@@ -3,6 +3,11 @@
 <?= $this->section('head'); ?>
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 <link href="<?= base_url('css/input_inventaris.css') ?>" rel="stylesheet">
+<style>
+    .form-control.is-invalid~.invalid-feedback {
+        display: block;
+    }
+</style>
 <?= $this->endSection(); ?>
 
 <?= $this->section('content'); ?>
@@ -128,6 +133,7 @@
             <form id="formProduk" action="" method="POST" enctype="multipart/form-data">
                 <?= csrf_field(); ?>
                 <input type="hidden" name="_method" id="formMethod" value="POST">
+                <input type="hidden" name="id_produk_edit" id="id_produk_edit" value="">
 
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalProdukLabel">Tambah Produk Baru</h5>
@@ -264,19 +270,19 @@
                             </select>
                         </div>
 
-                    <div class="form-group col-md-6">
-                        <label for="harga">Harga</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Rp</span>
-                            </div>
-                            <input type="number"
-                                class="form-control"
-                                id="harga"
-                                name="harga"
-                                required
-                                placeholder="0"
-                                oninput="
+                        <div class="form-group col-md-6">
+                            <label for="harga">Harga</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Rp</span>
+                                </div>
+                                <input type="number"
+                                    class="form-control"
+                                    id="harga"
+                                    name="harga"
+                                    required
+                                    placeholder="0"
+                                    oninput="
 
                                     this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null;
 
@@ -290,12 +296,11 @@
                                         this.setCustomValidity('');
                                     }
                                 "
-                                onkeydown="return event.keyCode !== 69 && event.keyCode !== 189 && event.keyCode !== 190 && event.keyCode !== 188"
-                            >
-                            <div id="error-harga-msg" class="invalid-feedback"></div>
+                                    onkeydown="return event.keyCode !== 69 && event.keyCode !== 189 && event.keyCode !== 190 && event.keyCode !== 188">
+                                <div id="error-harga-msg" class="invalid-feedback"></div>
+                            </div>
+                            <small class="form-text text-muted">Maksimal Input Rp 1.000.000.000.000</small>
                         </div>
-                        <small class="form-text text-muted">Maksimal Input Rp 1.000.000.000.000</small>
-                    </div>
                     </div>
 
                     <script>
@@ -342,8 +347,7 @@
                                     this.value = this.value.slice(0, -1);
                                 }
                             "
-                            onkeydown="return event.keyCode !== 69 && event.keyCode !== 189 && event.keyCode !== 190 && event.keyCode !== 188"
-                        >
+                            onkeydown="return event.keyCode !== 69 && event.keyCode !== 189 && event.keyCode !== 190 && event.keyCode !== 188">
 
                         <div id="error-stok-msg" class="invalid-feedback"></div>
                         <small class="form-text text-muted">Maksimal 1000 item.</small>

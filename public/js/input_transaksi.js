@@ -60,7 +60,7 @@ function validateForm() {
 // =======================================================
 // Inisialisasi Select2
 // =======================================================
-$(document).ready(function() {
+$(document).ready(function () {
 
     // [PERBAIKAN] Ambil URL dinamis dari atribut data- di form
     const formTransaksi = $('#form-transaksi');
@@ -76,7 +76,7 @@ $(document).ready(function() {
             url: searchPelangganUrl, // [PERBAIKAN] Menggunakan URL dinamis
             dataType: 'json',
             delay: 250,
-            processResults: function(data) {
+            processResults: function (data) {
                 return {
                     results: data.results
                 };
@@ -93,7 +93,7 @@ $(document).ready(function() {
             url: searchProdukUrl, // [PERBAIKAN] Menggunakan URL dinamis
             dataType: 'json',
             delay: 250,
-            processResults: function(data) {
+            processResults: function (data) {
                 return {
                     results: data.results
                 };
@@ -103,7 +103,7 @@ $(document).ready(function() {
     });
 
     // Event handler ketika produk dipilih dari PENCARIAN
-    selectBarang.on('select2:select', function(e) {
+    selectBarang.on('select2:select', function (e) {
         var data = e.params.data.data;
         const product = {
             id: data.id_produk,
@@ -117,13 +117,13 @@ $(document).ready(function() {
     });
 
     // Event handler untuk tombol Simpan Pelanggan Baru
-    btnSimpanPelanggan.on('click', function() {
+    btnSimpanPelanggan.on('click', function () {
         $.ajax({
             url: addPelangganUrl, // [PERBAIKAN] Menggunakan URL dinamis
             method: "POST",
             data: formAddPelanggan.serialize(),
             dataType: "json",
-            success: function(response) {
+            success: function (response) {
                 if (response.status === 'success') {
                     modalPelanggan.modal('hide');
                     Swal.fire({
@@ -140,11 +140,11 @@ $(document).ready(function() {
                     validateForm(); // [VALIDASI] Cek form lagi
                 }
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 if (xhr.status === 400) {
                     var errors = xhr.responseJSON.errors;
                     var errorHtml = '<ul>';
-                    $.each(errors, function(key, value) {
+                    $.each(errors, function (key, value) {
                         errorHtml += '<li>' + value + '</li>';
                     });
                     errorHtml += '</ul>';
@@ -156,7 +156,7 @@ $(document).ready(function() {
         });
     });
 
-    modalPelanggan.on('hidden.bs.modal', function() {
+    modalPelanggan.on('hidden.bs.modal', function () {
         modalErrors.hide().html('');
         formAddPelanggan[0].reset();
     });
@@ -178,7 +178,7 @@ $(document).ready(function() {
 
 // Klik produk di GRID KIRI
 if (daftarProduk) {
-    daftarProduk.addEventListener('click', function(e) {
+    daftarProduk.addEventListener('click', function (e) {
         let item = e.target.closest('.produk-item');
         if (item) {
             const product = {
@@ -195,7 +195,7 @@ if (daftarProduk) {
 
 
 // Tombol Reset
-btnReset.addEventListener('click', function() {
+btnReset.addEventListener('click', function () {
     // [PERBAIKAN] Tambahkan pemeriksaan konfirmasi sebelum mereset SEMUA
     Swal.fire({
         title: 'Reset Transaksi?',
@@ -208,7 +208,7 @@ btnReset.addEventListener('click', function() {
         cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
-            
+
             // 1. Reset Keranjang Belanja
             cart = [];
             updateKeranjang();
@@ -217,39 +217,39 @@ btnReset.addEventListener('click', function() {
             // Asumsi: Anda mungkin ingin input tanggal kosong atau kembali ke default.
             // Jika ingin kembali ke default hari ini, Anda perlu implementasi yang berbeda
             // Untuk mereset:
-            inputTanggal.value = ''; 
+            inputTanggal.value = '';
 
             // 3. Reset Select Pelanggan (Select2)
             // selectPelanggan.val(null).trigger('change');
             // Jika Anda ingin elemen select tereset:
-            selectPelanggan.val(null).trigger('change'); 
-            
+            selectPelanggan.val(null).trigger('change');
+
             // 4. Reset Select Barang (opsional, karena hanya pencarian)
-            selectBarang.val(null).trigger('change'); 
-            
+            selectBarang.val(null).trigger('change');
+
             // 5. Reset Status & Metode Pembayaran (kembali ke opsi pertama/default)
             // Asumsi: ID elemen-elemen ini adalah 'status_bayar' dan 'metode_bayar'
             const selectMetodeBayar = document.getElementById('metode_bayar'); // Asumsi ada elemen ini
-            if(selectMetodeBayar) {
+            if (selectMetodeBayar) {
                 selectMetodeBayar.value = selectMetodeBayar.options[0].value;
             }
-            
+
             // Reset Status Pembayaran (ini akan memicu event change untuk DP)
             statusBayar.value = statusBayar.options[0].value; // Kembali ke opsi pertama (misalnya 'Lunas')
-            
+
             // Panggil event change secara manual untuk menyembunyikan DP jika kembali ke 'Lunas'
-            statusBayar.dispatchEvent(new Event('change')); 
-            
+            statusBayar.dispatchEvent(new Event('change'));
+
             // 6. Reset Form Validasi
-            validateForm(); 
-            
+            validateForm();
+
             Swal.fire('Direset!', 'Semua inputan transaksi telah dikosongkan.', 'success');
         }
     });
 });
 
 // Status Bayar
-statusBayar.addEventListener('change', function() {
+statusBayar.addEventListener('change', function () {
     // [PERBAIKAN] Targetkan div-nya untuk display
     if (this.value === 'belum_lunas') {
         inputDPDiv.style.display = 'block';

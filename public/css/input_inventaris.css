@@ -38,3 +38,10 @@
 .btn-aksi-group .btn {
     font-size: 0.8rem;
 }
+
+/* Hilangkan spinner/scroll angka di input type number */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
