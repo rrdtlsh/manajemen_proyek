@@ -147,11 +147,15 @@
 
                     <div class="form-group" id="input-dp">
                         <label for="jumlah_dp" class="font-weight-bold text-gray-700">Jumlah Pelunasan/DP Baru (Rp)*</label>
+                        
                         <input type="number" class="form-control" id="jumlah_dp" name="jumlah_dp" 
-                                placeholder="Masukkan jumlah pembayaran baru (0 jika tidak ada)" value="0" required>
+                                placeholder="Masukkan jumlah pembayaran baru (0 jika tidak ada)" value="0" min="0" required>
+                        
+                        <small id="limit-feedback" class="font-weight-bold mt-1 d-block" style="color: #e74a3b;"></small> 
+                        
                         <small class="form-text text-muted">
                             Masukkan '0' jika hanya mengubah keranjang tanpa melakukan pembayaran tambahan.
-                       </small>
+                        </small>
                     </div>
 
                     <input type="hidden" name="total" id="total_belanja_hidden">
@@ -218,4 +222,68 @@
 <?= $this->section('script'); ?>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="<?= base_url('js/edit_transaksi.js') ?>"></script>
+<script>
+$(document).ready(function() {
+    // Fungsi untuk memformat angka ke Rupiah
+    function formatRupiah(angka) {
+        return new Intl.NumberFormat('id-ID').format(angka);
+    }
+
+    // Fungsi Utama Validasi Cap/Mentok
+    function validateMaxInput() {
+        // 1. Ambil nilai Total Belanja Baru (dari hidden input yang diupdate cart JS)
+        // Pastikan default 0 jika NaN/Kosong
+        let totalBelanjaBaru = parseFloat($('#total_belanja_hidden').val()) || 0;
+        
+        // 2. Ambil nilai yang Sudah Dibayar Sebelumnya (dari database)
+        let sudahDibayar = parseFloat($('#sudah_dibayar_sebelumnya').val()) || 0;
+
+        // 3. Hitung Sisa Tagihan Real-time
+        let maxBayar = totalBelanjaBaru - sudahDibayar;
+
+        // Jika total belanja turun dibawah yang sudah dibayar, max bayar jadi 0
+        if (maxBayar < 0) maxBayar = 0;
+
+        // 4. Ambil nilai input user saat ini
+        let inputField = $('#jumlah_dp');
+        let currentInput = parseFloat(inputField.val()) || 0;
+
+        // 5. LOGIKA CAP: Jika input melebihi sisa tagihan
+        if (currentInput > maxBayar) {
+            // Paksa nilai input turun ke maxBayar
+            inputField.val(maxBayar);
+            
+            // Beri pesan feedback visual
+            $('#limit-feedback').text('Maksimal input pelunasan: Rp ' + formatRupiah(maxBayar));
+            
+            // Opsional: Efek visual (shake/border merah)
+            inputField.addClass('is-invalid');
+        } else {
+            // Jika aman
+            $('#limit-feedback').text('');
+            inputField.removeClass('is-invalid');
+        }
+    }
+
+    // Event Listener 1: Saat user mengetik di kolom jumlah_dp
+    $('#jumlah_dp').on('input keyup change', function() {
+        validateMaxInput();
+    });
+
+    // Event Listener 2: Memantau perubahan Total Belanja (Karena user mungkin hapus/tambah barang)
+    // Kita gunakan MutationObserver karena #total_belanja_hidden diubah oleh script lain (edit_transaksi.js)
+    const targetNode = document.getElementById('total_belanja_hidden');
+    if (targetNode) {
+        const observer = new MutationObserver(function(mutationsList) {
+            // Setiap kali total belanja berubah, cek lagi limitnya
+            validateMaxInput();
+        });
+        observer.observe(targetNode, { attributes: true, attributeFilter: ['value'] });
+    }
+    
+    // Validasi awal saat halaman dimuat
+    /* Opsional: set delay sedikit agar JS cart selesai hitung dulu */
+    setTimeout(validateMaxInput, 500);
+});
+</script>
 <?= $this->endSection(); ?>
