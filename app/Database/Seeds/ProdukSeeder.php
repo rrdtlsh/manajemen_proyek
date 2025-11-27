@@ -10,7 +10,7 @@ class ProdukSeeder extends Seeder
     {
         $data = [ 
             [
-                'kode_produk'   => 'KP-001',
+                'kode_produk'   => 'KP001',
                 'nama_produk'   => 'Karpet selimut',
                 'id_kategori'   => 1, // Merujuk ke 'Karpet'
                 'id_supplier'   => 1, // Merujuk ke 'PT. Jaya Abadi'
@@ -20,7 +20,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'KP-002',
+                'kode_produk'   => 'KP002',
                 'nama_produk'   => 'Karpet Motif Bunga',
                 'id_kategori'   => 1, // Merujuk ke 'Karpet'
                 'id_supplier'   => 2, // Merujuk ke 'CV. Berkah Mandiri'
@@ -30,7 +30,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'SP-001',
+                'kode_produk'   => 'SP001',
                 'nama_produk'   => 'Sprei Katun Jepang',
                 'id_kategori'   => 2, // Merujuk ke 'Sprei'
                 'id_supplier'   => 3, // Merujuk ke 'UD. Sinar Terang'
@@ -40,7 +40,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'GD-001',
+                'kode_produk'   => 'GD001',
                 'nama_produk'   => 'Gorden Blackout',
                 'id_kategori'   => 3, // Merujuk ke 'Gorden'
                 'id_supplier'   => 1, // Merujuk ke 'PT. Jaya Abadi'
@@ -50,7 +50,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'KP-003',
+                'kode_produk'   => 'KP003',
                 'nama_produk'   => 'Karpet Premium Turki',
                 'id_kategori'   => 1,
                 'id_supplier'   => 2,
@@ -60,7 +60,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'KP-004',
+                'kode_produk'   => 'KP004',
                 'nama_produk'   => 'Karpet Bulu Rasfur',
                 'id_kategori'   => 1,
                 'id_supplier'   => 3,
@@ -70,7 +70,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'KP-005',
+                'kode_produk'   => 'KP005',
                 'nama_produk'   => 'Karpet Shaggy Tebal',
                 'id_kategori'   => 1,
                 'id_supplier'   => 1,
@@ -80,7 +80,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'SP-002',
+                'kode_produk'   => 'SP002',
                 'nama_produk'   => 'Sprei King Size Premium',
                 'id_kategori'   => 2,
                 'id_supplier'   => 1,
@@ -90,7 +90,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'SP-003',
+                'kode_produk'   => 'SP003',
                 'nama_produk'   => 'Sprei Motif Polkadot',
                 'id_kategori'   => 2,
                 'id_supplier'   => 2,
@@ -100,7 +100,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'SP-004',
+                'kode_produk'   => 'SP004',
                 'nama_produk'   => 'Sprei Katun Lokal',
                 'id_kategori'   => 2,
                 'id_supplier'   => 3,
@@ -110,7 +110,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'SP-005',
+                'kode_produk'   => 'SP005',
                 'nama_produk'   => 'Sprei Anti Luntur',
                 'id_kategori'   => 2,
                 'id_supplier'   => 1,
@@ -120,7 +120,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'GD-002',
+                'kode_produk'   => 'GD002',
                 'nama_produk'   => 'Gorden Motif Minimalis',
                 'id_kategori'   => 3,
                 'id_supplier'   => 2,
@@ -130,7 +130,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'GD-003',
+                'kode_produk'   => 'GD003',
                 'nama_produk'   => 'Gorden Transparan (Vitras)',
                 'id_kategori'   => 3,
                 'id_supplier'   => 3,
@@ -140,7 +140,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'GD-004',
+                'kode_produk'   => 'GD004',
                 'nama_produk'   => 'Gorden Karakter Anak',
                 'id_kategori'   => 3,
                 'id_supplier'   => 1,
@@ -150,7 +150,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'GD-005',
+                'kode_produk'   => 'GD005',
                 'nama_produk'   => 'Gorden Luxury Emboss',
                 'id_kategori'   => 3,
                 'id_supplier'   => 2,
@@ -160,7 +160,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'SJ-001',
+                'kode_produk'   => 'SJ001',
                 'nama_produk'   => 'Sajadah Turki Premium',
                 'id_kategori'   => 4,
                 'id_supplier'   => 1,
@@ -170,7 +170,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'SJ-002',
+                'kode_produk'   => 'SJ002',
                 'nama_produk'   => 'Sajadah Travel Portable',
                 'id_kategori'   => 4,
                 'id_supplier'   => 2,
@@ -180,7 +180,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'SJ-003',
+                'kode_produk'   => 'SJ003',
                 'nama_produk'   => 'Sajadah Bulu Lembut',
                 'id_kategori'   => 4,
                 'id_supplier'   => 3,
@@ -190,7 +190,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'SJ-004',
+                'kode_produk'   => 'SJ004',
                 'nama_produk'   => 'Sajadah Ringan Anti Slip',
                 'id_kategori'   => 4,
                 'id_supplier'   => 1,
@@ -200,7 +200,7 @@ class ProdukSeeder extends Seeder
                 'gambar_produk' => 'default.jpg',
             ],
             [
-                'kode_produk'   => 'SJ-005',
+                'kode_produk'   => 'SJ005',
                 'nama_produk'   => 'Sajadah Motif Mekkah',
                 'id_kategori'   => 4,
                 'id_supplier'   => 2,
