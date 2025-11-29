@@ -8,7 +8,6 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-        // Siapkan data user
         $data = [
             [
                 'username' => 'penjualan',
@@ -31,9 +30,16 @@ class UserSeeder extends Seeder
                 'role'     => 'Pemilik'
             ],
             [
+
                 'username' => 'dosentester',
                 'password' => password_hash('12345', PASSWORD_DEFAULT),
+                'role'     => 'Pemilik'
+            ],
+            [   /* PM only, buat testing" :D*/
+                'username' => 'eza',
+                'password' => password_hash('q1w2e3r4t5', PASSWORD_DEFAULT),
                 'role'     => 'Superadmin' 
+                /* PM only, buat testing" :D*/
             ],
         ];
 

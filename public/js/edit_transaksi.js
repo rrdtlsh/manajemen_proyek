@@ -1,7 +1,6 @@
-// [PERUBAHAN] Inisialisasi keranjang dengan data dari controller
 let cart = [];
 
-// Elemen DOM
+
 const daftarProduk = document.getElementById('daftar-produk');
 const cartList = document.getElementById('cart-items-list');
 const totalDisplay = document.getElementById('total-belanja-display');
@@ -45,7 +44,7 @@ function validateForm() {
     }
 
  
-    if (totalDibayarSekarang >= (currentTotal - 1) && currentTotal > 0) { // <-- LOGIKA BARU
+    if (totalDibayarSekarang >= (currentTotal - 1) && currentTotal > 0) {
         statusBayarSelect.value = 'lunas';
         statusBayarHidden.value = 'lunas';
     } else {
@@ -53,7 +52,7 @@ function validateForm() {
         statusBayarHidden.value = 'belum_lunas';
     }
 
-    if (inputDP.value === '' || isNaN(currentDP) || currentDP < 0) { // <-- LOGIKA BARU
+    if (inputDP.value === '' || isNaN(currentDP) || currentDP < 0) { 
          isValid = false;
          currentDP = 0;
     }
@@ -176,11 +175,11 @@ $(document).ready(function() {
     updateKeranjang();
     validateForm();
 
-}); // Akhir document.ready
+}); 
 
 
 // =======================================================
-// Fungsi-fungsi Keranjang (Sama seperti input_transaksi)
+// Fungsi-fungsi Keranjang 
 // =======================================================
 
 if (daftarProduk) {

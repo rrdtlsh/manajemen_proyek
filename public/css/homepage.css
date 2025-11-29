@@ -25,7 +25,6 @@ body {
     letter-spacing: -0.022em;
 }
 
-/* Background slideshow using two store photos */
 .page-bg {
     position: fixed;
     inset: 0;
@@ -33,12 +32,11 @@ body {
     overflow: hidden;
 }
 
-/* Green tint overlay to soften background photos */
 .page-bg::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(22, 48, 38, 0.55); /* dark green */
+    background: rgba(22, 48, 38, 0.55); 
     pointer-events: none;
 }
 
@@ -52,7 +50,6 @@ body {
     transition: opacity 1s ease-in-out;
 }
 
-/* Crossfade between two layers */
 @keyframes crossfadeTwo {
     0%, 45% { opacity: 1; }
     50%, 95% { opacity: 0; }
@@ -365,7 +362,7 @@ body {
 }
 
 .product-card:hover .product-overlay {
-    opacity: 1; /* munculkan efek gelap saat hover, tanpa teks */
+    opacity: 1; 
 }
 
 .product-category { display: none; }

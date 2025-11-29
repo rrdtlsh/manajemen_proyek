@@ -1,4 +1,3 @@
-/* Tema Dark Green untuk Penjualan */
 
 :root {
     --dark-green: #2d8659;
@@ -13,7 +12,6 @@
     --text-gray: #6b7280;
 }
 
-/* Sidebar Dark Green - Full Green dengan Font Poppins */
 ul.sidebar.penjualan-sidebar {
     background: var(--dark-green) !important;
     background-image: linear-gradient(180deg, var(--dark-green) 10%, #1e5d3f 100%) !important;
@@ -111,7 +109,7 @@ ul.sidebar.penjualan-sidebar #sidebarToggle:hover {
     border-color: rgba(255, 255, 255, 0.5);
 }
 
-/* Topbar Dark Green */
+
 .topbar.penjualan-topbar {
     background: var(--dark-green) !important;
     border-bottom: none;
@@ -191,7 +189,7 @@ ul.sidebar.penjualan-sidebar #sidebarToggle:hover {
     flex-shrink: 0;
 }
 
-/* Card Styling */
+/* Card  */
 .card.penjualan-card {
     border: 1px solid var(--gray-border);
     border-radius: 12px;
@@ -211,7 +209,7 @@ ul.sidebar.penjualan-sidebar #sidebarToggle:hover {
     border-radius: 12px 12px 0 0;
 }
 
-/* Button Styling */
+/* Button  */
 .btn-primary.penjualan-btn {
     background: var(--light-blue);
     border: none;
@@ -305,9 +303,8 @@ ul.sidebar.penjualan-sidebar #sidebarToggle:hover {
     box-shadow: 0 4px 12px rgba(45, 134, 89, 0.3);
 }
 
-/* Form Control - dihapus karena sudah di body.penjualan-body */
 
-/* Alert - styling dasar, override di body.penjualan-body */
+/* Alert */
 .alert-danger {
     background-color: #f8d7da;
     border-color: #dc3545;
@@ -337,7 +334,6 @@ ul.sidebar.penjualan-sidebar #sidebarToggle:hover {
     color: var(--dark-green) !important;
 }
 
-/* Text Primary Override untuk Penjualan - dihapus karena sudah di body.penjualan-body */
 
 /* Card Header Text */
 .card-header.penjualan-card-header h6 {
@@ -353,7 +349,6 @@ label.font-weight-bold {
     color: var(--text-dark);
 }
 
-/* Select Option Styling - sudah dipindah ke body.penjualan-body */
 
 /* Background Body untuk Penjualan */
 body.penjualan-body {
@@ -370,18 +365,15 @@ body.penjualan-body .sticky-footer {
     border-top: 1px solid var(--gray-border);
 }
 
-/* Content Area - hanya untuk penjualan */
 body.penjualan-body .container-fluid {
     background-color: #f3f4f6;
     padding: 1.5rem;
 }
 
-/* Override untuk semua elemen dalam body penjualan */
 body.penjualan-body .text-primary {
     color: var(--dark-green) !important;
 }
 
-/* Override Bootstrap Primary untuk Penjualan */
 body.penjualan-body .btn-primary:not(.penjualan-btn) {
     background-color: var(--dark-green);
     border-color: var(--dark-green);
@@ -445,13 +437,11 @@ body.penjualan-body .text-success {
     color: var(--dark-green) !important;
 }
 
-/* HR Styling */
 body.penjualan-body hr {
     border-color: var(--gray-border);
     opacity: 0.5;
 }
 
-/* Shadow untuk card dalam body penjualan */
 body.penjualan-body .shadow {
     box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
 }

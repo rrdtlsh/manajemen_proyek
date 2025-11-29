@@ -92,7 +92,6 @@ input[type=number] {
     color: white;
 }
 
-/* Tambahan untuk menggantikan inline styles */
 .icon-title {
     color: #2d8659;
 }
@@ -136,7 +135,6 @@ input[type=number] {
     display: none;
 }
 
-/* Styling untuk item di keranjang */
 .cart-item-icon {
     color: #2d8659;
 }

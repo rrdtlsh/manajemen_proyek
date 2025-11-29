@@ -19,28 +19,24 @@ $(document).ready(function () {
     });
 
     // ===========================================
-    //       LOGIKA VALIDASI INPUT (REAL-TIME)
+    //       LOGIKA VALIDASI INPUT 
     // ===========================================
 
-    // A. Validasi KODE PRODUK
-    // Aturan: Max 10 karakter, Hanya Huruf & Angka (Tanpa spasi/simbol)
+    // Validasi KODE PRODUK
+    // Max 10 karakter, Hanya Huruf & Angka (Tanpa spasi/simbol)
     $('#kode_produk').on('input', function() {
         let val = $(this).val();
         
-        // 1. Hapus karakter selain huruf dan angka (Hapus @!#$- spasi dll)
         let cleanVal = val.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
         
-        // 2. Batasi Max 10 Karakter
         if(cleanVal.length > 10) {
             cleanVal = cleanVal.substring(0, 10);
         }
 
-        // Update nilai input jika ada karakter terlarang yang dihapus
         if(val !== cleanVal) {
             $(this).val(cleanVal);
         }
 
-        // Reset style validasi manual
         $(this).removeClass('is-invalid is-valid');
         $('#error-kode-msg').html(''); 
         // (Validasi duplikat AJAX biasanya dipanggil di event 'blur')

@@ -1,6 +1,6 @@
-let cart = []; // Variabel global keranjang
+let cart = []; 
 
-// Elemen DOM
+
 const daftarProduk = document.getElementById('daftar-produk');
 const cartList = document.getElementById('cart-items-list');
 const totalDisplay = document.getElementById('total-belanja-display');
@@ -10,38 +10,33 @@ const btnBayar = document.getElementById('btn-bayar');
 const btnReset = document.getElementById('btn-reset');
 const statusBayar = document.getElementById('status_bayar');
 
-// [PERBAIKAN] Ambil <input> DP-nya, bukan <div>-nya
-const inputDPDiv = document.getElementById('input-dp'); // Ini div
-const inputDP = document.getElementById('jumlah_dp'); // Ini input number-nya
+const inputDPDiv = document.getElementById('input-dp'); 
+const inputDP = document.getElementById('jumlah_dp'); 
 inputDP.addEventListener('keydown', function(event) {
-        // Daftar tombol yang dilarang keras
+        // forbidden characters
         const forbiddenKeys = ['-', '+', '.', 'e', 'E', ',', 'ArrowDown']; 
         
-        // Jika tombol yang ditekan ada di daftar terlarang, batalkan aksi (cegah input)
+        // cegah input
         if (forbiddenKeys.includes(event.key)) {
             event.preventDefault();
         }
     });
 
-    // 2. MEMBATASI JUMLAH MAKSIMAL (LOGIKA MENTOK)
+    
     inputDP.addEventListener('input', function() {
-        const maxLimit = 1000000000; // 1 Miliar
+        const maxLimit = 1000000000; // batas input nominal 1m
         
-        // Hapus karakter non-digit jika ada yang lolos (misal dari copy-paste)
         this.value = this.value.replace(/[^0-9]/g, '');
 
-        // Cek jika kosong biar tidak error saat parsing
         if (this.value === '') return;
 
-        // Cek batas maksimal
         if (parseInt(this.value) > maxLimit) {
-            this.value = maxLimit; // Paksa kembali ke 1 Miliar
+            this.value = maxLimit; 
         }
     });
 
 
 
-// Elemen DOM untuk Validasi
 const inputTanggal = document.getElementById('tanggal');
 const selectPelanggan = $('#cari-pelanggan');
 const selectBarang = $('#cari-barang');
@@ -51,36 +46,30 @@ const formAddPelanggan = $('#form-add-pelanggan');
 const modalErrors = $('#modal-errors');
 
 // =======================================================
-// [VALIDASI] Fungsi untuk Cek Form dan Aktifkan Tombol Simpan
+// Validasi Cek Form dan Aktifkan Tombol Simpan
 // =======================================================
 function validateForm() {
     let isValid = true;
 
-    // 1. Cek Keranjang (minimal 1 barang)
     if (cart.length === 0) {
         isValid = false;
     }
 
-    // 2. Cek Tanggal
     if (inputTanggal.value === '') {
         isValid = false;
     }
 
-    // 3. Cek Pelanggan (wajib dipilih)
     if (selectPelanggan.val() === null || selectPelanggan.val() === '') {
         isValid = false;
     }
 
-    // 4. Cek Uang DP (jika 'belum_lunas')
     if (statusBayar.value === 'belum_lunas') {
-        // [PERBAIKAN] Gunakan 'inputDP.value' (variabel input)
         const dpValue = parseFloat(inputDP.value);
         if (inputDP.value === '' || isNaN(dpValue) || dpValue <= 0) {
             isValid = false;
         }
     }
 
-    // 5. Aktifkan atau Non-aktifkan tombol
     btnBayar.disabled = !isValid;
 }
 
@@ -89,7 +78,6 @@ function validateForm() {
 // =======================================================
 $(document).ready(function () {
 
-    // [PERBAIKAN] Ambil URL dinamis dari atribut data- di form
     const formTransaksi = $('#form-transaksi');
     const searchPelangganUrl = formTransaksi.data('url-search-pelanggan');
     const searchProdukUrl = formTransaksi.data('url-search-produk');
@@ -100,7 +88,7 @@ $(document).ready(function () {
         placeholder: 'Cari nama atau No. HP pelanggan...',
         allowClear: false,
         ajax: {
-            url: searchPelangganUrl, // [PERBAIKAN] Menggunakan URL dinamis
+            url: searchPelangganUrl, 
             dataType: 'json',
             delay: 250,
             processResults: function (data) {
@@ -117,7 +105,7 @@ $(document).ready(function () {
         placeholder: 'Ketik nama barang...',
         allowClear: true,
         ajax: {
-            url: searchProdukUrl, // [PERBAIKAN] Menggunakan URL dinamis
+            url: searchProdukUrl, 
             dataType: 'json',
             delay: 250,
             processResults: function (data) {
@@ -146,7 +134,7 @@ $(document).ready(function () {
     // Event handler untuk tombol Simpan Pelanggan Baru
     btnSimpanPelanggan.on('click', function () {
         $.ajax({
-            url: addPelangganUrl, // [PERBAIKAN] Menggunakan URL dinamis
+            url: addPelangganUrl,
             method: "POST",
             data: formAddPelanggan.serialize(),
             dataType: "json",
@@ -164,7 +152,7 @@ $(document).ready(function () {
                     selectPelanggan.append(newOption).trigger('change');
                     formAddPelanggan[0].reset();
                     modalErrors.hide();
-                    validateForm(); // [VALIDASI] Cek form lagi
+                    validateForm(); 
                 }
             },
             error: function (xhr) {
@@ -188,15 +176,14 @@ $(document).ready(function () {
         formAddPelanggan[0].reset();
     });
 
-    // [VALIDASI] Panggil validateForm() saat event-event ini terjadi
     inputTanggal.addEventListener('change', validateForm);
     selectPelanggan.on('change', validateForm);
     statusBayar.addEventListener('change', validateForm);
-    inputDP.addEventListener('input', validateForm); // Targetkan <input>
+    inputDP.addEventListener('input', validateForm); 
 
-    validateForm(); // Panggil sekali saat halaman dimuat
+    validateForm(); 
 
-}); // Akhir document.ready
+}); 
 
 
 // =======================================================
@@ -223,7 +210,6 @@ if (daftarProduk) {
 
 // Tombol Reset
 btnReset.addEventListener('click', function () {
-    // [PERBAIKAN] Tambahkan pemeriksaan konfirmasi sebelum mereset SEMUA
     Swal.fire({
         title: 'Reset Transaksi?',
         text: "Anda yakin ingin menghapus semua inputan (Tanggal, Pelanggan, Keranjang, Pembayaran)?",
@@ -236,38 +222,26 @@ btnReset.addEventListener('click', function () {
     }).then((result) => {
         if (result.isConfirmed) {
 
-            // 1. Reset Keranjang Belanja
             cart = [];
             updateKeranjang();
 
-            // 2. Reset Input Tanggal (misalnya diatur ke kosong atau default hari ini)
-            // Asumsi: Anda mungkin ingin input tanggal kosong atau kembali ke default.
-            // Jika ingin kembali ke default hari ini, Anda perlu implementasi yang berbeda
-            // Untuk mereset:
+        
             inputTanggal.value = '';
 
-            // 3. Reset Select Pelanggan (Select2)
-            // selectPelanggan.val(null).trigger('change');
-            // Jika Anda ingin elemen select tereset:
             selectPelanggan.val(null).trigger('change');
 
-            // 4. Reset Select Barang (opsional, karena hanya pencarian)
             selectBarang.val(null).trigger('change');
 
-            // 5. Reset Status & Metode Pembayaran (kembali ke opsi pertama/default)
-            // Asumsi: ID elemen-elemen ini adalah 'status_bayar' dan 'metode_bayar'
             const selectMetodeBayar = document.getElementById('metode_bayar'); // Asumsi ada elemen ini
             if (selectMetodeBayar) {
                 selectMetodeBayar.value = selectMetodeBayar.options[0].value;
             }
 
-            // Reset Status Pembayaran (ini akan memicu event change untuk DP)
-            statusBayar.value = statusBayar.options[0].value; // Kembali ke opsi pertama (misalnya 'Lunas')
+            statusBayar.value = statusBayar.options[0].value; 
 
-            // Panggil event change secara manual untuk menyembunyikan DP jika kembali ke 'Lunas'
+            
             statusBayar.dispatchEvent(new Event('change'));
 
-            // 6. Reset Form Validasi
             validateForm();
 
             Swal.fire('Direset!', 'Semua inputan transaksi telah dikosongkan.', 'success');
@@ -277,7 +251,6 @@ btnReset.addEventListener('click', function () {
 
 // Status Bayar
 statusBayar.addEventListener('change', function () {
-    // [PERBAIKAN] Targetkan div-nya untuk display
     if (this.value === 'belum_lunas') {
         inputDPDiv.style.display = 'block';
         inputDP.setAttribute('required', 'required');
@@ -286,7 +259,7 @@ statusBayar.addEventListener('change', function () {
         inputDP.removeAttribute('required');
         inputDP.value = '';
     }
-    validateForm(); // [VALIDASI] Panggil cek form
+    validateForm(); 
 });
 
 
@@ -329,9 +302,9 @@ function updateKeranjang() {
                 <small class="text-muted">Klik produk di kiri atau cari barang</small>
             </div>
         `;
-        // baris 'btnBayar.disabled = true' dihapus dari sini (sudah benar)
+        
     } else {
-        // baris 'btnBayar.disabled = false' dihapus dari sini (sudah benar)
+        
         cart.forEach(item => {
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('cart-item-card', 'penjualan-cart');
@@ -375,7 +348,7 @@ function updateKeranjang() {
         });
     }
     hitungTotal();
-    validateForm(); // [VALIDASI] Panggil cek form setiap keranjang berubah
+    validateForm(); 
 }
 
 function ubahQty(id, aksi) {

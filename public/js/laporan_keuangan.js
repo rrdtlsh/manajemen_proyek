@@ -1,13 +1,12 @@
 $(document).ready(function() {
-    // Inisialisasi DataTable untuk tabel laporan
     $('#dataTableLaporan').DataTable({
         "order": [
-            [0, "asc"] // Urutkan berdasarkan Tanggal (kolom pertama)
+            [0, "asc"] // Urutkan berdasarkan tgl
         ],
-        "pageLength": 10 // Tampilkan 10 entri per halaman
+        "pageLength": 10 // Tampilkan 10 entry/hlmn
     });
 
-    // Logika untuk filter
+    // Logika  filter
     const yearFilter = document.getElementById('yearFilter');
     const quarterFilter = document.getElementById('quarterFilter');
     const filterButton = document.getElementById('filterButton');
@@ -35,8 +34,6 @@ $(document).ready(function() {
             if (selectedQuarter) {
                 newUrl.searchParams.set('quarter', selectedQuarter);
             }
-
-            // Arahkan ke URL baru
             window.location.href = newUrl.href;
         });
     }
