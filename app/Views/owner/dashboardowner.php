@@ -92,7 +92,7 @@
             </div>
         </div>
 
-        <!-- KPI 3: Keuntungan Bersih -->
+        <!-- KPI 3: Omzet -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
@@ -131,7 +131,7 @@
         </div>
     </div>
 
-    <!-- BARIS 2: GRAFIK UTAMA -->
+    <!-- GRAFIK UTAMA -->
     <div class="row">
         <!-- Grafik Penjualan -->
         <div class="col-xl-8 col-lg-7">
@@ -152,7 +152,7 @@
         </div>
     </div>
 
-    <!-- BARIS 3: OPERASIONAL (STOK & PELANGGAN) -->
+    <!-- OPERASIONAL (STOK & PELANGGAN) -->
     <div class="row">
         <!-- Stok Menipis -->
         <div class="col-12 mb-4">
@@ -306,7 +306,7 @@
         </div>
     </div>
 
-    <!-- BARIS 4: ANALISIS LANJUTAN -->
+    <!-- ANALISIS LANJUTAN -->
 <div class="row">
     <div class="col-lg-6 mb-4">
         <div class="card shadow mb-4 h-100">

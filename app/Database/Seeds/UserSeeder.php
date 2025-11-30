@@ -35,11 +35,11 @@ class UserSeeder extends Seeder
                 'password' => password_hash('12345', PASSWORD_DEFAULT),
                 'role'     => 'Pemilik'
             ],
-            [   /* PM only, buat testing" :D*/
+            [   /*forbidden role, tidak official NOT FOR GENERAL USE*/
                 'username' => 'eza',
                 'password' => password_hash('q1w2e3r4t5', PASSWORD_DEFAULT),
                 'role'     => 'Superadmin' 
-                /* PM only, buat testing" :D*/
+                /* PM only, buat testing"*/
             ],
         ];
 

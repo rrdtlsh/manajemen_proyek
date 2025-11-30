@@ -20,13 +20,12 @@ class RestokModel extends Model
         'harga_satuan',
         'total_harga',
 
-        // status inventaris → owner
+        // status inventaris -> owner
         'status',          // Menunggu / Disetujui / Ditolak
         'status_owner',    // Menunggu / Disetujui / Ditolak
         'id_owner',
         'tanggal_approve',
 
-        // timestamps
         'created_at',
         'updated_at'
     ];
@@ -35,11 +34,11 @@ class RestokModel extends Model
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
 
-    // ====================================================
-    //                   CUSTOM QUERY
-    // ====================================================
+    // ====================================
+    //             CUSTOM QUERY
+    // ====================================
 
-    // Request menunggu persetujuan owner
+    // req menunggu persetujuan owner
     public function getPendingForOwner()
     {
         return $this->where('status_owner', 'Menunggu')
@@ -47,7 +46,7 @@ class RestokModel extends Model
             ->findAll();
     }
 
-    // Request yang sudah disetujui owner
+    // req yang sudah disetujui owner
     public function getApproved()
     {
         return $this->where('status_owner', 'Disetujui')
@@ -55,7 +54,7 @@ class RestokModel extends Model
             ->findAll();
     }
 
-    // Request yang ditolak owner
+    // req yang ditolak owner
     public function getRejected()
     {
         return $this->where('status_owner', 'Ditolak')

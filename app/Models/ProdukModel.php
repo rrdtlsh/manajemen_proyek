@@ -12,7 +12,6 @@ class ProdukModel extends Model
     protected $useTimestamps = false;
 
 
-    // Diambil dari file Anda sebelumnya
     protected $allowedFields = [
         'kode_produk',
         'nama_produk',
@@ -24,9 +23,9 @@ class ProdukModel extends Model
         'gambar_produk'
     ];
 
-    /**
+    /*
      * Mengurangi stok produk.
-     * (Ini fungsi yang menurut error "undefined")
+     * 
      */
     public function kurangiStok($id_produk, $jumlah)
     {
@@ -35,7 +34,7 @@ class ProdukModel extends Model
             ->update();
     }
 
-    /**
+    /*
      * Menambah stok produk (untuk mengembalikan stok saat edit).
      */
     public function tambahStok($id_produk, $jumlah)

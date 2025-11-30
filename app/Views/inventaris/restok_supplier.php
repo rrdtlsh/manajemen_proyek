@@ -154,10 +154,8 @@
                         let errorSpam = document.getElementById('error_spam');
                         let errorGibberish = document.getElementById('error_gibberish');
                         
-                        // Regex: Karakter apapun (.) ditangkap, lalu dicek apakah muncul lagi (\1) sebanyak 4 kali
                         let isSpam = /(.)\1{2,}/.test(text);
                         
-                        // Ini untuk menangkal asal ketik/keysmash
                         let isGibberish = /[bcdfghjklmnpqrstvwxyz]{5,}/i.test(text);
 
                         if (isSpam) {

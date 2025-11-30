@@ -224,7 +224,6 @@
 <script src="<?= base_url('js/edit_transaksi.js') ?>"></script>
 <script>
 $(document).ready(function() {
-    // Fungsi untuk memformat angka ke Rupiah
     function formatRupiah(angka) {
         return new Intl.NumberFormat('id-ID').format(angka);
     }

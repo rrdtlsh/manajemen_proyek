@@ -178,21 +178,21 @@
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 
 <script>
-    // DataTable
+    
     $('#dataTableSupplier').DataTable({
         "order": [
             [0, "asc"]
         ],
     });
 
-    // Edit Supplier (auto-fill modal)
+    // Edit Suppllier
     $('.btn-edit-supplier').on('click', function() {
         $('#id_supplier').val($(this).data('id'));
         $('#nama_supplier').val($(this).data('nama'));
         $('#alamat').val($(this).data('alamat'));
         $('#no_telp').val($(this).data('telp'));
 
-        // Ganti action form menjadi UPDATE
+        // ganti action form menjadi UPDATE
         $('#modalSupplier form').attr('action',
             "<?= base_url('karyawan/inventaris/update_supplier/'); ?>" + $(this).data('id')
         );
@@ -200,7 +200,6 @@
         $('.modal-title').text('Edit Data Supplier');
     });
 
-    // Ketika klik tombol tambah
     $('#modalSupplier').on('show.bs.modal', function(e) {
         if (!$(e.relatedTarget).hasClass('btn-edit-supplier')) {
             $('#modalSupplier form').attr('action', "<?= base_url('karyawan/inventaris/store_supplier'); ?>");
@@ -223,7 +222,6 @@
             confirmButtonText: "Ya, hapus!"
         }).then((result) => {
             if (result.isConfirmed) {
-                // gunakan path base dari server
                 window.location.href = "<?= base_url('karyawan/inventaris/delete_supplier/'); ?>" + id;
             }
         });

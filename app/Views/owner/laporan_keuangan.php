@@ -173,17 +173,16 @@
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Inisialisasi DataTable
+    
         $('#dataTableLaporan').DataTable({
-            "order": [[ 0, "desc" ]] // Urutkan tanggal descending
+            "order": [[ 0, "desc" ]] 
         });
 
-        // Logika Tombol Filter (Custom untuk halaman Owner)
         $('#filterButton').click(function() {
             var year = $('#yearFilter').val();
             var quarter = $('#quarterFilter').val();
             
-            // Reload halaman dengan query parameter baru
+            
             var url = new URL(window.location.href);
             url.searchParams.set('year', year);
             

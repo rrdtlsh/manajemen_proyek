@@ -14,7 +14,7 @@ class PelangganModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = ['nama_pelanggan', 'no_hp', 'alamat', 'created_at', 'updated_at'];
 
-    // Dates
+    
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';

@@ -36,7 +36,7 @@
     </div>
 </div>
 
-<!-- RINGKASAN -->
+<!-- ringkasan hari ini-->
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex justify-content-between align-items-center">
         <h6 class="m-0 font-weight-bold" style="color: #2d8659;">
@@ -50,7 +50,7 @@
     </div>
 </div>
 
-<!-- GRAFIK 7 HARI -->
+<!-- grafik keuangan dalam 7 hari -->
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex justify-content-between align-items-center">
         <h6 class="m-0 font-weight-bold" style="color: #2d8659;">
@@ -64,7 +64,7 @@
     </div>
 </div>
 
-<!-- TABEL TRANSAKSI -->
+<!-- tabel transaksi -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold" style="color: #2d8659;">
@@ -124,12 +124,12 @@
 <?= $this->endSection() ?>
 
 
-<!-- SCRIPT CHART -->
+<!-- chart.js -->
 <?= $this->section('script') ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // ==================== TREND 7 HARI ====================
+    // trend 7 hari
     const trendLabels = <?= $trend_labels ?? '[]' ?>;
     const pemasukanData = <?= $pemasukan_data ?? '[]' ?>;
     const pengeluaranData = <?= $pengeluaran_data ?? '[]' ?>;
@@ -163,7 +163,7 @@
         }
     });
 
-    // ==================== RINGKASAN BAR ====================
+    
     const pemasukanHariIni = <?= $pemasukan_hari_ini ?? 0 ?>;
     const pengeluaranHariIni = <?= $pengeluaran_hari_ini ?? 0 ?>;
     const saldoHariIni = pemasukanHariIni - pengeluaranHariIni;

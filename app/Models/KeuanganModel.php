@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class KeuanganModel extends Model
 {
     protected $table          = 'keuangan';
-    protected $primaryKey     = 'id_keuangan'; // <-- UBAH KE SINI
+    protected $primaryKey     = 'id_keuangan'; 
     protected $useAutoIncrement = true;
     protected $allowedFields = [
         'tanggal',

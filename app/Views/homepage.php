@@ -18,10 +18,8 @@
     <script src="<?= base_url('js/homepage.js') ?>" defer></script>
 
     <style>
-        /* Internal Styling untuk Tampilan Lebih Cantik */
         :root {
             --primary-color: #2d8659;
-            /* Warna hijau khas */
             --secondary-color: #f8f9fa;
             --text-dark: #333;
             --text-muted: #6c757d;
@@ -29,22 +27,16 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-
-            /* --- PERUBAHAN DI SINI --- */
-            /* Warna dasar hijau muda yang sangat lembut */
             background-color: #e8f5e9;
 
-            /* Tambahkan gradasi halus supaya tidak polos (datar) */
             background-image: linear-gradient(to bottom, #298f12ff 0%, #0a2e0dff 100%);
 
-            /* Pastikan background memenuhi halaman */
             min-height: 100vh;
             background-attachment: fixed;
 
             color: var(--text-dark);
         }
 
-        /* Navbar Styling */
         .navbar {
             background-color: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -69,7 +61,7 @@
             color: var(--primary-color) !important;
         }
 
-        /* Hero Section */
+        
         .hero-section {
             position: relative;
             height: 80vh;
@@ -90,7 +82,7 @@
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
-            /* Dark overlay */
+            
         }
 
         .hero-content {
@@ -154,7 +146,6 @@
             position: relative;
             width: 100%;
             padding-top: 100%;
-            /* 1:1 Aspect Ratio */
             overflow: hidden;
         }
 
@@ -187,7 +178,6 @@
             opacity: 1;
         }
 
-        /* Carousel Buttons Override */
         .carousel-btn {
             background-color: white;
             color: var(--primary-color);
@@ -207,7 +197,6 @@
             color: white;
         }
 
-        /* About Us */
         .about-section {
             background-color: #f0f4f1;
             border-radius: 20px;
@@ -233,7 +222,6 @@
             font-size: 1.2rem;
         }
 
-        /* Footer */
         .footer {
             background-color: #222;
             color: #fff;

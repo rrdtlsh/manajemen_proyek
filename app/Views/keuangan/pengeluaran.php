@@ -138,63 +138,56 @@
         let errorMsg = document.getElementById('errorMsg');
         let wordInfo = document.getElementById('wordInfo');
         
-        // --- VALIDASI 1: Hapus Simbol (Hanya Huruf, Angka & Spasi) ---
+        // validasi simbol/spesial char
         if (/[^a-zA-Z0-9\s]/.test(teks)) {
-            // Hapus karakter terlarang
             teks = teks.replace(/[^a-zA-Z0-9\s]/g, '');
             input.value = teks; 
             errorMsg.innerText = "Simbol tidak diperbolehkan (Hanya Huruf & Angka).";
         } else {
-            // Hapus pesan error simbol jika sudah bersih
+            
             if (errorMsg.innerText.includes("Simbol")) {
                 errorMsg.innerText = "";
             }
         }
 
-// --- VALIDASI 2: Auto-Correct Huruf Berulang (Maksimal 2 huruf sama) ---
-        // Regex: /(.)\1{2,}/g artinya mencari huruf yg diulang 3 kali atau lebih
+
         if (/(.)\1{2,}/.test(teks)) {
-            // Lakukan penggantian otomatis
-            // '$1$1' artinya: Ambil huruf tersebut ($1), dan tulis ulang cukup 2 kali saja
-            teks = teks.replace(/(.)\1{2,}/g, '$1$1');
             
-            // Update tampilan input seketika
+            teks = teks.replace(/(.)\1{2,}/g, '$1$1');
             input.value = teks;
             
             errorMsg.innerText = "Huruf berulang tidak valid.";
         } else {
-            // Hapus pesan error jika tidak ada spam, TAPI jangan hapus error simbol/limit
+            // Hapus pesan error jika tidak ada spam
             if (errorMsg.innerText.includes("Huruf berulang")) {
                 errorMsg.innerText = "";
             }
         }
 
-        // --- VALIDASI 3: Update Counter & Cek Limit ---
-        // Hitung jumlah karakter langsung
         let jumlahKarakter = teks.length;
         
-        // Update teks counter
+        
         if(wordInfo) {
             wordInfo.innerText = jumlahKarakter + '/100 Karakter';
         }
 
-        // Cek Maksimal (Backup Logic jika maxlength ditembus via paste)
+        // cek maksimal (Backup Logic jika maxlength ditembus via paste)
         if (jumlahKarakter >= 100) {
              errorMsg.innerText = "Maksimal 100 karakter";
-             // Jika paste teks panjang, potong paksa ke 100
+             // klo paste teks panjang, potong paksa ke 100
              if(jumlahKarakter > 100) {
                 input.value = teks.substring(0, 100);
                 wordInfo.innerText = '100/100 Karakter';
              }
         } 
-        // Cek Minimal (Misal minimal 10 karakter agar valid)
+        // cek minimum ( minimal 10 karakter agar valid)
         else if (jumlahKarakter < 10 && jumlahKarakter > 0) {
             input.setCustomValidity('Terlalu singkat, Minimal 10 karakter.');
-             // Hapus pesan error max jika ada
+
              if (errorMsg.innerText.includes("Maksimal")) errorMsg.innerText = "";
         } 
         else {
-            // Jika aman (antara 10 - 99 karakter)
+        
             input.setCustomValidity(''); 
             if (errorMsg.innerText.includes("Maksimal") || errorMsg.innerText.includes("Terdeteksi")) {
                 errorMsg.innerText = "";
@@ -221,7 +214,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 <script>
     $(document).ready(function() {
-        // 3. PERBAIKAN: SweetAlert untuk Flashdata Success
+        //SweetAlert untuk Flashdata Success
         <?php if (session()->getFlashdata('success')) : ?>
             Swal.fire({
                 icon: 'success',
@@ -239,7 +232,7 @@
             ] // Urutkan tanggal terbaru
         });
 
-        // 4. PERBAIKAN: SweetAlert untuk Konfirmasi Hapus
+        //SweetAlert untuk Konfirmasi Hapus
         $('.btn-hapus-pengeluaran').on('click', function(e) {
             e.preventDefault();
             const deleteUrl = $(this).data('url');
@@ -255,7 +248,6 @@
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Jika dikonfirmasi, redirect ke URL hapus
                     window.location.href = deleteUrl;
                 }
             });

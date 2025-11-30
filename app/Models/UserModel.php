@@ -12,8 +12,7 @@ class UserModel extends Model
     protected $returnType       = 'array';
     protected $allowedFields    = ['username', 'password', 'role'];
 
-    // Anda bisa tambahkan fungsi kustom di sini, 
-    // misalnya untuk mencari user berdasarkan username
+   
     public function getUserByUsername($username)
     {
         return $this->where('username', $username)->first();

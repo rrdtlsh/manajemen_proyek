@@ -9,10 +9,10 @@ class PelangganSeeder extends Seeder
 {
     public function run()
     {
-        $faker = \Faker\Factory::create('id_ID'); // Pakai locale Indonesia
+        $faker = \Faker\Factory::create('id_ID'); // 
         $data = [];
 
-        // Buat 15 pelanggan dummy
+        // seeding 15 pelanggan
         for ($i = 0; $i < 15; $i++) {
             $data[] = [
                 'nama_pelanggan' => $faker->name,
@@ -23,7 +23,7 @@ class PelangganSeeder extends Seeder
             ];
         }
 
-        // Tambah pelanggan manual tetap (untuk testing pasti)
+        // Tambah pelanggan manual 
         $data[] = [
             'nama_pelanggan' => 'Budi Santoso',
             'no_hp'          => '081234567890',

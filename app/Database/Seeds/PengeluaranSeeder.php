@@ -11,24 +11,23 @@ class PengeluaranSeeder extends Seeder
     {
         $data = [];
         
-        // [PERBAIKAN] Ambil ID User dengan cara yang benar untuk Query Builder
         $query   = $this->db->table('user')->select('id_user')->get();
-        $results = $query->getResultArray(); // Hasil: [['id_user' => 1], ['id_user' => 2]]
+        $results = $query->getResultArray(); 
         
-        // Ubah menjadi array sederhana: [1, 2]
+        
         $userIds = array_column($results, 'id_user');
 
-        // Fallback jika tabel user kosong
+        // fallback jika tabel user kosong
         if (empty($userIds)) {
             $userIds = [1];
         }
 
-        // Kita buat data pengeluaran untuk 3 bulan terakhir
+        // data dummy 3 bulan terakhir
         for ($i = 0; $i < 3; $i++) {
             $bulan = Time::now()->subMonths($i);
-            $tahunBulan = $bulan->format('Y-m'); // Contoh: 2025-10
+            $tahunBulan = $bulan->format('Y-m'); 
 
-            // 1. Biaya Listrik (Tanggal 5 setiap bulan)
+            //pln
             $data[] = [
                 'tanggal'     => $tahunBulan . '-05',
                 'tipe'        => 'Pengeluaran',
@@ -38,7 +37,7 @@ class PengeluaranSeeder extends Seeder
                 'id_user'     => $userIds[array_rand($userIds)],
             ];
 
-            // 2. Biaya Internet (Tanggal 10 setiap bulan)
+            // internet
             $data[] = [
                 'tanggal'     => $tahunBulan . '-10',
                 'tipe'        => 'Pengeluaran',
@@ -48,7 +47,7 @@ class PengeluaranSeeder extends Seeder
                 'id_user'     => $userIds[array_rand($userIds)],
             ];
 
-            // 3. Gaji Karyawan (Tanggal 25 setiap bulan)
+            // gaji karyawan
             $data[] = [
                 'tanggal'     => $tahunBulan . '-25',
                 'tipe'        => 'Pengeluaran',
@@ -58,7 +57,7 @@ class PengeluaranSeeder extends Seeder
                 'id_user'     => $userIds[array_rand($userIds)],
             ];
 
-            // 4. Biaya Tak Terduga (Random tanggal)
+            // biaya tak terduga
             for ($j=0; $j < 2; $j++) { 
                 $tglRandom = rand(1, 28);
                 $data[] = [
@@ -73,7 +72,6 @@ class PengeluaranSeeder extends Seeder
         }
 
         // Insert ke tabel keuangan
-        // Pastikan array data tidak kosong sebelum insert batch
         if (!empty($data)) {
             $this->db->table('keuangan')->insertBatch($data);
         }

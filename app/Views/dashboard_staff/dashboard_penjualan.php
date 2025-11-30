@@ -2,14 +2,14 @@
 
 <?= $this->section('head') ?>
 <style>
-    /* Style untuk container chart agar responsif */
+    
     .chart-container {
         position: relative;
         height: 350px;
         width: 100%;
     }
 
-    /* [BARU] Menambahkan style untuk badge status (seperti di riwayat) */
+    
     .badge-warning {
         background-color: #f6c23e;
         color: #fff;
@@ -117,9 +117,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // =======================================================
-    // KODE UNTUK CHART GARIS (OMZET 7 HARI)
-    // =======================================================
+    // chart omzet 7 hari
     const chartLabels = <?= $chart_labels; ?>;
     const chartData = <?= $chart_data; ?>;
 
@@ -170,9 +168,7 @@
         }
     });
 
-    // =======================================================
-    // KODE UNTUK CHART BATANG (RINGKASAN HARI INI)
-    // =======================================================
+  // bar chart
     const penjualanHariIni = <?= $penjualan_hari_ini ?? 0; ?>;
     const produkTerjual = <?= $produk_terjual_hari_ini ?? 0; ?>;
     const omzetHariIni = <?= $omzet_hari_ini ?? 0; ?>;

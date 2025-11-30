@@ -1,21 +1,20 @@
 <?php
-// Ambil role pengguna dari session
+
 $session = session();
 $role = $session->get('role');
-// Pengecekan role yang lebih konsisten (mengubah ke huruf kecil)
+
 $userRole = strtolower($role ?? ''); 
 $currentPath = uri_string();
 ?>
 
 <?php
-// --- BLOK UNTUK SEMUA ROLE (KARYAWAN + PEMILIK + SUPERADMIN) ---
 if (
     $userRole == 'penjualan' || 
     $userRole == 'inventaris' || 
     $userRole == 'keuangan' || 
     $userRole == 'pemilik' || 
     $userRole == 'owner' || 
-    $userRole == 'superadmin' // <-- Tambahan Superadmin
+    $userRole == 'superadmin'
 ) : 
 ?>
     <ul class="navbar-nav sidebar penjualan-sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -29,7 +28,6 @@ if (
         <hr class="sidebar-divider my-0">
 
         <?php // === MENU PENJUALAN ===
-        // Tampilkan jika role Penjualan ATAU Superadmin
         if ($userRole == 'penjualan' || $userRole == 'superadmin') : ?>
             
             <?php if($userRole == 'superadmin'): ?>
@@ -57,7 +55,6 @@ if (
         <?php endif; ?>
 
         <?php // === MENU KEUANGAN ===
-        // Menggunakan IF terpisah (bukan elseif) agar Superadmin bisa melihat ini juga
         if ($userRole == 'keuangan' || $userRole == 'superadmin') : ?>
 
             <?php if($userRole == 'superadmin'): ?>
@@ -92,7 +89,6 @@ if (
         <?php endif; ?>
 
         <?php // === MENU INVENTARIS ===
-        // Menggunakan IF terpisah
         if ($userRole == 'inventaris' || $userRole == 'superadmin') : ?>
 
             <?php if($userRole == 'superadmin'): ?>

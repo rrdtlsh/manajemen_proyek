@@ -31,7 +31,6 @@ class DatabaseSeeder extends Seeder
         
         $this->db->query('SET FOREIGN_KEY_CHECKS=1;');
 
-        // 4. Jalankan seeder sesuai urutan relasi
         $this->call('UserSeeder');
         $this->call('KategoriSeeder');
         $this->call('SupplierSeeder');

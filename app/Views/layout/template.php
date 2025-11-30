@@ -17,11 +17,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
 
     <?php
-    // Logika Penentuan Tema Warna
     $role = session()->get('role');
     $userRole = strtolower($role ?? '');
     
-    // Terapkan CSS Hijau untuk role berikut + Superadmin
     if (
         $userRole == 'penjualan' ||
         $userRole == 'inventaris' ||
@@ -37,12 +35,11 @@
     <?= $this->renderSection('head') ?>
 
     <?php if($userRole === 'superadmin'): ?>
-    <style>
-        /* Beri border visual agar penguji sadar ini mode testing */
+    <style> /* PERINGATAN UNTUK SUPERADMIN*/
         body.penjualan-body {
-            border-top: 5px solid #f6c23e; /* Warna kuning peringatan */
+            border-top: 5px solid #f6c23e;
         }
-        /* Ubah kursor tombol submit agar terlihat berbeda */
+        
         .btn-danger, .btn-success, .btn-warning, button[type="submit"] {
             cursor: not-allowed;
             opacity: 0.8;
@@ -113,7 +110,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/js/sb-admin-2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
+    <script> /* SUPERADMIN TEST MODE ALERT */
         $(document).ready(function() {
             // Flashdata Success
             <?php if (session()->getFlashdata('success')) : ?>
@@ -125,12 +122,9 @@
                 Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error'); ?>', showConfirmButton: true });
             <?php endif; ?>
 
-            // --- LOGIKA KHUSUS SUPERADMIN (Simulasi Pengujian) ---
             <?php if($userRole === 'superadmin'): ?>
                 
-                // 1. Intercept Formulir (Cegah Simpan/Update)
                 $('form').on('submit', function(e) {
-                    // Kecuali form logout atau filter laporan (GET method biasanya aman)
                     if ($(this).attr('method') && $(this).attr('method').toUpperCase() === 'POST') {
                         e.preventDefault();
                         Swal.fire({
@@ -142,14 +136,11 @@
                     }
                 });
 
-                // 2. Intercept Tombol Hapus (Link dengan class btn-danger atau URL delete)
                 $('a[href*="delete"], .btn-danger').on('click', function(e) {
-                    // Biarkan tombol export PDF (biasanya warna merah) tetap jalan
                     if($(this).attr('href') && $(this).attr('href').includes('export')) {
                         return true; 
                     }
 
-                    // Blokir aksi hapus
                     if ($(this).attr('href') && $(this).attr('href') !== '#' && !$(this).data('toggle')) {
                         e.preventDefault();
                         Swal.fire({
@@ -160,13 +151,11 @@
                     }
                 });
 
-                // 3. Modifikasi Tampilan Tombol agar jelas
                 $('button[type="submit"]').text(function(i, text) {
                     return text + ' (Test)';
                 });
                 
             <?php endif; ?>
-            // --- AKHIR LOGIKA SUPERADMIN ---
         });
     </script>
 

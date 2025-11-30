@@ -10,7 +10,6 @@ class RestokSeeder extends Seeder
     public function run()
     {
         $data = [
-            // 1. Kasus Menunggu (Baru diajukan staf)
             [
                 'nama_supplier'   => 'PT. Jaya Abadi',
                 'nama_barang'     => 'Karpet Selimut Tebal',
@@ -23,7 +22,6 @@ class RestokSeeder extends Seeder
                 'tanggal_approve' => null,
                 'created_at'      => Time::now()->subDays(1)->toDateTimeString(),
             ],
-            // 2. Kasus Menunggu (Item lain)
             [
                 'nama_supplier'   => 'CV. Berkah Mandiri',
                 'nama_barang'     => 'Sprei Katun Jepang King',
@@ -45,11 +43,11 @@ class RestokSeeder extends Seeder
                 'total_harga'     => 7500000,
                 'status'          => 'Disetujui',
                 'status_owner'    => 'Disetujui',
-                'id_owner'        => 4, // Asumsi ID Owner = 4
+                'id_owner'        => 4, 
                 'tanggal_approve' => Time::now()->subDays(3)->toDateTimeString(),
                 'created_at'      => Time::now()->subDays(4)->toDateTimeString(),
             ],
-            // 4. Kasus Ditolak Owner
+            
             [
                 'nama_supplier'   => 'PT. Jaya Abadi',
                 'nama_barang'     => 'Sajadah Travel Tipis',
@@ -62,7 +60,7 @@ class RestokSeeder extends Seeder
                 'tanggal_approve' => Time::now()->subDays(2)->toDateTimeString(),
                 'created_at'      => Time::now()->subDays(2)->toDateTimeString(),
             ],
-            // 5. Kasus Menunggu (Baru banget)
+            
             [
                 'nama_supplier'   => 'CV. Berkah Mandiri',
                 'nama_barang'     => 'Bedcover Set Rumbai',
@@ -77,7 +75,6 @@ class RestokSeeder extends Seeder
             ],
         ];
 
-        // Insert Batch agar cepat
         $this->db->table('restok')->insertBatch($data);
     }
 }

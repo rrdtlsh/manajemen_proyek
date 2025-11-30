@@ -6,13 +6,10 @@
 <?= $this->endSection(); ?>
 <?php
 function formatKode($kode) {
-    // Ambil huruf depan, misalnya "KP"
     $prefix = substr($kode, 0, 2);
 
-    // Ambil angka belakang
     $angka = substr($kode, 2);
 
-    // Gabungkan dengan tanda minus
     return $prefix . '-' . $angka;
 }
 ?>
@@ -140,12 +137,11 @@ function formatKode($kode) {
                                 var inputKode = $('#kode_produk');
                                 var msgBox = $('#error-kode-msg');
 
-                                // 1. EVENT SAAT KURSOR KELUAR (CEK KE SERVER)
+                                //EVENT SAAT KURSOR KELUAR 
                                 inputKode.on('blur', function() {
                                     var field = $(this);
                                     var kodeInput = field.val().trim();
 
-                                    // Reset dulu
                                     field.removeClass('is-invalid is-valid');
                                     msgBox.html('');
 
@@ -174,36 +170,35 @@ function formatKode($kode) {
                                                 // KODE SUDAH ADA -> KUNCI TOMBOL
                                                 field.addClass('is-invalid'); 
                                                 msgBox.html(response.message); 
-                                                btnSimpan.prop('disabled', true); // <--- INI SENGAJA DIKUNCI
+                                                btnSimpan.prop('disabled', true); 
                                             } else {
                                                 // KODE AMAN -> BUKA TOMBOL
                                                 field.addClass('is-valid'); 
                                                 
                                                 // Cek apakah kolom lain ada yang error? Kalau bersih, nyalakan tombol
                                                 if ($('.is-invalid').length === 0) {
-                                                    btnSimpan.prop('disabled', false); // <--- TOMBOL BISA DITEKAN
+                                                    btnSimpan.prop('disabled', false); 
                                                 }
                                             }
                                         },
                                         error: function() {
                                             btnSimpan.text('Simpan');
                                             field.addClass('is-invalid');
-                                            btnSimpan.prop('disabled', true); // Error koneksi = Kunci tombol
+                                            btnSimpan.prop('disabled', true);
                                         }
                                     });
                                 });
 
-                                // 2. EVENT SAAT MENGETIK ULANG (RESET TOMBOL)
-                                // Ini penting agar saat user hapus/edit, tombol langsung "Ready" lagi
+                                //EVENT SAAT MENGETIK ULANG (RESET TOMBOL)
+                               
                                 inputKode.on('input', function() {
                                     var field = $(this);
                                     
-                                    // Hapus warna merah/hijau saat ngetik
                                     field.removeClass('is-invalid is-valid');
                                     msgBox.html('');
 
                                     // Langsung nyalakan tombol saat user mulai memperbaiki input
-                                    // (Nanti akan dicek lagi saat user selesai ngetik/blur)
+                                    // Nanti  dicek lagi saat user selesai ngetik/blur
                                     if ($('.is-invalid').length === 0) {
                                         btnSimpan.prop('disabled', false);
                                         btnSimpan.text('Simpan');
@@ -406,10 +401,9 @@ function formatKode($kode) {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // --- FUNGSI VALIDASI FILE (Diluar document.ready agar bisa dipanggil HTML) ---
     function validasiFile(input) {
         const file = input.files[0];
-        const limit = 2 * 1024 * 1024; // 2MB
+        const limit = 2 * 1024 * 1024; 
 
         if (file) {
             if (file.size > limit) {
@@ -439,10 +433,10 @@ function formatKode($kode) {
     // --- DOCUMENT READY ---
     $(document).ready(function() {
         
-        // 1. Inisialisasi DataTable
+        // Inisialisasi DataTable
         $('#dataTableInventaris').DataTable();
 
-        // 2. SweetAlert untuk Tombol Hapus (.btn-hapus)
+        // SweetAlert untuk Tombol Hapus (.btn-hapus)
         // Gunakan 'body' on click agar tetap jalan meskipun di halaman 2 datatable
         $('body').on('click', '.btn-hapus', function(e) {
             e.preventDefault();
@@ -464,8 +458,7 @@ function formatKode($kode) {
             });
         });
 
-        // 3. AJAX Cek Kode Produk
-        // 3. AJAX Cek Kode Produk
+
 var csrfName = '<?= csrf_token() ?>';
 var csrfHash = '<?= csrf_hash() ?>';
 
@@ -494,13 +487,13 @@ $('#kode_produk').on('blur', function() {
             $('input[name="' + csrfName + '"]').val(csrfHash);
 
             if (response.status === 'taken') {
-                // Kode terpakai → merah
+                // Kode terpakai = merah
                 field.removeClass('is-valid').addClass('is-invalid');
                 msgBox.html('<strong class="text-danger">Kode sudah digunakan.</strong>');
                 $('button[type="submit"]').prop('disabled', true);
 
             } else {
-                // Kode tersedia → hijau + centang
+                // Kode tersedia = hijau + icon centang
                 field.removeClass('is-invalid').addClass('is-valid');
                 msgBox.html('<span class="text-success">Kode tersedia.</span>');
                 $('button[type="submit"]').prop('disabled', false);
@@ -513,21 +506,20 @@ $('#kode_produk').on('blur', function() {
 });
 
 
-        // Reset error saat ngetik ulang
         $('#kode_produk').on('input', function() {
             $(this).removeClass('is-invalid is-valid');
             $('#error-kode-msg').html('');
             $('button[type="submit"]').prop('disabled', false);
         });
 
-        // 4. Logika Modal Tambah/Edit
+        //  Tambah/Edit
         $('#btnTambahProduk').click(function() {
             $('#formProduk').attr('action', '<?= base_url('owner/manajemen_produk/store'); ?>');
             $('#modalProdukLabel').text('Tambah Produk Baru');
             $('#formProduk')[0].reset();
             $('#gambar-preview-container').hide();
             $('#gambar-label').text('Pilih gambar...');
-            $('#kode_produk').removeClass('is-invalid is-valid'); // Reset validasi visual
+            $('#kode_produk').removeClass('is-invalid is-valid'); 
         });
 
         $('.btn-edit').click(function() {
@@ -551,7 +543,6 @@ $('#kode_produk').on('blur', function() {
             $('#id_supplier').val(supplier);
             $('#tanggal_masuk').val(tanggal);
             
-            // Saat edit, hapus class valid/invalid sisa ajax sebelumnya
             $('#kode_produk').removeClass('is-invalid is-valid');
 
             if (gambar) {

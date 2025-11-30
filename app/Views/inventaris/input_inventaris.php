@@ -174,7 +174,7 @@
                                     var kodeInput = field.val();
                                     var msgBox = $('#error-kode-msg');
 
-                                    // Reset style dulu
+                                    
                                     field.removeClass('is-invalid is-valid');
                                     msgBox.html('');
                                     $('button[type="submit"]').prop('disabled', false);
@@ -187,14 +187,14 @@
                                         dataType: "json",
                                         data: {
                                             kode_produk: kodeInput,
-                                            [csrfName]: csrfHash // Gunakan variabel token dinamis
+                                            [csrfName]: csrfHash 
                                         },
                                         success: function(response) {
-                                            // 1. UPDATE TOKEN (PENTING!)
+                                            //  UPDATE TOKEN 
                                             csrfHash = response.token;
                                             $('input[name="' + csrfName + '"]').val(csrfHash);
 
-                                            // 2. PROSES LOGIKA TAMPILAN
+                                            // PROSES LOGIKA UI
                                             if (response.status === 'taken') {
                                                 field.addClass('is-invalid');
                                                 msgBox.html('<strong>Gagal!</strong> Kode sudah digunakan produk lain.');
@@ -203,7 +203,7 @@
                                                 field.addClass('is-valid');
                                                 msgBox.html('<span class="text-success">Kode tersedia.</span>');
 
-                                                // Cek apakah ada error lain (seperti harga) sebelum enable tombol
+                                                // cek apa ada error lain (seperti harga) sebelum enable tombol
                                                 if ($('.is-invalid').length === 0) {
                                                     $('button[type="submit"]').prop('disabled', false);
                                                 }
@@ -216,12 +216,12 @@
                                     });
                                 });
 
-                                // Hapus error saat user mulai mengetik ulang
+                                //  error hilang ketika user typing ulang
                                 $('#kode_produk').on('input', function() {
                                     $(this).removeClass('is-invalid is-valid');
                                     $('#error-kode-msg').html('');
 
-                                    // Cek error lain sebelum enable
+                                    // cek error lain sebelum enable tombol submit
                                     if ($('.is-invalid').length === 0) {
                                         $('button[type="submit"]').prop('disabled', false);
                                     }
@@ -416,13 +416,13 @@
                     <script>
                         function validasiFile(input) {
                             const file = input.files[0];
-                            const limit = 2 * 1024 * 1024; // 2MB
+                            const limit = 2 * 1024 * 1024;
 
                             if (file) {
-                                // Daftar tipe file yang diizinkan
+                                
                                 const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
 
-                                // --- Cek Ukuran File
+                                // validasi ukuran file
                                 if (file.size > limit) {
                                     Swal.fire({
                                         icon: 'error',
@@ -439,7 +439,7 @@
                                     return false;
                                 }
 
-                                // Jika lolos kedua validasi (Format & Ukuran)
+                                
                                 document.getElementById('gambar-label').innerHTML = file.name;
 
                                 const reader = new FileReader();

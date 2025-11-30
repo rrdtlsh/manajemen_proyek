@@ -9,11 +9,11 @@ class TransaksiSeeder extends Seeder
 {
     public function run()
     {
-        // Ambil ID Pelanggan & User yang ada
+        // ambil ID Pelanggan & User yang ada
         $pelangganIds = $this->db->table('pelanggan')->select('id_pelanggan')->get()->getResultArray();
         $userIds      = $this->db->table('user')->select('id_user')->get()->getResultArray();
         
-        // Ambil Produk (ID & Harga)
+        // ambil produk (ID & Harga)
         $produkList   = $this->db->table('produk')->select('id_produk, harga, stok')->get()->getResultArray();
 
         if (empty($pelangganIds) || empty($produkList)) {
@@ -25,18 +25,15 @@ class TransaksiSeeder extends Seeder
         $dataDetail    = [];
         $dataKeuangan  = [];
 
-        // Buat 20 Transaksi Acak dalam 1 bulan terakhir
+        // 20 transaksi random
         for ($i = 1; $i <= 20; $i++) {
             
-            // Random Tanggal (antara 30 hari lalu sampai hari ini)
             $randomDays = rand(0, 30);
             $tanggal    = Time::now()->subDays($randomDays)->toDateString();
             
-            // Random Pelanggan & User
             $idPelanggan = $pelangganIds[array_rand($pelangganIds)]['id_pelanggan'];
             $idUser      = $userIds[array_rand($userIds)]['id_user'] ?? 1; // Default admin id 1
 
-            // Tentukan barang yang dibeli (1 sampai 3 jenis barang)
             $jumlahJenisBarang = rand(1, 3);
             $totalTransaksi    = 0;
             $tempDetail        = [];
@@ -49,7 +46,6 @@ class TransaksiSeeder extends Seeder
 
                 $totalTransaksi += $subtotal;
 
-                // Simpan detail sementara (karena butuh id_penjualan nanti)
                 $tempDetail[] = [
                     'id_produk'    => $produk['id_produk'],
                     'qty'          => $qty,
@@ -57,7 +53,6 @@ class TransaksiSeeder extends Seeder
                 ];
             }
 
-            // Status Pembayaran (80% Lunas, 20% Belum Lunas/DP)
             $isLunas = (rand(1, 10) > 2); 
             $status  = $isLunas ? 'Lunas' : 'Belum Lunas';
             $metode  = (rand(1, 2) == 1) ? 'cash' : 'transfer';
@@ -67,7 +62,6 @@ class TransaksiSeeder extends Seeder
                 $dp = round($totalTransaksi * 0.3, -3); // DP 30%
             }
 
-            // 1. INSERT KE PENJUALAN
             $this->db->table('penjualan')->insert([
                 'tanggal'           => $tanggal,
                 'total'             => $totalTransaksi,
@@ -81,7 +75,6 @@ class TransaksiSeeder extends Seeder
 
             $idPenjualanBaru = $this->db->insertID();
 
-            // 2. SIAPKAN DETAIL PENJUALAN
             foreach ($tempDetail as $detail) {
                 $dataDetail[] = [
                     'id_penjualan' => $idPenjualanBaru,
@@ -91,7 +84,6 @@ class TransaksiSeeder extends Seeder
                 ];
             }
 
-            // 3. SIAPKAN KEUANGAN (PEMASUKAN)
             $uangMasuk = $isLunas ? $totalTransaksi : $dp;
             $dataKeuangan[] = [
                 'tanggal'     => $tanggal,
@@ -103,7 +95,6 @@ class TransaksiSeeder extends Seeder
             ];
         }
 
-        // Insert Batch Detail & Keuangan
         if (!empty($dataDetail)) {
             $this->db->table('detail_penjualan')->insertBatch($dataDetail);
         }

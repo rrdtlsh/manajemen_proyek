@@ -20,12 +20,11 @@
         font-weight: bold;
         color: #000;
     }
-    /* Badge Status */
+
     .badge-custom {
         font-size: 0.9rem;
         padding: 0.4em 0.8em;
     }
-    /* Form elemen dalam tabel */
     .status-select {
         border-radius: 5px 0 0 5px;
         border: 1px solid #d1d3e2;
@@ -34,11 +33,10 @@
     .btn-ubah {
         border-radius: 0 5px 5px 0;
     }
-    /* Tombol Aksi */
     .btn-action {
         width: 80px;
         margin-bottom: 5px;
-        display: block; /* Agar tombol turun ke bawah (stack) */
+        display: block; 
         font-size: 0.8rem;
         font-weight: bold;
     }
@@ -156,7 +154,6 @@
 
 <script>
     $(document).ready(function() {
-        // 1. Inisialisasi DataTable
         $('#dataTableRestok').DataTable({
             "language": {
                 "search": "Cari:",
@@ -173,8 +170,6 @@
             }
         });
 
-        // 2. Event Listener Tombol Hapus (Delegation untuk DataTables)
-        // Kita pakai $('body').on() supaya tombol di halaman 2, 3, dst tetap bisa diklik
         $('body').on('click', '.btn-hapus', function(e) {
             e.preventDefault();
             const href = $(this).attr('href');

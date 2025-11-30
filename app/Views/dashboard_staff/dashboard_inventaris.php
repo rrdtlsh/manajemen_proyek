@@ -13,7 +13,7 @@
 
 <?= $this->section('content') ?>
 
-<!-- GREETING -->
+<!-- greeting card -->
 <div class="card shadow-sm mb-4" style="border-left: 5px solid #2d8659;">
     <div class="card-body p-3">
         <div class="d-flex align-items-center">
@@ -28,7 +28,7 @@
     </div>
 </div>
 
-<!-- RINGKASAN HARI INI -->
+<!-- ringkasan hari ini -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold" style="color:#2d8659;">
@@ -42,7 +42,7 @@
     </div>
 </div>
 
-<!-- Grafik Stok 7 Hari -->
+<!-- grafik stok 7 hari kebelakang -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold" style="color:#2d8659;">
@@ -56,10 +56,10 @@
     </div>
 </div>
 
-<!-- DATA TERBARU -->
+<!-- data baru -->
 <div class="row">
 
-    <!-- PRODUK -->
+    <!-- produk -->
     <div class="col-md-4">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
@@ -80,7 +80,7 @@
         </div>
     </div>
 
-    <!-- RESTOK -->
+    <!-- restok -->
     <div class="col-md-4">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
@@ -101,7 +101,7 @@
         </div>
     </div>
 
-    <!-- SUPPLIER -->
+    <!-- supplier -->
     <div class="col-md-4">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
@@ -132,7 +132,7 @@
 
 <script>
     /* ================================
-   RINGKASAN HARI INI (BAR CHART)
+   ringkasan hari ini pakai bar chart
 ==================================*/
     const summaryChart = new Chart(document.getElementById('summaryChart'), {
         type: 'bar',
@@ -159,7 +159,7 @@
 
 
     /* ================================
-       GRAFIK STOK 7 HARI (LINE CHART)
+       grafik sotk 7 hari pakai line chart
     ==================================*/
     const stokChart = new Chart(document.getElementById('stokChart'), {
         type: 'line',

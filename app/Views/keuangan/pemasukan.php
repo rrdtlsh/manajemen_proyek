@@ -51,13 +51,12 @@
                 <tbody>
                     <?php foreach ($laporan as $item) : ?>
                         <?php 
-                            // Cek apakah keterangan mengandung format "Penjualan #ANGKA"
-                            // Kita gunakan Regex untuk mengambil ID Penjualan
+                        
                             $isPenjualan = false;
                             $idPenjualan = null;
                             if (preg_match('/Penjualan #(\d+)/i', $item['keterangan'], $matches)) {
                                 $isPenjualan = true;
-                                $idPenjualan = $matches[1]; // Mengambil angka ID
+                                $idPenjualan = $matches[1]; 
                             }
                         ?>
                         <tr>
@@ -145,17 +144,16 @@
             "order": [[ 0, "desc" ]] 
         });
 
-        // Event Listener untuk Tombol Detail
         $('.btn-detail').on('click', function() {
             var idPenjualan = $(this).data('id');
             
-            // Reset Modal
+            
             $('#modal-id-transaksi').text(idPenjualan);
             $('#modal-tbody').empty();
             $('#loading-spinner').show();
             $('#detail-content').hide();
 
-            // AJAX Request
+            
             $.ajax({
                 url: "<?= base_url('karyawan/keuangan/get_detail/'); ?>" + idPenjualan,
                 type: "GET",

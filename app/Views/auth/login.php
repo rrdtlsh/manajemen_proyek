@@ -64,13 +64,10 @@
 
     <?php if (session()->getFlashdata('error')) : ?>
         <script>
-            // Menunggu halaman siap
             window.onload = function() {
-                // 1. Mengosongkan field username dan password
                 document.getElementById('username').value = '';
                 document.getElementById('password').value = '';
 
-                // 2. Menampilkan pop-up alert biasa
                 alert("<?= session()->getFlashdata('error') ?>");
             };
         </script>
