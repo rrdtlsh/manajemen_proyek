@@ -7,6 +7,7 @@ use CodeIgniter\Database\RawSql;
 
 class CreateTabelRestok extends Migration
 {
+    protected $DBGroup = 'default';
     public function up()
     {
         $this->forge->addField([

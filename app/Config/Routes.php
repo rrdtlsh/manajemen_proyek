@@ -50,7 +50,7 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
         // Laporan
         $routes->get('laporan_penjualan', 'Owner::laporan_penjualan');
         $routes->get('laporan_keuangan', 'OwnerKeuanganController::index');
-        
+        $routes->get('download_transcript', 'Owner::download_transcript');
     });
 
 
@@ -131,3 +131,9 @@ $routes->group('/', ['filter' => 'auth'], static function ($routes) {
     $routes->get('keuangan/dashboard', 'KeuanganController::dashboard');
     
 });
+
+// Route Khusus CLI (Command Line Interface)
+$routes->cli('etl/produk', 'EtlController::process_produk');
+$routes->cli('etl/penjualan', 'EtlController::process_penjualan');
+$routes->cli('etl/pelanggan', 'EtlController::process_pelanggan');
+$routes->cli('etl/inventaris', 'EtlController::process_inventaris');

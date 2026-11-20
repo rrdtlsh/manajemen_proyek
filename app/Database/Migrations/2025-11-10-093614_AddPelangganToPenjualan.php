@@ -6,6 +6,7 @@ use CodeIgniter\Database\Migration;
 
 class AddPelangganToPenjualan extends Migration
 {
+    protected $DBGroup = 'default';
     public function up()
     {
         $fields = [

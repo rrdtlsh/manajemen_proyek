@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\laragon\www\manajemen_proyek\phpunit.xml.dist" tests="12" assertions="28" errors="0" failures="0" skipped="0" time="10.723248">
+    <testsuite name="App" tests="12" assertions="28" errors="0" failures="0" skipped="0" time="10.723248">
+      <testsuite name="App\Controllers\LoginTest" file="C:\laragon\www\manajemen_proyek\tests\app\Controllers\LoginTest.php" tests="3" assertions="15" errors="0" failures="0" skipped="0" time="9.702640">
+        <testcase name="testLoginSuccessKaryawan" file="C:\laragon\www\manajemen_proyek\tests\app\Controllers\LoginTest.php" line="18" class="App\Controllers\LoginTest" classname="App.Controllers.LoginTest" assertions="6" time="3.451204"/>
+        <testcase name="testLoginSuccessOwner" file="C:\laragon\www\manajemen_proyek\tests\app\Controllers\LoginTest.php" line="34" class="App\Controllers\LoginTest" classname="App.Controllers.LoginTest" assertions="4" time="3.125287"/>
+        <testcase name="testLoginFailWrongPassword" file="C:\laragon\www\manajemen_proyek\tests\app\Controllers\LoginTest.php" line="46" class="App\Controllers\LoginTest" classname="App.Controllers.LoginTest" assertions="5" time="3.126149"/>
+      </testsuite>
+      <testsuite name="App\Controllers\PenjualanAccessTest" file="C:\laragon\www\manajemen_proyek\tests\app\Controllers\PenjualanAccessTest.php" tests="2" assertions="4" errors="0" failures="0" skipped="0" time="0.117370">
+        <testcase name="testAccessWithoutLogin" file="C:\laragon\www\manajemen_proyek\tests\app\Controllers\PenjualanAccessTest.php" line="12" class="App\Controllers\PenjualanAccessTest" classname="App.Controllers.PenjualanAccessTest" assertions="2" time="0.042410"/>
+        <testcase name="testAccessWithSession" file="C:\laragon\www\manajemen_proyek\tests\app\Controllers\PenjualanAccessTest.php" line="21" class="App\Controllers\PenjualanAccessTest" classname="App.Controllers.PenjualanAccessTest" assertions="2" time="0.074961"/>
+      </testsuite>
+      <testsuite name="App\Models\ProdukModelTest" file="C:\laragon\www\manajemen_proyek\tests\app\Models\ProdukModelTest.php" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="0.044243">
+        <testcase name="testKurangiStok" file="C:\laragon\www\manajemen_proyek\tests\app\Models\ProdukModelTest.php" line="18" class="App\Models\ProdukModelTest" classname="App.Models.ProdukModelTest" assertions="1" time="0.026894"/>
+        <testcase name="testTambahStok" file="C:\laragon\www\manajemen_proyek\tests\app\Models\ProdukModelTest.php" line="39" class="App\Models\ProdukModelTest" classname="App.Models.ProdukModelTest" assertions="1" time="0.017349"/>
+      </testsuite>
+      <testsuite name="ExampleDatabaseTest" file="C:\laragon\www\manajemen_proyek\tests\database\ExampleDatabaseTest.php" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="0.832466">
+        <testcase name="testModelFindAll" file="C:\laragon\www\manajemen_proyek\tests\database\ExampleDatabaseTest.php" line="17" class="ExampleDatabaseTest" classname="ExampleDatabaseTest" assertions="1" time="0.724927"/>
+        <testcase name="testSoftDeleteLeavesRow" file="C:\laragon\www\manajemen_proyek\tests\database\ExampleDatabaseTest.php" line="28" class="ExampleDatabaseTest" classname="ExampleDatabaseTest" assertions="2" time="0.107539"/>
+      </testsuite>
+      <testsuite name="ExampleSessionTest" file="C:\laragon\www\manajemen_proyek\tests\session\ExampleSessionTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.005899">
+        <testcase name="testSessionSimple" file="C:\laragon\www\manajemen_proyek\tests\session\ExampleSessionTest.php" line="10" class="ExampleSessionTest" classname="ExampleSessionTest" assertions="1" time="0.005899"/>
+      </testsuite>
+      <testsuite name="HealthTest" file="C:\laragon\www\manajemen_proyek\tests\unit\HealthTest.php" tests="2" assertions="3" errors="0" failures="0" skipped="0" time="0.020629">
+        <testcase name="testIsDefinedAppPath" file="C:\laragon\www\manajemen_proyek\tests\unit\HealthTest.php" line="12" class="HealthTest" classname="HealthTest" assertions="1" time="0.006634"/>
+        <testcase name="testBaseUrlHasBeenSet" file="C:\laragon\www\manajemen_proyek\tests\unit\HealthTest.php" line="17" class="HealthTest" classname="HealthTest" assertions="2" time="0.013995"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

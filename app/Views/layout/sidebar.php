@@ -134,19 +134,14 @@ if (
             <li class="nav-item <?= (strpos($currentPath, 'owner') !== false && strpos($currentPath, 'laporan') === false && strpos($currentPath, 'manajemen') === false && strpos($currentPath, 'restok') === false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('owner'); ?>">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard Owner</span>
+                    <span>Dashboard Penjualan</span>
                 </a>
             </li>
-            <li class="nav-item <?= (strpos($currentPath, 'owner/laporan_penjualan') !== false) ? 'active' : ''; ?>">
-                <a class="nav-link" href="<?= base_url('owner/laporan_penjualan'); ?>">
-                    <i class="fas fa-fw fa-chart-line"></i>
-                    <span>Laporan Penjualan</span>
-                </a>
-            </li>
+      
             <li class="nav-item <?= (strpos($currentPath, 'owner/laporan_keuangan') !== false) ? 'active' : ''; ?>">
                 <a class="nav-link" href="<?= base_url('owner/laporan_keuangan'); ?>">
                     <i class="fas fa-fw fa-file-invoice-dollar"></i>
-                    <span>Laporan Keuangan</span>
+                    <span>Dashboard Keuangan</span>
                 </a>
             </li>
             <li class="nav-item <?= (strpos($currentPath, 'owner/manajemen_produk') !== false) ? 'active' : ''; ?>">

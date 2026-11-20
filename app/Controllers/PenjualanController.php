@@ -139,7 +139,6 @@ class PenjualanController extends BaseController
             $penjualanModel->insert($dataPenjualan);
             $idPenjualanBaru = $penjualanModel->getInsertID();
 
-            // Ambil error DB jika ada
             $dbError = $db->error();
 
             if ($idPenjualanBaru <= 0 || ($dbError && isset($dbError['code']) && $dbError['code'] != 0)) {
@@ -152,7 +151,6 @@ class PenjualanController extends BaseController
                 echo "\n\nDB Error:\n";
                 print_r($dbError);
                 echo "</pre>";
-                // pastikan transaksi di-rollback
                 $db->transRollback();
                 exit;
             }
@@ -208,7 +206,6 @@ class PenjualanController extends BaseController
 
             $db->transComplete();
 
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
             if ($statusBayarEnum === 'Lunas') {
                 return redirect()->to('/karyawan/input_penjualan')->with('success', 'Transaksi Lunas berhasil disimpan!');
             } else {
@@ -217,7 +214,6 @@ class PenjualanController extends BaseController
         } catch (\Exception $e) {
             $db->transRollback();
             log_message('error', 'Error di store_penjualan: ' . $e->getMessage() . ' - File: ' . $e->getFile() . ' - Line: ' . $e->getLine());
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
             return redirect()->to('/karyawan/input_penjualan')->with('error', 'Error: ' . $e->getMessage());
         }
     }
@@ -235,19 +231,14 @@ class PenjualanController extends BaseController
 
         $penjualan = $penjualanModel->find($id_penjualan);
 
-        // *** LOGIKA BARU: Hitung Sisa Tagihan ***
         $total_tagihan = (float) $penjualan['total'];
-        // total_dp adalah total yang sudah dibayar sejauh ini
         $sudah_dibayar = (float) $penjualan['jumlah_dp']; 
         $sisa_tagihan = $total_tagihan - $sudah_dibayar;
-        // *** AKHIR LOGIKA BARU ***
 
         if (!$penjualan) {
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
             return redirect()->to('karyawan/riwayat_penjualan')->with('error', 'Transaksi tidak ditemukan.');
         }
         if ($penjualan['status_pembayaran'] == 'Lunas') {
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
             return redirect()->to('karyawan/riwayat_penjualan')->with('error', 'Transaksi yang sudah lunas tidak dapat diedit.');
         }
 
@@ -305,7 +296,6 @@ class PenjualanController extends BaseController
         $cart_items_json = $this->request->getPost('cart_items');
         $cart_items = json_decode($cart_items_json, true);
         
-        // Ini adalah total belanja BARU (hasil kalkulasi JS jika cart diubah)
         $total_belanja_baru = (float) $this->request->getPost('total'); 
         
         $jumlah_pelunasan_baru = ($this->request->getPost('jumlah_dp') ?? 0);
@@ -342,55 +332,49 @@ class PenjualanController extends BaseController
         $sudah_dibayar_sebelumnya = (float) $penjualan['jumlah_dp'];
 
         // 3. Kalkulasi status pembayaran baru
-        // Total yg sudah dibayar = (Lama + Baru)
         $total_dibayar_sekarang = $sudah_dibayar_sebelumnya + $jumlah_pelunasan_baru;
         
-        $statusBayarEnum = 'Belum Lunas';
-        // Sisa tagihan = Total Belanja BARU - Total yg SUDAH DIBAYAR (Lama + Baru)
+        $statusEnum = 'belum_lunas';       
+        $statusDisplay = 'Belum Lunas';    
+
         $sisa_tagihan_baru = $total_belanja_baru - $total_dibayar_sekarang;
 
-        // Cek LUNAS. Kita beri toleransi 1 (untuk pembulatan)
+        // Cek LUNAS
         if ($sisa_tagihan_baru <= 1) { 
-            $statusBayarEnum = 'Lunas';
+            $statusEnum = 'lunas';      
+            $statusDisplay = 'Lunas';   
             
-            // Jika lunas, pastikan pembayaran baru sesuai
-            // Jika Sisa 500.000, tapi user input 600.000, kita anggap dia bayar 500.000
+            // Logika pencegahan lebih bayar
             $sisa_seharusnya = $total_belanja_baru - $sudah_dibayar_sebelumnya;
             if ($jumlah_pelunasan_baru > $sisa_seharusnya) {
-                $jumlah_pelunasan_baru = $sisa_seharusnya; // Catat pelunasan yg benar
+                $jumlah_pelunasan_baru = $sisa_seharusnya; 
             }
-             // Jika status lunas, total yg dibayar jadi pas
             $total_dibayar_sekarang = $total_belanja_baru;
         }
 
-        // 4. Validasi
-
-
+        // 4. Validasi Logic
         if ($jumlah_pelunasan_baru < 0) {
             return redirect()->back()->withInput()->with('error', 'Jumlah pelunasan tidak boleh negatif.');
         }
-        // Cek jika total baru lebih kecil dari yg sudah dibayar
         if ($total_belanja_baru < $sudah_dibayar_sebelumnya) {
-            return redirect()->back()->withInput()->with('error', 'Error: Total belanja baru (Rp '.number_format($total_belanja_baru).') tidak boleh lebih kecil dari yang sudah dibayar (Rp '.number_format($sudah_dibayar_sebelumnya).').');
+            return redirect()->back()->withInput()->with('error', 'Error: Total belanja baru tidak boleh lebih kecil dari yang sudah dibayar.');
         }
         if (empty($cart_items) || $cart_items == '[]') {
             return redirect()->back()->withInput()->with('error', 'Keranjang tidak boleh kosong.');
         }
 
-        // *** LOGIKA BARU SELESAI ***
-
         $db->transStart();
 
-        // (Logika pengembalian stok lama - INI SUDAH BENAR)
+        // (Logika Stok: Kembalikan Stok Lama)
         $old_details = $detailModel->where('id_penjualan', $id_penjualan)->findAll();
         foreach ($old_details as $item) {
             $produkModel->tambahStok($item['id_produk'], $item['qty']);
         }
 
-        // (Logika hapus detail lama - INI SUDAH BENAR)
+        // (Logika Stok: Hapus Detail Lama)
         $detailModel->where('id_penjualan', $id_penjualan)->delete();
 
-        // (Logika insert detail baru & kurangi stok - INI SUDAH BENAR)
+        // (Logika Stok: Insert Detail Baru & Kurangi Stok)
         $dataDetailBatch = [];
         foreach ($cart_items as $item) {
             $qty = (int)($item['qty'] ?? 0);
@@ -407,52 +391,48 @@ class PenjualanController extends BaseController
         }
         if (!empty($dataDetailBatch)) {
             $detailModel->insertBatch($dataDetailBatch);
-            // (Error checking... sudah ada)
              if ($db->error()['code'] != 0) {
-                // ... (kode error check Anda) ...
                 exit;
             }
         }
 
-        // *** MODIFIKASI UPDATE TABEL PENJUALAN ***
         $penjualanModel->update($id_penjualan, [
             'tanggal'           => $tanggal_form,
             'id_pelanggan'      => $id_pelanggan_form,
-            'total'             => $total_belanja_baru, // Total belanja baru
-            'status_pembayaran' => $statusBayarEnum,    // Status baru (Lunas/Belum Lunas)
+            'total'             => $total_belanja_baru, 
             'metode_pembayaran' => $metode_bayar_form,
-            // Simpan total yg sudah dibayar (Lama + Baru)
-            'jumlah_dp'         => ($statusBayarEnum == 'Lunas') ? 0 : $total_dibayar_sekarang, 
+            
+            // Cek variabel $statusEnum (bukan statusBayarEnum)
+            'jumlah_dp'         => ($statusEnum == 'lunas') ? 0 : $total_dibayar_sekarang, 
+            
+            'status_bayar'      => $statusEnum,     // Masuk: 'lunas' atau 'belum_lunas'
+            'status_pembayaran' => $statusDisplay,  // Masuk: 'Lunas' atau 'Belum Lunas'
+            
         ]);
 
         if ($jumlah_pelunasan_baru > 0) {
-            
             // Tentukan Tipe Pemasukan
             $tipeKeuangan = 'Pelunasan';
-            if ($statusBayarEnum == 'Lunas') {
+            if ($statusEnum == 'lunas') {
                  $tipeKeuangan = ($sudah_dibayar_sebelumnya > 0) ? 'Pelunasan' : 'Pemasukan';
             }
 
             $keuanganModel->insert([
                 'tanggal'     => $tanggal_form,
-                // Keterangan diubah agar jelas ini pelunasan
                 'keterangan'  => 'Pelunasan Transaksi #' . $id_penjualan, 
-                'pemasukan'   => $jumlah_pelunasan_baru, // Catat HANYA pembayaran baru
+                'pemasukan'   => $jumlah_pelunasan_baru, 
                 'pengeluaran' => 0,
                 'tipe'        => $tipeKeuangan,
                 'id_user'     => session()->get('user_id')
             ]);
         }
         
-        // *** SELESAI MODIFIKASI KEUANGAN ***
-
         $db->transComplete();
 
         if ($db->transStatus() === false) {
             return redirect()->back()->withInput()->with('error', 'Gagal memperbarui transaksi.');
         }
 
-        // [PERBAIKAN] Redirect ke rute 'karyawan/'
         return redirect()->to('karyawan/riwayat_penjualan')->with('success', 'Transaksi #' . $id_penjualan . ' berhasil diperbarui.');
     }
 
@@ -481,7 +461,6 @@ class PenjualanController extends BaseController
 
         $penjualan = $penjualanModel->find($id_penjualan);
         if (!$penjualan) {
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
             return redirect()->to('karyawan/riwayat_penjualan')->with('error', 'Transaksi tidak ditemukan.');
         }
 
@@ -492,8 +471,6 @@ class PenjualanController extends BaseController
             $old_details = $detailModel->where('id_penjualan', $id_penjualan)->findAll();
 
             foreach ($old_details as $item) {
-                // [PERBAIKAN] Panggil fungsi tambahStok dari ProdukModel
-                // Pastikan fungsi ini ada di ProdukModel Anda
                 $produkModel->tambahStok($item['id_produk'], $item['qty']);
             }
 
@@ -504,15 +481,12 @@ class PenjualanController extends BaseController
             $db->transComplete();
 
             if ($db->transStatus() === false) {
-                // [PERBAIKAN] Redirect ke rute 'karyawan/'
                 return redirect()->to('karyawan/riwayat_penjualan')->with('error', 'Gagal menghapus data transaksi.');
             }
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
             return redirect()->to('karyawan/riwayat_penjualan')->with('success', 'Transaksi #' . $id_penjualan . ' berhasil dihapus dan stok telah dikembalikan.');
         } catch (\Exception $e) {
             $db->transRollback();
             log_message('error', '[DELETE_PENJUALAN] ' . $e->getMessage());
-            // [PERBAIKAN] Redirect ke rute 'karyawan/'
             return redirect()->to('karyawan/riwayat_penjualan')->with('error', 'Terjadi kesalahan server saat menghapus transaksi.');
         }
     }

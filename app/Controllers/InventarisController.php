@@ -86,6 +86,7 @@ class InventarisController extends BaseController
     {
         $produkModel = new \App\Models\ProdukModel();
 
+        //governor (tata kelola data)
         $rules = [
             'kode_produk'   => 'required|is_unique[produk.kode_produk]|alpha_numeric|max_length[10]',
             'nama_produk'   => 'required|max_length[20]',

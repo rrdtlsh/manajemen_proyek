@@ -51,6 +51,26 @@ class Database extends Config
         ],
     ];
 
+    public array $dwh = [
+        'DSN'          => '',
+        'hostname'     => 'localhost',
+        'username'     => 'root',             // Sesuaikan user
+        'password'     => '',                 // Sesuaikan password
+        'database'     => 'db_warehouse_thj', // Buat database baru ini di HeidiSQL
+        'DBDriver'     => 'MySQLi',
+        'DBPrefix'     => '',
+        'pConnect'     => false,
+        'DBDebug'      => true,
+        'charset'      => 'utf8mb4',
+        'DBCollat'     => 'utf8mb4_general_ci',
+        'swapPre'      => '',
+        'encrypt'      => false,
+        'compress'     => false,
+        'strictOn'     => false,
+        'failover'     => [],
+        'port'         => 3306,
+    ];
+
     //    /**
     //     * Sample database connection for SQLite3.
     //     *

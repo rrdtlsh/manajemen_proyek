@@ -2,230 +2,213 @@
 
 namespace App\Controllers;
 
-use App\Models\PenjualanModel;
+use App\Models\Dwh\FactPenjualanModel;
+use App\Models\Dwh\FactInventarisModel;
 use App\Models\ProdukModel;
-use App\Models\PelangganModel;
-use App\Models\DetailPenjualanModel;
-use App\Models\KeuanganModel;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class Owner extends BaseController
 {
-    protected $penjualanModel;
+    protected $factPenjualan;
+    protected $factInventaris;
     protected $produkModel;
-    protected $pelangganModel;
-    protected $detailPenjualanModel;
-    protected $keuanganModel;
 
     public function __construct()
     {
-        $this->penjualanModel = new PenjualanModel();
-        $this->produkModel = new ProdukModel();
-        $this->pelangganModel = new PelangganModel();
-        $this->detailPenjualanModel = new DetailPenjualanModel();
-        $this->keuanganModel = new KeuanganModel();
-        helper('number');
+        // 1. Load Model DWH (Untuk Analisis Historis & Tren)
+        $this->factPenjualan  = new FactPenjualanModel();
+        $this->factInventaris = new FactInventarisModel();
+        
+        // 2. Load Model Operasional (Hanya untuk Cek Stok Real-time hari ini)
+        $this->produkModel    = new ProdukModel(); 
+        
+        helper(['number', 'form']);
     }
 
-    // Fungsi Helper untuk Menghitung Pertumbuhan (%)
-    private function calculateGrowth($current, $previous)
-    {
-        if ($previous == 0) {
-            return $current > 0 ? 100 : 0;
-        }
-        return (($current - $previous) / $previous) * 100;
-    }
-
-    public function laporan_penjualan()
-    {
-        $data = [
-            'title' => 'Laporan Riwayat Penjualan',
-            'penjualan' => $this->penjualanModel
-                ->select('penjualan.*, pelanggan.nama_pelanggan')
-                ->join('pelanggan', 'pelanggan.id_pelanggan = penjualan.id_pelanggan', 'left')
-                ->orderBy('penjualan.tanggal', 'DESC')
-                ->orderBy('penjualan.id_penjualan', 'DESC')
-                ->findAll()
-        ];
-
-        return view('owner/laporan_penjualan', $data);
-    }
     public function index()
     {
-        // =================================================================
-        // 1. KPI UTAMA & PERTUMBUHAN (GROWTH)
-        // =================================================================
-        
-        $bulanIni = date('m');
-        $tahunIni = date('Y');
+        // --- A. PERSIAPAN WAKTU ---
+        $bulanIni  = date('m');
+        $tahunIni  = date('Y');
         $bulanLalu = date('m', strtotime('-1 month'));
-        $tahunLalu = date('Y', strtotime('-1 month'));
+        $tahunLalu = date('Y', strtotime('-1 month')); // Handle jika Januari (kembali ke Des tahun lalu)
 
-        // --- PENDAPATAN ---
-        // Bulan Ini
-        $pendapatanRow = $this->keuanganModel->selectSum('pemasukan')
-            ->where('tipe', 'pemasukan')
-            ->where('MONTH(tanggal)', $bulanIni)
-            ->where('YEAR(tanggal)', $tahunIni)
-            ->get()->getRow();
-        // FIXED: Pastikan float dan handle null
-        $totalPendapatan = ($pendapatanRow && $pendapatanRow->pemasukan !== null) ? (float)$pendapatanRow->pemasukan : 0.0;
+        // --- B. AMBIL KPI UTAMA DARI DWH (Sangat Cepat) ---
+        // Menggunakan method getKpiBulanan yang sudah kita buat di Model DWH
+        $kpiNow  = $this->factPenjualan->getKpiBulanan($bulanIni, $tahunIni);
+        $kpiLast = $this->factPenjualan->getKpiBulanan($bulanLalu, $tahunLalu);
 
-        // Bulan Lalu
-        $pendapatanLaluRow = $this->keuanganModel->selectSum('pemasukan')
-            ->where('tipe', 'pemasukan')
-            ->where('MONTH(tanggal)', $bulanLalu)
-            ->where('YEAR(tanggal)', $tahunLalu)
-            ->get()->getRow();
-        $totalPendapatanLalu = ($pendapatanLaluRow && $pendapatanLaluRow->pemasukan !== null) ? (float)$pendapatanLaluRow->pemasukan : 0.0;
-
-        // Hitung Growth Pendapatan
-        $pendapatanGrowth = $this->calculateGrowth($totalPendapatan, $totalPendapatanLalu);
-
-
-        // --- PENGELUARAN ---
-        // Bulan Ini
-        $pengeluaranRow = $this->keuanganModel->selectSum('pengeluaran')
-            ->where('tipe', 'pengeluaran')
-            ->where('MONTH(tanggal)', $bulanIni)
-            ->where('YEAR(tanggal)', $tahunIni)
-            ->get()->getRow();
-        // FIXED: Pastikan float dan handle null
-        $totalPengeluaran = ($pengeluaranRow && $pengeluaranRow->pengeluaran !== null) ? (float)$pengeluaranRow->pengeluaran : 0.0;
-
-        // Bulan Lalu
-        $pengeluaranLaluRow = $this->keuanganModel->selectSum('pengeluaran')
-            ->where('tipe', 'pengeluaran')
-            ->where('MONTH(tanggal)', $bulanLalu)
-            ->where('YEAR(tanggal)', $tahunLalu)
-            ->get()->getRow();
-        $totalPengeluaranLalu = ($pengeluaranLaluRow && $pengeluaranLaluRow->pengeluaran !== null) ? (float)$pengeluaranLaluRow->pengeluaran : 0.0;
-
-        // Hitung Growth Pengeluaran
-        $pengeluaranGrowth = $this->calculateGrowth($totalPengeluaran, $totalPengeluaranLalu);
-
-
-        // --- KEUNTUNGAN & LAINNYA ---
-        $keuntunganBersih = $totalPendapatan - $totalPengeluaran;
-        $totalPenjualan = $this->penjualanModel->countAllResults(); // Total sepanjang masa
-        $totalProduk = $this->produkModel->countAllResults();
-        $totalPelanggan = $this->pelangganModel->countAllResults();
-
-
-        // =================================================================
-        // 2. DATA GRAFIK & INSIGHT UTAMA
-        // =================================================================
-
-        // Grafik 1: Tren Penjualan
-        $salesChartData = $this->penjualanModel
-            ->select("DATE(tanggal) as tanggal, COUNT(id_penjualan) as jumlah")
-            ->where('tanggal >=', date('Y-m-d', strtotime('-7 days')))
-            ->groupBy("DATE(tanggal)")
-            ->orderBy("DATE(tanggal)", "ASC")
-            ->findAll();
-
-        // Grafik 2: Produk Terlaris
-        $topProductsData = $this->detailPenjualanModel
-            ->select("produk.nama_produk, SUM(detail_penjualan.qty) as total_terjual")
-            ->join("produk", "produk.id_produk = detail_penjualan.id_produk")
-            ->groupBy("produk.id_produk")
-            ->orderBy("total_terjual", "DESC")
-            ->limit(5)
-            ->findAll();
-
-        // Grafik 3: Pendapatan Kategori (SAFE MODE - Hitung Manual)
-        // Menggunakan left join dan hitung (qty * harga) karena kolom subtotal tdk ada
-        $categorySalesData = $this->detailPenjualanModel
-            ->select('kategori.nama_kategori, SUM(detail_penjualan.qty * detail_penjualan.harga_satuan) as total_pendapatan')
-            ->join('produk', 'produk.id_produk = detail_penjualan.id_produk')
-            ->join('kategori', 'kategori.id_kategori = produk.id_kategori', 'left')
-            ->groupBy('kategori.nama_kategori')
-            ->orderBy('total_pendapatan', 'DESC')
-            ->limit(5)
-            ->findAll();
-            
-        // Sanitasi data
-        foreach ($categorySalesData as &$cat) {
-            if (empty($cat['nama_kategori'])) { $cat['nama_kategori'] = 'Lainnya'; }
-            $cat['total_pendapatan'] = (float)$cat['total_pendapatan']; 
+        // Sanitasi nilai null jika belum ada penjualan
+        $pendapatan     = $kpiNow['pendapatan'] ?? 0;
+        $keuntungan     = $kpiNow['keuntungan'] ?? 0;
+        $totalTransaksi = $kpiNow['total_transaksi'] ?? 0; // Pastikan query di model ada COUNT(id)
+        
+        // --- C. HITUNG PERTUMBUHAN (GROWTH) ---
+        $pendapatanLalu = $kpiLast['pendapatan'] ?? 0;
+        $growthPendapatan = 0;
+        
+        if ($pendapatanLalu > 0) {
+            $growthPendapatan = (($pendapatan - $pendapatanLalu) / $pendapatanLalu) * 100;
+        } elseif ($pendapatan > 0) {
+            $growthPendapatan = 100; // Dari 0 ke ada nilai = 100%
         }
 
-        // Insight 4: Stok Menipis
-        $lowStockProducts = $this->produkModel
-            ->select('produk.nama_produk, produk.stok, kategori.nama_kategori')
+        // --- D. DATA UNTUK GRAFIK (DARI DWH) ---
+        
+        // 1. Tren Penjualan Harian
+        $rawTren = $this->factPenjualan->getTrenPenjualan(7);
+        $trenHarian = array_reverse($rawTren); // <-- SOLUSI: Balik urutan agar Masa Lalu -> Hari Ini
+        // 2. Top Produk
+        $topProduk = $this->factPenjualan->getTopProduk(5);
+
+        // 3. Kategori (Perlu method baru di FactPenjualanModel, atau gunakan query builder DWH disini)
+        // Kita asumsikan Anda menambahkan method getPendapatanKategori() di FactPenjualanModel
+        // Atau kita query manual DWH disini untuk contoh
+        $dbDwh = \Config\Database::connect('dwh');
+        $kategoriData = $dbDwh->table('fact_penjualan fp')
+            ->select('dp.kategori, SUM(fp.total_omzet) as total_pendapatan')
+            ->join('dim_produk dp', 'dp.sk_produk = fp.sk_produk')
+            ->groupBy('dp.kategori')
+            ->orderBy('total_pendapatan', 'DESC')
+            ->limit(5)
+            ->get()->getResultArray();
+
+        // --- E. DATA OPERASIONAL & ANALISIS STOK ---
+        
+        // 1. Stok Menipis (Tetap ambil dari OLTP agar Real-time saat ini juga)
+        $lowStock = $this->produkModel
+            // Perbaikan: Select 'nama_kategori', lalu di-alias jadi 'kategori'
+            ->select('produk.nama_produk, produk.stok, produk.kode_produk') 
             ->join('kategori', 'kategori.id_kategori = produk.id_kategori', 'left')
             ->where('produk.stok <', 10)
+            ->where('produk.stok >', 0)
             ->orderBy('produk.stok', 'ASC')
             ->limit(5)
             ->findAll();
 
-        // Insight 5: Metode Pembayaran
-        $paymentMethodData = $this->penjualanModel
-            ->select('metode_pembayaran, COUNT(id_penjualan) as jumlah')
-            ->where('metode_pembayaran !=', '') 
-            ->groupBy('metode_pembayaran')
-            ->orderBy('jumlah', 'DESC')
-            ->findAll();
-
-        // Insight 6: Top Pelanggan
-        $topCustomers = $this->penjualanModel
-            ->select('pelanggan.nama_pelanggan, COUNT(penjualan.id_penjualan) as total_transaksi, SUM(penjualan.total) as total_belanja')
-            ->join('pelanggan', 'pelanggan.id_pelanggan = penjualan.id_pelanggan', 'left')
-            ->where('penjualan.id_pelanggan !=', null)
-            ->groupBy('penjualan.id_pelanggan')
-            ->orderBy('total_belanja', 'DESC')
-            ->limit(5)
-            ->findAll();
-
-        // --- 3. DEAD STOCK ANALYSIS (BARU) ---
-        // Logika: Cari produk yg stok > 0 TAPI id_produknya TIDAK ADA di transaksi 90 hari terakhir
+        // 2. Dead Stock (Barang Mengendap > 90 Hari)
+        // Menggunakan logika DWH FactInventaris
+        $deadStock = $this->factInventaris->getDeadStock(90);
         
-        // Subquery: Ambil ID produk yang TERJUAL dalam 90 hari terakhir
-        $db = \Config\Database::connect();
-        $subQuery = $db->table('detail_penjualan')
-                       ->select('id_produk')
-                       ->join('penjualan', 'penjualan.id_penjualan = detail_penjualan.id_penjualan')
-                       ->where('penjualan.tanggal >=', date('Y-m-d', strtotime('-90 days')))
-                       ->groupBy('id_produk')
-                       ->getCompiledSelect();
-
-        // Query Utama: Produk yg stok > 0 DAN id_produk NOT IN (Subquery)
-        $deadStock = $this->produkModel
-            ->select('produk.nama_produk, produk.stok, produk.harga as harga_jual, kategori.nama_kategori')
-            ->join('kategori', 'kategori.id_kategori = produk.id_kategori', 'left')
-            ->where('produk.stok >', 0)
-            ->where("produk.id_produk NOT IN ($subQuery)", null, false) // false agar tidak di-escape
-            ->limit(5)
-            ->findAll();
-
-
-        // =================================================================
-        // 4. PACKING DATA
-        // =================================================================
-
+        // HYDRATION: Tambal data yang kosong dengan data Toko (OLTP)
+        if (!empty($deadStock)) {
+            foreach ($deadStock as &$item) {
+                // Cari produk asli di database toko
+                $produkAsli = $this->produkModel->find($item['id_produk_sumber']);
+                
+                if ($produkAsli) {
+                    // 1. Ambil STOK Real-time (Wajib)
+                    $item['stok'] = $produkAsli['stok']; 
+                    
+                    // 2. Ambil HARGA Real-time (Jika di DWH 0)
+                    // Pastikan dikonversi ke float agar bisa dihitung matematikanya
+                    $hargaDwh = (float) $item['harga_jual'];
+                    if ($hargaDwh <= 0) {
+                        $item['harga_jual'] = (float) $produkAsli['harga'];
+                    }
+                    
+                    // 3. Pastikan Kode Produk ada
+                    if (empty($item['kode_produk'])) {
+                        $item['kode_produk'] = $produkAsli['kode_produk'];
+                    }
+                } else {
+                    $item['stok'] = 0;
+                }
+            }
+            unset($item); 
+        }
+        // 3. Tren Pergerakan Stok (Masuk vs Keluar)
+        $rawStok = $this->factInventaris->getPergerakanStok(7);
+        $trenStok = array_reverse($rawStok);
+        // --- F. PACKING DATA KE VIEW ---
         $data = [
-            'title'             => 'Dashboard Owner',
+            'title'            => 'Dashboard Owner (DWH)',
+            'totalPendapatan'  => $pendapatan,
+            'totalPengeluaran' => 0, // DWH Penjualan biasanya tidak catat pengeluaran listrik/gaji, bisa ambil dari OLTP Keuangan jika perlu
+            'keuntunganBersih' => $keuntungan,
+            'totalPenjualan'   => $totalTransaksi, // Jumlah bon/transaksi
+            'pendapatanGrowth' => $growthPendapatan,
+            'pengeluaranGrowth'=> 0, // Opsional
             
-            'totalPenjualan'    => $totalPenjualan,
-            'totalPendapatan'   => $totalPendapatan,
-            'totalPengeluaran'  => $totalPengeluaran,
-            'keuntunganBersih'  => $keuntunganBersih,
-            
-            // Data Pertumbuhan (Growth) untuk View
-            'pendapatanGrowth'  => $pendapatanGrowth,
-            'pengeluaranGrowth' => $pengeluaranGrowth,
+            'lowStockProducts' => $lowStock,
+            'deadStock'        => $deadStock,
+            'topCustomers'     => $this->factPenjualan->getTopPelanggan(5), // Bisa ditambahkan query DWH DimPembeli jika mau
 
-            'totalProduk'       => $totalProduk,
-            'totalPelanggan'    => $totalPelanggan,
-            'lowStockProducts'  => $lowStockProducts,
-            'topCustomers'      => $topCustomers,
-            'deadStock'         => $deadStock, // Variabel baru dikirim
-            
-            'salesChartData'    => json_encode($salesChartData),
-            'topProductsData'   => json_encode($topProductsData),
-            'categorySalesData' => json_encode($categorySalesData),
-            'paymentMethodData' => json_encode($paymentMethodData)
+            'errorRate'      => count($deadStock),
+
+            // Data JSON untuk chart.js
+            'salesChartData'    => json_encode($trenHarian),
+            'topProductsData'   => json_encode($topProduk),
+            'categorySalesData' => json_encode($kategoriData),
+            'stockMovementData' => json_encode($trenStok),
+            'paymentMethodData' => json_encode($this->factPenjualan->getMetodePembayaran()) // Bisa query ke DWH FactPenjualan group by status_pembayaran
         ];
 
         return view('owner/dashboardowner', $data);
+    }
+
+
+    public function download_transcript()
+    {
+        // 1. SIAPKAN DATA (Sama seperti Dashboard)
+        $bulanIni  = date('m');
+        $tahunIni  = date('Y');
+        
+        $kpiNow  = $this->factPenjualan->getKpiBulanan($bulanIni, $tahunIni);
+        
+        // Data Stok Menipis (Real-time)
+        $lowStock = $this->produkModel
+            ->select('produk.nama_produk, produk.stok, produk.kode_produk') 
+            ->join('kategori', 'kategori.id_kategori = produk.id_kategori', 'left')
+            ->where('produk.stok <', 10)
+            ->where('produk.stok >', 0)
+            ->orderBy('produk.stok', 'ASC')
+            ->findAll();
+
+        // Data Dead Stock (Analisis DWH)
+        $deadStock = $this->factInventaris->getDeadStock(90);
+        // Hydration data deadstock (sama seperti di index)
+        if (!empty($deadStock)) {
+            foreach ($deadStock as &$item) {
+                $produkAsli = $this->produkModel->find($item['id_produk_sumber']);
+                if ($produkAsli) {
+                    $item['stok'] = $produkAsli['stok']; 
+                    $hargaDwh = (float) $item['harga_jual'];
+                    if ($hargaDwh <= 0) $item['harga_jual'] = (float) $produkAsli['harga'];
+                    if (empty($item['kode_produk'])) $item['kode_produk'] = $produkAsli['kode_produk'];
+                } else {
+                    $item['stok'] = 0;
+                }
+            }
+            unset($item);
+        }
+
+        $data = [
+            'title'            => 'Transkrip Status Toko',
+            'periode'          => date('F Y'),
+            'totalPendapatan'  => $kpiNow['pendapatan'] ?? 0,
+            'keuntunganBersih' => $kpiNow['keuntungan'] ?? 0,
+            'totalTransaksi'   => $kpiNow['total_transaksi'] ?? 0,
+            'lowStock'         => $lowStock,
+            'deadStock'        => $deadStock,
+            'topCustomers'     => $this->factPenjualan->getTopPelanggan(10), // Ambil Top 10 untuk laporan
+            'topProducts'      => $this->factPenjualan->getTopProduk(10)
+        ];
+
+        // 2. RENDER VIEW KE PDF
+        $html = view('owner/pdf_transcript', $data);
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true); // Agar bisa load gambar/logo jika ada
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // 3. DOWNLOAD FILE
+        $filename = 'Transkrip_Status_Toko_' . date('Y_m') . '.pdf';
+        $dompdf->stream($filename, ["Attachment" => true]);
     }
 }

@@ -37,7 +37,7 @@ class AuthFilter implements FilterInterface
                 // Tentukan dashboard default untuk role ini
                 $role = strtolower($userRole);
                 $redirectURL = '/'; // Halaman default
-
+                //Role base access control (RBAC)
                 if ($role == 'owner' || $role == 'pemilik') {
                     $redirectURL = '/owner';
                 } elseif ($role == 'penjualan') {
